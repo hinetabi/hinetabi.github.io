@@ -10,21 +10,28 @@
     :root {
       --bg: #fafaf8; --bg-secondary: #f1efea; --bg-card: #ffffff;
       --text-primary: #1a1a18; --text-secondary: #6b6b67;
-      --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
+      --border: rgba(0,0,0,0.09); --border-hover: rgba(0,0,0,0.18);
       --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
-      --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
+      --amber: #F59E0B; --amber-bg: #FEF3C7; --amber-text: #92400E;
+      --red: #EF4444; --red-bg: #FEE2E2; --red-text: #991B1B;
+      --radius-sm: 5px; --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px;
+      --transition: 0.22s ease;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
     }
     body.dark {
-      --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1c1c1a;
+      --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1e1e1c;
       --text-primary: #f0ede6; --text-secondary: #888780;
-      --border: rgba(255,255,255,0.09); --border-hover: rgba(255,255,255,0.18);
+      --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.16);
+      --green-bg: rgba(29,158,117,0.12); --green-text: #6ee9c0;
+      --amber-bg: rgba(245,158,11,0.12); --amber-text: #fcd34d;
+      --red-bg: rgba(239,68,68,0.12); --red-text: #fca5a5;
     }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
-    .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+    .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 6rem; }
     nav { display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 0; border-bottom: 0.5px solid var(--border); margin-bottom: 3.5rem; }
     .nav-left { display: flex; align-items: center; gap: 1rem; }
     .nav-logo { font-size: 15px; font-weight: 500; color: var(--text-primary); font-family: 'DM Mono', monospace; text-decoration: none; }
-    .toggle-btn { font-size: 13px; font-family: 'DM Sans', sans-serif; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background var(--transition), border-color var(--transition); }
+    .toggle-btn { font-size: 13px; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: border-color var(--transition); }
     .toggle-btn:hover { border-color: var(--green); }
     .back-link { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
     .back-link:hover { color: var(--text-primary); }
@@ -34,52 +41,69 @@
     .post-title { font-size: 30px; font-weight: 500; color: var(--text-primary); line-height: 1.25; letter-spacing: -0.5px; margin-bottom: 0.85rem; }
     .post-meta { font-size: 13px; color: var(--text-secondary); }
     .post-content { line-height: 1.8; }
-    .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
+    .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.1rem; }
     .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
-    .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
-    .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
-    .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
+    .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.55rem; }
+    .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.1rem; }
+    .post-content li { font-size: 14.5px; color: var(--text-secondary); margin-bottom: 0.35rem; line-height: 1.7; }
     .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
-    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
-    .callout p { margin-bottom: 0; font-size: 14px; }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
     .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
     hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
-    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
-    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
-    .post-nav a:hover { color: var(--green); }
-    @media (max-width: 600px) { .post-title { font-size: 24px; } }
-    /* ── FIGURES ── */
-    .figure {
-      background: var(--bg-secondary);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem 1.5rem 1rem;
-      margin: 2rem 0;
-      overflow-x: auto;
-    }
-    .figure-caption {
-      font-size: 12px;
-      color: var(--text-secondary);
-      text-align: center;
-      margin-top: 0.85rem;
-      font-family: 'DM Mono', monospace;
-      letter-spacing: 0.02em;
-    }
-    /* ── DESIGN POLISH ── */
-    .callout {
-      background: var(--green-bg) !important;
-      border-left: 3px solid var(--green) !important;
-      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
-      padding: 1rem 1.25rem !important;
-      margin-bottom: 1.5rem !important;
-    }
-    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
-    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
-    body.dark .callout p { color: #6ee9c0 !important; }
-    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .callout { background: var(--green-bg); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .callout p { margin-bottom: 0; font-size: 14px; color: var(--green-text); }
+    .figure { background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem 1.5rem 1rem; margin: 1.75rem 0; overflow-x: auto; }
+    .figure-caption { font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: 0.85rem; font-family: 'DM Mono', monospace; letter-spacing: 0.02em; }
+
+    /* ── SOURCE CARDS ── */
+    .source-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.5rem 0; }
+    .source-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; box-shadow: var(--shadow-sm); transition: border-color var(--transition), box-shadow var(--transition); }
+    .source-card:hover { border-color: var(--green); box-shadow: var(--shadow-md); }
+    .source-card-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+    .source-num { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: var(--green-text); background: var(--green-bg); padding: 2px 8px; border-radius: var(--radius-pill); flex-shrink: 0; }
+    .source-card-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+    .source-card ul { padding-left: 1rem; margin: 0; }
+    .source-card li { font-size: 13px; color: var(--text-secondary); margin-bottom: 3px; line-height: 1.5; }
+    .source-footer { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 0.75rem; padding-top: 0.65rem; border-top: 0.5px solid var(--border); }
+    .badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-pill); }
+    .badge-green { color: var(--green-text); background: var(--green-bg); }
+    .badge-amber { color: var(--amber-text); background: var(--amber-bg); }
+    .badge-red   { color: var(--red-text);   background: var(--red-bg); }
+
+    /* ── AUDIT QUESTIONS ── */
+    .audit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 1.25rem 0; }
+    .audit-card { background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 1rem; }
+    .audit-q { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; gap: 0.5rem; align-items: flex-start; }
+    .audit-q-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--green-text); font-weight: 500; flex-shrink: 0; padding-top: 1px; }
+    .audit-card ul { padding-left: 1rem; margin: 0; }
+    .audit-card li { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 3px; line-height: 1.5; }
+
+    /* ── TRAINING-SERVING DIAGRAM ── */
+    .ts-diagram { display: flex; flex-direction: column; gap: 10px; }
+    .ts-row { display: flex; align-items: center; gap: 0; }
+    .ts-box { flex: 1; border-radius: var(--radius-md); padding: 0.7rem 1rem; border: 0.5px solid var(--border); text-align: center; }
+    .ts-box-head { font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .ts-box-text { font-size: 12px; color: var(--text-secondary); }
+    .ts-train { background: var(--green-bg); border-color: var(--green); }
+    .ts-train .ts-box-head { color: var(--green-text); }
+    .ts-serve { background: var(--amber-bg); border-color: var(--amber); }
+    .ts-serve .ts-box-head { color: var(--amber-text); }
+    .ts-arrow { width: 40px; text-align: center; font-size: 18px; color: var(--text-secondary); flex-shrink: 0; }
+    .ts-equal { border: 0.5px solid var(--border); background: var(--bg-card); border-radius: var(--radius-sm); padding: 0.3rem 0.5rem; }
+    .ts-equal-label { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--green-text); font-weight: 500; }
+    .ts-gap { background: var(--red-bg); border-color: var(--red); }
+    .ts-gap .ts-box-head { color: var(--red-text); }
+
+    /* ── POST NAV ── */
     .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
     .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
     .post-nav a:hover { color: var(--green); }
+
+    @media (max-width: 600px) {
+      .post-title { font-size: 24px; }
+      .source-grid { grid-template-columns: 1fr; }
+      .audit-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -109,21 +133,88 @@
       <hr>
 
       <div class="step-label">Source Inventory</div>
-      <h2>The Four Data Source Categories in Banking</h2>
+      <h2>The Four Data Source Categories</h2>
 
-      <p>Most retail banks have access to four broad categories of data that are relevant to credit scoring. Each carries a different type of signal and a different set of operational constraints.</p>
+      <p>Most retail banks have access to four broad categories of data for credit scoring. Each carries a different type of signal, operational constraint, and compliance overhead:</p>
 
-      <h3>1. Application data</h3>
-      <p>Collected at the time the borrower submits a loan application: declared income, employment status, tenure, requested loan amount, loan purpose, existing liabilities. This data is self-reported, which means it may be inaccurate or subject to fraud. It is, however, always available at inference time because the borrower fills it in. Application data typically forms the backbone of a scorecard, especially for new-to-bank customers where behavioral history is limited.</p>
+      <!-- Source cards grid -->
+      <div class="source-grid">
+        <div class="source-card">
+          <div class="source-card-head">
+            <span class="source-num">01</span>
+            <span class="source-card-name">Application Form</span>
+          </div>
+          <ul>
+            <li>Declared income &amp; employment type</li>
+            <li>Employment tenure</li>
+            <li>Loan amount &amp; purpose</li>
+            <li>Existing liabilities (self-reported)</li>
+            <li>Residential stability (own/rent/duration)</li>
+          </ul>
+          <div class="source-footer">
+            <span class="badge badge-green">✓ Always available</span>
+            <span class="badge badge-green">Real-time</span>
+            <span class="badge badge-amber">Self-reported risk</span>
+          </div>
+        </div>
 
-      <h3>2. Credit bureau data</h3>
-      <p>External data pulled from a credit bureau (e.g., CIC in Vietnam, CIBIL in India, Experian globally) at the time of application. It includes: existing credit obligations, repayment history across lenders, number of open accounts, recent credit inquiries, and in some markets a pre-computed bureau score. Bureau data is powerful — it captures behavior across the borrower's entire credit history, not just within the bank. The key constraints are cost (each bureau pull has a fee), coverage (thin-file or new-to-credit borrowers may have minimal bureau records), and regulatory compliance around what bureau attributes can be used in an automated credit decision.</p>
+        <div class="source-card">
+          <div class="source-card-head">
+            <span class="source-num">02</span>
+            <span class="source-card-name">Credit Bureau (CIC)</span>
+          </div>
+          <ul>
+            <li>Bureau score (pre-computed PD)</li>
+            <li>Repayment history across all lenders</li>
+            <li>Number of open credit accounts</li>
+            <li>Recent hard inquiries</li>
+            <li>Total outstanding balance</li>
+          </ul>
+          <div class="source-footer">
+            <span class="badge badge-green">High signal</span>
+            <span class="badge badge-amber">~65–80% coverage</span>
+            <span class="badge badge-amber">Compliance review</span>
+          </div>
+        </div>
 
-      <h3>3. Internal transaction and behavioral data</h3>
-      <p>For existing bank customers (as opposed to new applicants), the bank has visibility into account activity: salary credits, spending patterns, average daily balance, ATM withdrawal frequency, bill payment behavior, and product holdings (savings account, existing loans, insurance). This is proprietary data that no other lender has access to, which makes it a genuine competitive moat. A customer who maintains a consistently high average balance and receives regular salary credits is a materially different risk profile from one who does not — even if their bureau score is identical.</p>
+        <div class="source-card">
+          <div class="source-card-head">
+            <span class="source-num">03</span>
+            <span class="source-card-name">Internal Transactions</span>
+          </div>
+          <ul>
+            <li>Salary credit regularity &amp; amount</li>
+            <li>Average daily balance (3/6/12M)</li>
+            <li>Bill payment behavior</li>
+            <li>ATM &amp; spending patterns</li>
+            <li>Existing loan repayment history</li>
+          </ul>
+          <div class="source-footer">
+            <span class="badge badge-green">Proprietary moat</span>
+            <span class="badge badge-amber">Existing customers only</span>
+            <span class="badge badge-green">T+0 cache</span>
+          </div>
+        </div>
 
-      <h3>4. Alternative data</h3>
-      <p>In markets with large thin-file populations (young adults, self-employed individuals), alternative data can fill the gap where bureau records are sparse. This includes: telco data (call patterns, top-up frequency, SIM tenure), e-commerce transaction history, mobile app usage signals, and utility payment records. Alternative data requires careful legal and ethical review — data sharing agreements, consent frameworks, and in many jurisdictions explicit regulatory approval. The signal quality also varies significantly and requires empirical validation rather than assumption.</p>
+        <div class="source-card">
+          <div class="source-card-head">
+            <span class="source-num">04</span>
+            <span class="source-card-name">Alternative Data</span>
+          </div>
+          <ul>
+            <li>Telco: SIM tenure, top-up frequency</li>
+            <li>E-commerce transaction history</li>
+            <li>Utility &amp; rent payment records</li>
+            <li>Mobile app usage signals</li>
+            <li>Social / device fingerprint</li>
+          </ul>
+          <div class="source-footer">
+            <span class="badge badge-amber">Thin-file coverage</span>
+            <span class="badge badge-red">Agreement required</span>
+            <span class="badge badge-red">Batch T+1</span>
+          </div>
+        </div>
+      </div>
 
       <hr>
 
@@ -132,59 +223,136 @@
 
       <p>For each candidate data source, a structured audit answers four questions before any feature is built:</p>
 
+      <!-- Audit question cards -->
+      <div class="audit-grid">
+        <div class="audit-card">
+          <div class="audit-q"><span class="audit-q-num">Q1</span><span>Coverage</span></div>
+          <ul>
+            <li>What % of loan applicants have a record here?</li>
+            <li>Is the uncovered segment systematically different?</li>
+            <li>Bureau: thin-file &amp; rural applicants often missing</li>
+            <li>Internal data: new-to-bank applicants have no history</li>
+            <li>Sub-50% coverage → requires explicit missingness strategy</li>
+          </ul>
+        </div>
+        <div class="audit-card">
+          <div class="audit-q"><span class="audit-q-num">Q2</span><span>Signal Relevance</span></div>
+          <ul>
+            <li>Does this source carry predictive signal for default?</li>
+            <li>Quick check: Information Value (IV) univariate analysis</li>
+            <li>IV &lt; 0.02 → weak, skip for initial feature set</li>
+            <li>IV 0.02–0.1 → medium, include for evaluation</li>
+            <li>IV &gt; 0.1 → strong, prioritize for feature engineering</li>
+          </ul>
+        </div>
+        <div class="audit-card">
+          <div class="audit-q"><span class="audit-q-num">Q3</span><span>Access &amp; Compliance</span></div>
+          <ul>
+            <li>Who owns the data? Is a sharing agreement in place?</li>
+            <li>Prohibited attributes: gender, ethnicity, religion, pregnancy</li>
+            <li>Beware proxy variables that correlate with protected classes</li>
+            <li>Document the legal basis <em>before</em> feature engineering</li>
+            <li>In Vietnam: SBV Model Risk Management circular applies</li>
+          </ul>
+        </div>
+        <div class="audit-card">
+          <div class="audit-q"><span class="audit-q-num">Q4</span><span>Latency &amp; Freshness</span></div>
+          <ul>
+            <li>Can this data be served when the decision is made?</li>
+            <li>Bureau: near-real-time in most markets</li>
+            <li>Batch features: need feature store cache (T+0)</li>
+            <li>Define: max acceptable staleness per feature</li>
+            <li>Define: fallback if source is unavailable (impute / refer)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Source register table -->
       <div class="figure">
         <svg width="100%" viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="max-width:580px; display:block; margin:0 auto;">
-          <!-- Headers -->
-          <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">DATA SOURCE</text>
+          <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">DATA SOURCE REGISTER</text>
           <text x="200" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">COVERAGE</text>
           <text x="300" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">SIGNAL</text>
           <text x="390" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">LATENCY</text>
-          <text x="470" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">COMPLIANCE</text>
+          <text x="470" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">STATUS</text>
           <line x1="0" y1="20" x2="580" y2="20" stroke="var(--border)" stroke-width="0.5"/>
-          <!-- Row: Application data -->
           <text x="10" y="40" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)" font-weight="500">Application form</text>
           <rect x="200" y="28" width="70" height="10" rx="5" fill="var(--green-bg)"/><rect x="200" y="28" width="64" height="10" rx="5" fill="var(--green)"/>
           <rect x="300" y="28" width="70" height="10" rx="5" fill="var(--green-bg)"/><rect x="300" y="28" width="50" height="10" rx="5" fill="var(--green)"/>
           <text x="390" y="40" font-family="DM Mono, monospace" font-size="11" fill="var(--green-text)">Real-time</text>
-          <text x="470" y="40" font-family="DM Sans, sans-serif" font-size="11" fill="var(--green-text)">✓ Clear</text>
-          <!-- Row: Bureau -->
-          <text x="10" y="72" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)" font-weight="500">Credit bureau</text>
+          <text x="470" y="40" font-family="DM Sans, sans-serif" font-size="11" fill="var(--green-text)">✓ Go</text>
+          <text x="10" y="72" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)" font-weight="500">Credit bureau (CIC)</text>
           <rect x="200" y="60" width="70" height="10" rx="5" fill="var(--green-bg)"/><rect x="200" y="60" width="46" height="10" rx="5" fill="#F59E0B"/>
           <rect x="300" y="60" width="70" height="10" rx="5" fill="var(--green-bg)"/><rect x="300" y="60" width="67" height="10" rx="5" fill="var(--green)"/>
           <text x="390" y="72" font-family="DM Mono, monospace" font-size="11" fill="var(--green-text)">~1–2 sec</text>
           <text x="470" y="72" font-family="DM Sans, sans-serif" font-size="11" fill="#F59E0B">⚠ Review</text>
-          <!-- Row: Internal TX -->
           <text x="10" y="104" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)" font-weight="500">Internal transactions</text>
           <rect x="200" y="92" width="70" height="10" rx="5" fill="var(--green-bg)"/><rect x="200" y="92" width="38" height="10" rx="5" fill="#F59E0B"/>
           <rect x="300" y="92" width="70" height="10" rx="5" fill="var(--green-bg)"/><rect x="300" y="92" width="60" height="10" rx="5" fill="var(--green)"/>
           <text x="390" y="104" font-family="DM Mono, monospace" font-size="11" fill="var(--text-secondary)">T+0 (cache)</text>
-          <text x="470" y="104" font-family="DM Sans, sans-serif" font-size="11" fill="var(--green-text)">✓ Internal</text>
-          <!-- Row: Alternative -->
+          <text x="470" y="104" font-family="DM Sans, sans-serif" font-size="11" fill="var(--green-text)">✓ Go</text>
           <text x="10" y="136" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)" font-weight="500">Alternative data</text>
           <rect x="200" y="124" width="70" height="10" rx="5" fill="var(--green-bg)"/><rect x="200" y="124" width="24" height="10" rx="5" fill="#EF4444"/>
           <rect x="300" y="124" width="70" height="10" rx="5" fill="var(--green-bg)"/><rect x="300" y="124" width="32" height="10" rx="5" fill="#F59E0B"/>
           <text x="390" y="136" font-family="DM Mono, monospace" font-size="11" fill="var(--text-secondary)">Batch T+1</text>
-          <text x="470" y="136" font-family="DM Sans, sans-serif" font-size="11" fill="#EF4444">✗ Agreement</text>
+          <text x="470" y="136" font-family="DM Sans, sans-serif" font-size="11" fill="#EF4444">✗ Conditional</text>
           <line x1="0" y1="148" x2="580" y2="148" stroke="var(--border)" stroke-width="0.5"/>
-          <text x="10" y="160" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">Bar = relative coverage / signal strength</text>
+          <text x="10" y="160" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">Bar width = relative coverage / signal strength vs. max observed</text>
         </svg>
-        <div class="figure-caption">Fig 1 — Data source register: coverage, signal strength, serving latency, and compliance status</div>
+        <div class="figure-caption">Fig 1 — Data source register: coverage, signal strength, serving latency, and go/no-go status</div>
       </div>
 
-      <h3>Coverage</h3>
-      <p>What fraction of the target population (loan applicants) has a record in this source? Bureau coverage is often below 100% — particularly for first-time borrowers or customers from rural areas. Internal transaction data only exists for customers who already hold a bank account. If a source covers only 40% of applicants, any feature derived from it will require a missingness strategy for the remaining 60%, which can introduce bias if the uncovered segment is systematically different from the covered one.</p>
+      <hr>
 
-      <h3>Relevance</h3>
-      <p>Does this source plausibly carry predictive signal for default behavior? A quick univariate analysis (comparing the distribution of a feature between good and bad borrowers) is sufficient at this stage. Information Value (IV) is a standard credit risk metric for this: IV below 0.02 is typically considered weak, 0.02–0.1 medium, above 0.1 strong. Use IV as a fast filter, not a final selection criterion — features with moderate IV can still contribute in combination.</p>
+      <div class="step-label">Critical Check</div>
+      <h2>Training-Serving Consistency</h2>
 
-      <h3>Access and compliance</h3>
-      <p>Who owns this data source? Is there a data sharing agreement in place? Does using this data in an automated credit decision comply with local consumer credit regulations? In regulated markets, certain attributes (gender, ethnicity, religion, marital status, pregnancy) are explicitly prohibited as model inputs. Beyond explicit prohibitions, regulators increasingly scrutinize proxy variables — features that are nominally neutral but correlate strongly with a protected class. Document the legal basis for using each source before feature engineering begins.</p>
+      <p>The most insidious failure mode in credit scoring deployment is a <strong>training-serving gap</strong>: a feature that exists in training data but is not reliably available — or is computed differently — at serving time. The same transformation pipeline must be executable both offline and online.</p>
 
-      <h3>Latency and freshness</h3>
-      <p>Can this data be served at the time a credit decision is needed? Bureau pulls happen in near-real-time in most markets. Internal transaction aggregates may require a T+1 batch job. If a feature requires a batch computation that runs at midnight, it cannot support an application submitted at 11 PM unless the feature store caches yesterday's value — which introduces a staleness assumption. For each feature, define: what is the maximum acceptable staleness, and what happens if the data source is unavailable (fallback value, feature imputation, or decline the application with an error code)?</p>
+      <!-- Training-serving diagram -->
+      <div class="figure">
+        <p style="font-size:11px; font-family:'DM Mono',monospace; color:var(--text-secondary); margin-bottom:1rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:500;">CORRECT: Same pipeline, both environments</p>
+        <div class="ts-diagram">
+          <div class="ts-row">
+            <div class="ts-box ts-train">
+              <div class="ts-box-head">Offline Training</div>
+              <div class="ts-box-text">Raw features → impute → WOE encode → scale → model.fit()</div>
+            </div>
+            <div class="ts-arrow" style="color:var(--green);">≡</div>
+            <div class="ts-box ts-serve">
+              <div class="ts-box-head">Online Serving</div>
+              <div class="ts-box-text">Raw features → impute → WOE encode → scale → model.predict()</div>
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size:11px; font-family:'DM Mono',monospace; color:var(--text-secondary); margin: 1.25rem 0 0.75rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:500;">DANGEROUS: Diverged pipelines</p>
+        <div class="ts-diagram">
+          <div class="ts-row">
+            <div class="ts-box ts-train">
+              <div class="ts-box-head">Offline Training</div>
+              <div class="ts-box-text">avg_balance_6m computed over full history in SQL</div>
+            </div>
+            <div class="ts-arrow" style="color:var(--red);">≠</div>
+            <div class="ts-box ts-gap">
+              <div class="ts-box-head" style="color:var(--red-text);">Online Serving</div>
+              <div class="ts-box-text">avg_balance_6m fetched from feature store — stale by 24h</div>
+            </div>
+          </div>
+        </div>
+        <div class="figure-caption">Fig 2 — Training-serving consistency. Diverged pipelines produce silent model degradation that is hard to diagnose post-deployment.</div>
+      </div>
+
+      <p>Common causes of training-serving gaps to check for every feature:</p>
+      <ul>
+        <li><strong>Transformation mismatch</strong> — imputation applied in training but not in the serving pipeline, or vice versa</li>
+        <li><strong>Staleness assumptions</strong> — batch-computed features cached from yesterday do not match the real-time context of today's application</li>
+        <li><strong>Aggregation window differences</strong> — "last 6 months" means different things depending on whether the anchor date is the application date or the current date</li>
+        <li><strong>Encoding drift</strong> — WOE bins fitted on training data may not handle new categories seen in production (e.g., a new employment type added to the application form)</li>
+      </ul>
 
       <div class="callout">
-        <p>A feature that exists in training data but cannot be reliably served in production will become a silent liability. The training-serving consistency check is not optional. The same transformation pipeline — including imputation logic, encoding, and scaling — must be executable both offline (training) and online (inference). Discrepancies here are one of the most common causes of model degradation that is hard to diagnose post-deployment.</p>
+        <p>Every feature that exists in the training set must have a documented serving path. If a serving path cannot be established before feature engineering begins, exclude the feature — not after training, when removing it costs days of rework.</p>
       </div>
 
       <hr>
@@ -192,9 +360,16 @@
       <div class="step-label">Output</div>
       <h2>Data Source Register</h2>
 
-      <p>The output of this stage is a data source register: a table documenting every candidate source with its coverage rate, estimated IV, owner, compliance status, latency, and a go/no-go decision for inclusion in the feature engineering phase. Sources that are excluded should have a documented reason — this prevents the same discussion from happening again in six months when a new team member joins the project.</p>
-
-      <p>For a typical retail bank in a Southeast Asian market, the register might include: application form fields (go, always available), CIC bureau score and attributes (go, subject to coverage), internal salary and balance aggregates (go, existing customers only), and telco data (conditional, subject to data sharing agreement and regulatory review). This clarity at the source level makes the EDA phase in Part 3 much more focused and efficient.</p>
+      <p>The output of this stage is a register documenting every candidate source. For each source include:</p>
+      <ul>
+        <li><strong>Coverage rate</strong> across the target application population</li>
+        <li><strong>Estimated IV</strong> from a quick univariate analysis</li>
+        <li><strong>Owner &amp; access path</strong> (which team, which API or table)</li>
+        <li><strong>Compliance status</strong> (cleared / under review / excluded)</li>
+        <li><strong>Serving latency</strong> and the fallback behavior if unavailable</li>
+        <li><strong>Go / No-go decision</strong> with reason if excluded</li>
+      </ul>
+      <p>Sources excluded should have a documented reason — this prevents the same discussion happening again in six months when a new team member joins the project.</p>
 
     </div>
 

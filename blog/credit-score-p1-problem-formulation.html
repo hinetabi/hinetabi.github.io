@@ -10,76 +10,131 @@
     :root {
       --bg: #fafaf8; --bg-secondary: #f1efea; --bg-card: #ffffff;
       --text-primary: #1a1a18; --text-secondary: #6b6b67;
-      --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
+      --border: rgba(0,0,0,0.09); --border-hover: rgba(0,0,0,0.18);
       --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
-      --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
+      --amber: #F59E0B; --amber-bg: #FEF3C7; --amber-text: #92400E;
+      --red: #EF4444; --red-bg: #FEE2E2; --red-text: #991B1B;
+      --radius-sm: 5px; --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px;
+      --transition: 0.22s ease;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
     }
     body.dark {
-      --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1c1c1a;
+      --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1e1e1c;
       --text-primary: #f0ede6; --text-secondary: #888780;
-      --border: rgba(255,255,255,0.09); --border-hover: rgba(255,255,255,0.18);
+      --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.16);
+      --green-bg: rgba(29,158,117,0.12); --green-text: #6ee9c0;
+      --amber-bg: rgba(245,158,11,0.12); --amber-text: #fcd34d;
+      --red-bg: rgba(239,68,68,0.12); --red-text: #fca5a5;
     }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
-    .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+    .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 6rem; }
+
+    /* NAV */
     nav { display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 0; border-bottom: 0.5px solid var(--border); margin-bottom: 3.5rem; }
     .nav-left { display: flex; align-items: center; gap: 1rem; }
     .nav-logo { font-size: 15px; font-weight: 500; color: var(--text-primary); font-family: 'DM Mono', monospace; text-decoration: none; }
-    .toggle-btn { font-size: 13px; font-family: 'DM Sans', sans-serif; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background var(--transition), border-color var(--transition); }
+    .toggle-btn { font-size: 13px; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: border-color var(--transition); }
     .toggle-btn:hover { border-color: var(--green); }
     .back-link { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
     .back-link:hover { color: var(--text-primary); }
+
+    /* HEADER */
     .post-header { margin-bottom: 3rem; }
     .post-tag { font-size: 12px; font-weight: 500; color: var(--green-text); background: var(--green-bg); padding: 4px 11px; border-radius: var(--radius-pill); display: inline-block; margin-bottom: 1rem; }
     .series-nav-label { font-size: 12px; color: var(--text-secondary); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; }
     .post-title { font-size: 30px; font-weight: 500; color: var(--text-primary); line-height: 1.25; letter-spacing: -0.5px; margin-bottom: 0.85rem; }
     .post-meta { font-size: 13px; color: var(--text-secondary); }
+
+    /* CONTENT */
     .post-content { line-height: 1.8; }
-    .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
+    .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.1rem; }
     .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
-    .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
-    .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
-    .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
+    .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.55rem; }
+    .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.1rem; }
+    .post-content li { font-size: 14.5px; color: var(--text-secondary); margin-bottom: 0.35rem; line-height: 1.7; }
     .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
-    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
-    .callout p { margin-bottom: 0; font-size: 14px; }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .post-content em { color: var(--text-primary); }
     .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
     hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
-    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
-    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
-    .post-nav a:hover { color: var(--green); }
-    @media (max-width: 600px) { .post-title { font-size: 24px; } }
-    /* ── FIGURES ── */
-    .figure {
-      background: var(--bg-secondary);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem 1.5rem 1rem;
-      margin: 2rem 0;
-      overflow-x: auto;
+
+    /* CALLOUT */
+    .callout { background: var(--green-bg); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .callout p { margin-bottom: 0; font-size: 14px; color: var(--green-text); }
+
+    /* FIGURE */
+    .figure { background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem 1.5rem 1rem; margin: 1.75rem 0; overflow-x: auto; }
+    .figure-caption { font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: 0.85rem; font-family: 'DM Mono', monospace; letter-spacing: 0.02em; }
+
+    /* TAB ROW — DPD selector */
+    .tab-row { display: flex; gap: 6px; margin-bottom: 1rem; }
+    .tab-btn { font-size: 12px; font-family: 'DM Mono', monospace; padding: 5px 14px; border-radius: var(--radius-pill); border: 0.5px solid var(--border-hover); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; transition: all var(--transition); }
+    .tab-btn:hover { border-color: var(--green); color: var(--green-text); }
+    .tab-btn.active { background: var(--green); border-color: var(--green); color: #fff; }
+    .dpd-panel { display: none; }
+    .dpd-panel.active { display: block; }
+
+    /* DPD comparison rows */
+    .dpd-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .dpd-cell { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 0.85rem 1rem; box-shadow: var(--shadow-sm); }
+    .dpd-cell-label { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-secondary); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .dpd-cell-val { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+    .dpd-cell-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .tag-green { display: inline-block; font-size: 11px; font-weight: 500; color: var(--green-text); background: var(--green-bg); padding: 2px 8px; border-radius: var(--radius-pill); }
+    .tag-amber { display: inline-block; font-size: 11px; font-weight: 500; color: var(--amber-text); background: var(--amber-bg); padding: 2px 8px; border-radius: var(--radius-pill); }
+    .tag-red   { display: inline-block; font-size: 11px; font-weight: 500; color: var(--red-text);   background: var(--red-bg);   padding: 2px 8px; border-radius: var(--radius-pill); }
+
+    /* FEASIBILITY CHECKLIST */
+    .checklist { display: flex; flex-direction: column; gap: 8px; margin: 1.25rem 0; }
+    .check-item {
+      display: flex; align-items: flex-start; gap: 0.85rem;
+      background: var(--bg-card); border: 0.5px solid var(--border);
+      border-radius: var(--radius-md); padding: 0.85rem 1rem;
+      cursor: pointer; transition: border-color var(--transition), box-shadow var(--transition);
+      box-shadow: var(--shadow-sm); user-select: none;
     }
-    .figure-caption {
-      font-size: 12px;
-      color: var(--text-secondary);
-      text-align: center;
-      margin-top: 0.85rem;
-      font-family: 'DM Mono', monospace;
-      letter-spacing: 0.02em;
+    .check-item:hover { border-color: var(--green); }
+    .check-item.checked { border-color: var(--green); background: var(--green-bg); }
+    .check-icon {
+      width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;
+      border: 1.5px solid var(--border-hover); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: transparent; transition: all var(--transition);
     }
-    /* ── DESIGN POLISH ── */
-    .callout {
-      background: var(--green-bg) !important;
-      border-left: 3px solid var(--green) !important;
-      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
-      padding: 1rem 1.25rem !important;
-      margin-bottom: 1.5rem !important;
-    }
-    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
-    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
-    body.dark .callout p { color: #6ee9c0 !important; }
-    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .check-item.checked .check-icon { background: var(--green); border-color: var(--green); color: #fff; }
+    .check-body strong { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+    .check-body p { font-size: 13px; color: var(--text-secondary); margin: 3px 0 0; line-height: 1.55; }
+    .check-item.checked .check-body strong { color: var(--green-text); }
+
+    /* COST ASYMMETRY CARDS */
+    .cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.25rem 0; }
+    .cost-card { border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; border: 0.5px solid var(--border); }
+    .cost-card.fn { background: var(--red-bg); border-color: rgba(239,68,68,0.25); }
+    .cost-card.fp { background: var(--amber-bg); border-color: rgba(245,158,11,0.25); }
+    .cost-card-head { font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    .cost-card.fn .cost-card-head { color: var(--red-text); }
+    .cost-card.fp .cost-card-head { color: var(--amber-text); }
+    .cost-card-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .cost-card ul { padding-left: 1rem; }
+    .cost-card li { font-size: 13px; color: var(--text-secondary); margin-bottom: 3px; line-height: 1.5; }
+
+    /* OUTPUT CHECKLIST */
+    .output-list { display: flex; flex-direction: column; gap: 6px; margin: 1rem 0; }
+    .output-item { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.7rem 1rem; background: var(--bg-secondary); border-radius: var(--radius-md); border: 0.5px solid var(--border); }
+    .output-num { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--green-text); font-weight: 500; flex-shrink: 0; padding-top: 1px; min-width: 20px; }
+    .output-item p { font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.55; }
+    .output-item strong { color: var(--text-primary); }
+
+    /* POST NAV */
     .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
     .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
     .post-nav a:hover { color: var(--green); }
+
+    @media (max-width: 600px) {
+      .post-title { font-size: 24px; }
+      .dpd-row { grid-template-columns: 1fr; }
+      .cost-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -104,97 +159,258 @@
 
     <div class="post-content">
 
-      <p>Before a single line of code is written, the most important work in an ML project happens in a whiteboard session with business stakeholders. In credit scoring, the business question sounds deceptively simple: <em>who should we lend to?</em> Unpacking that question carefully is what separates a model that ships and holds up in production from one that looks great on a validation set and fails quietly in the real world.</p>
+      <p>Before writing a single line of code, the most important work in an ML project happens in a whiteboard session with business stakeholders. In credit scoring, the business question sounds deceptively simple: <em>who should we lend to?</em> Unpacking that question carefully is what separates a model that ships and holds up in production from one that looks great on a validation set and fails quietly in the real world.</p>
 
       <hr>
 
       <div class="step-label">Business Goal → Model Goal</div>
       <h2>Mapping the Business Problem to a Model Objective</h2>
 
-      <p>The business goal in retail lending is to maximize portfolio profitability while keeping non-performing loan (NPL) rates within an acceptable range. The risk team frames this as: <em>identify which applicants are likely to default within 12 months of loan origination.</em></p>
-
-      <p>Translating this to an ML task requires three decisions:</p>
+      <p>The business goal in retail lending is to maximize portfolio profitability while keeping non-performing loan (NPL) rates within an acceptable range. Translating this to an ML task requires three concrete decisions:</p>
 
       <h3>1. What is the prediction target?</h3>
-      <p>The target label is a binary indicator: did the borrower become 90+ days past due (DPD90+) at any point within 12 months of disbursement? This is the standard "bad" definition in consumer credit. It is specific enough to be measurable and directly tied to the bank's loan loss provisions.</p>
+      <p>The target label is a binary indicator of default. The most common definition is <strong>DPD90+</strong>: did the borrower go 90+ days past due at any point within 12 months of disbursement? But the choice of DPD threshold is itself a business decision with real tradeoffs — use the interactive chart below to explore them.</p>
+
+      <!-- DPD interactive chart -->
+      <div class="figure">
+        <div class="tab-row">
+          <button class="tab-btn" onclick="switchDPD('dpd30')">DPD 30+</button>
+          <button class="tab-btn active" onclick="switchDPD('dpd90')">DPD 90+ ★ standard</button>
+          <button class="tab-btn" onclick="switchDPD('dpd120')">DPD 120+</button>
+        </div>
+
+        <div class="dpd-panel" id="dpd30">
+          <div class="dpd-row">
+            <div class="dpd-cell">
+              <div class="dpd-cell-label">Definition</div>
+              <div class="dpd-cell-val">30+ days past due</div>
+              <div class="dpd-cell-sub">Within 12 months of origination</div>
+            </div>
+            <div class="dpd-cell">
+              <div class="dpd-cell-label">Bad rate (typical)</div>
+              <div class="dpd-cell-val">~15–20%</div>
+              <div class="dpd-cell-sub"><span class="tag-amber">High imbalance</span></div>
+            </div>
+            <div class="dpd-cell">
+              <div class="dpd-cell-label">Key risk</div>
+              <div class="dpd-cell-val">Cure rate ~25%</div>
+              <div class="dpd-cell-sub">Many DPD30 borrowers self-correct — inflates false positives</div>
+            </div>
+          </div>
+          <div style="margin-top:0.85rem;">
+            <ul>
+              <li>Catches delinquency early, but many are <strong>technical defaults</strong> (missed due to payment processing delays)</li>
+              <li>High sensitivity → more data for minority class, but noisier labels</li>
+              <li>Regulators may question a model trained on a volatile label definition</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="dpd-panel active" id="dpd90">
+          <div class="dpd-row">
+            <div class="dpd-cell">
+              <div class="dpd-cell-label">Definition</div>
+              <div class="dpd-cell-val">90+ days past due</div>
+              <div class="dpd-cell-sub">Within 12 months of origination</div>
+            </div>
+            <div class="dpd-cell">
+              <div class="dpd-cell-label">Bad rate (typical)</div>
+              <div class="dpd-cell-val">~3–8%</div>
+              <div class="dpd-cell-sub"><span class="tag-green">Industry standard</span></div>
+            </div>
+            <div class="dpd-cell">
+              <div class="dpd-cell-label">Cure rate</div>
+              <div class="dpd-cell-val">&lt; 5%</div>
+              <div class="dpd-cell-sub">Borrower very unlikely to self-correct at 90 days</div>
+            </div>
+          </div>
+          <div style="margin-top:0.85rem;">
+            <ul>
+              <li>Directly tied to the bank's loan loss provisioning threshold</li>
+              <li>Accepted by regulators and model governance committees as the standard "bad" definition</li>
+              <li>Gives 12 months for outcomes to materialize — requires mature vintage data</li>
+              <li><strong>Recommended default</strong> unless the product has specific early-detection needs</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="dpd-panel" id="dpd120">
+          <div class="dpd-row">
+            <div class="dpd-cell">
+              <div class="dpd-cell-label">Definition</div>
+              <div class="dpd-cell-val">120+ days past due</div>
+              <div class="dpd-cell-sub">Within 12 months of origination</div>
+            </div>
+            <div class="dpd-cell">
+              <div class="dpd-cell-label">Bad rate (typical)</div>
+              <div class="dpd-cell-val">~2–5%</div>
+              <div class="dpd-cell-sub"><span class="tag-red">Severe imbalance</span></div>
+            </div>
+            <div class="dpd-cell">
+              <div class="dpd-cell-label">Key risk</div>
+              <div class="dpd-cell-val">Very few bad labels</div>
+              <div class="dpd-cell-sub">Model may not have enough signal to learn effectively</div>
+            </div>
+          </div>
+          <div style="margin-top:0.85rem;">
+            <ul>
+              <li>Captures only the most severe delinquencies — close to write-off territory</li>
+              <li>Very small bad population makes training unstable and validation unreliable</li>
+              <li>Misses early-stage defaults that are recoverable with intervention</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="figure-caption">Fig 1 — DPD threshold comparison. Click to explore tradeoffs. DPD90+ is the industry standard for consumer credit scoring.</div>
+      </div>
 
       <div class="callout">
-        <p>The definition of "bad" is a business decision, not a technical one. Using DPD30+ captures more defaults but misclassifies borrowers who missed one payment due to a processing error. Using DPD90+ is more conservative but means the model only detects serious delinquency. Align with the risk team before labeling a single row.</p>
+        <p>The "bad" definition is a business decision, not a technical one. Align with the risk team and model governance before labeling a single row — changing this definition later forces a full retrain.</p>
       </div>
 
       <h3>2. What is the ML task?</h3>
-      <p>This is a <strong>binary classification</strong> problem. The model outputs a probability of default (PD) for each applicant, which is then mapped to a credit score band (e.g., 300–850, or an internal A/B/C/D/E tier). The score is used by underwriters and automated decisioning engines to approve, reject, or escalate loan applications.</p>
-
-      <h3>3. What metrics matter?</h3>
-      <p>Two types of metrics must be defined upfront:</p>
+      <p>This is a <strong>binary classification</strong> problem. The model outputs a probability of default (PD) for each applicant, then mapped to a score band:</p>
       <ul>
-        <li><strong>ML metric:</strong> AUC-ROC (measures rank-ordering ability across all thresholds), Gini coefficient (2 × AUC − 1, common in credit risk), and KS statistic (maximum separation between good and bad score distributions). A Gini above 0.40 is generally considered acceptable for a retail credit scorecard.</li>
-        <li><strong>Business metric:</strong> NPL rate at a given approval rate. The model's value is measured by how much it reduces defaults compared to the existing rule-based cutoff — while maintaining a commercially viable approval rate. A model that rejects everyone has a perfect NPL rate and is useless.</li>
+        <li><strong>Score bands (internal):</strong> A (lowest risk) → E (highest risk), typically mapped to approve / refer / decline decisions</li>
+        <li><strong>Score scale (external):</strong> 300–850 style, or 0–1000, calibrated to match the bank's historical NPL rates per band</li>
+        <li><strong>Outputs used by:</strong> automated decisioning engines, underwriter workstations, and portfolio risk dashboards</li>
       </ul>
 
+      <h3>3. What metrics matter?</h3>
+      <p>Define both ML and business metrics upfront — one drives model development, the other drives the deployment decision:</p>
+      <ul>
+        <li><strong>Gini coefficient</strong> = 2 × AUC − 1 — measures rank-ordering power. Target: Gini &gt; 0.40 for retail credit</li>
+        <li><strong>KS statistic</strong> — maximum separation between good and bad score CDFs. Target: KS &gt; 30%</li>
+        <li><strong>AUC-ROC</strong> — threshold-independent discrimination. Gini and KS are generally preferred in credit risk</li>
+        <li><strong>Business metric:</strong> NPL rate reduction at the same approval rate, or approval rate lift at the same NPL rate</li>
+      </ul>
+
+      <!-- Business → ML objective table -->
       <div class="figure">
         <svg width="100%" viewBox="0 0 580 130" xmlns="http://www.w3.org/2000/svg" style="max-width:580px; display:block; margin:0 auto;">
-          <!-- Left column header -->
           <rect x="0" y="0" width="260" height="28" rx="6" fill="var(--green-bg)"/>
           <text x="130" y="19" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="var(--green-text)" font-weight="500">Business Question</text>
-          <!-- Right column header -->
           <rect x="320" y="0" width="260" height="28" rx="6" fill="var(--green-bg)"/>
           <text x="450" y="19" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="var(--green-text)" font-weight="500">ML Objective</text>
-          <!-- Arrow center -->
           <text x="290" y="19" text-anchor="middle" font-size="16" fill="var(--green-text)">→</text>
-          <!-- Row 1 -->
           <rect x="0" y="38" width="260" height="26" rx="4" fill="var(--bg-card)" stroke="var(--border)" stroke-width="0.5"/>
           <text x="12" y="55" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-secondary)">Will this borrower default?</text>
           <rect x="320" y="38" width="260" height="26" rx="4" fill="var(--bg-card)" stroke="var(--border)" stroke-width="0.5"/>
           <text x="332" y="55" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)">Binary classification · P(default)</text>
           <text x="290" y="55" text-anchor="middle" font-size="14" fill="var(--text-secondary)">→</text>
-          <!-- Row 2 -->
           <rect x="0" y="70" width="260" height="26" rx="4" fill="var(--bg-card)" stroke="var(--border)" stroke-width="0.5"/>
           <text x="12" y="87" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-secondary)">How good is our model?</text>
           <rect x="320" y="70" width="260" height="26" rx="4" fill="var(--bg-card)" stroke="var(--border)" stroke-width="0.5"/>
-          <text x="332" y="87" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)">Gini coefficient · KS statistic · AUC</text>
+          <text x="332" y="87" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)">Gini &gt; 0.40 · KS &gt; 30% · AUC</text>
           <text x="290" y="87" text-anchor="middle" font-size="14" fill="var(--text-secondary)">→</text>
-          <!-- Row 3 -->
           <rect x="0" y="102" width="260" height="26" rx="4" fill="var(--bg-card)" stroke="var(--border)" stroke-width="0.5"/>
           <text x="12" y="119" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-secondary)">Is the model worth deploying?</text>
           <rect x="320" y="102" width="260" height="26" rx="4" fill="var(--bg-card)" stroke="var(--border)" stroke-width="0.5"/>
           <text x="332" y="119" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)">NPL rate Δ · approval rate · ROI</text>
           <text x="290" y="119" text-anchor="middle" font-size="14" fill="var(--text-secondary)">→</text>
         </svg>
-        <div class="figure-caption">Fig 1 — Translating business questions into ML objectives for credit scoring</div>
+        <div class="figure-caption">Fig 2 — Translating business questions into ML objectives for credit scoring</div>
       </div>
 
       <hr>
 
       <div class="step-label">Feasibility</div>
-      <h2>Assessing Feasibility Before Committing</h2>
+      <h2>Feasibility Checklist</h2>
 
-      <p>Running a feasibility check before scoping the full pipeline is not skepticism — it is good engineering discipline. Credit scoring has several structural constraints that must be surfaced early.</p>
+      <p>Running a feasibility check before scoping the full pipeline is not skepticism — it is good engineering discipline. Work through each item below before committing to the full lifecycle. Click each item to mark it assessed.</p>
 
-      <h3>Do we have labeled data?</h3>
-      <p>For a supervised model, we need historical loan records where the outcome (default or not) is known. This requires a <strong>performance window</strong>: loans disbursed at least 12 months ago, so the DPD90+ outcome has had time to materialize. A common mistake is training on too recent data where a large portion of the portfolio is still "current" simply because not enough time has passed — not because the borrowers are good.</p>
-      <p>If the bank is new or the product is new, labeled data may be scarce. In this case, options include: borrowing a scorecard from a similar portfolio, using bureau scores as a proxy target, or applying semi-supervised techniques with a smaller labeled sample.</p>
-
-      <h3>Is there a meaningful signal-to-noise ratio?</h3>
-      <p>A quick correlation analysis between candidate features (income, debt-to-income ratio, bureau score, internal transaction features) and the default label will indicate whether a model is worth building. If the strongest feature has a point-biserial correlation below 0.05, the data may not carry enough signal for a useful model. This does not mean abandoning the effort — it means scoping expectations honestly.</p>
-
-      <h3>What does the baseline achieve?</h3>
-      <p>The existing lending policy is the baseline. If the bank already applies a bureau score cutoff or a manual underwriting rule, what is the current NPL rate and approval rate? The ML model must credibly beat this baseline — not just in AUC, but in a realistic operational scenario. If the gap between the baseline and a strong ML model is small, the cost of building, deploying, and maintaining the ML system may not be justified.</p>
-
-      <h3>Can the features be served at inference time?</h3>
-      <p>In a loan origination context, inference happens when an applicant submits an application — often within seconds. Any feature that requires batch computation (e.g., a rolling 6-month transaction aggregate computed overnight) cannot be served in real time unless a feature store pre-computes and caches it. Identify latency-sensitive features early. A feature that improves AUC by 0.02 but adds 800ms of lookup latency may not be worth it depending on the SLA.</p>
-
-      <h3>What is the cost asymmetry?</h3>
-      <p>In credit, the cost of a false negative (approving a borrower who defaults) is typically much higher than the cost of a false positive (rejecting a creditworthy borrower). The false negative cost includes the loan principal, lost interest, and collection costs. The false positive cost is the foregone margin on a loan that would have performed. Quantifying this ratio now — even roughly — determines the decision threshold that will be used in production and influences how the model should be evaluated during development.</p>
-
-      <div class="callout">
-        <p>Feasibility is not a binary pass/fail gate. The goal is to walk out of this stage with aligned expectations: what performance level is good enough to justify deployment, what data exists to train on, and what operational constraints will shape the feature set. These constraints should be documented and revisited throughout the project.</p>
+      <div class="checklist">
+        <div class="check-item" onclick="this.classList.toggle('checked')">
+          <div class="check-icon">✓</div>
+          <div class="check-body">
+            <strong>Labeled data available?</strong>
+            <p>Need loans disbursed ≥ 12 months ago with known DPD90+ outcomes. Recent vintages are still "performing" — not because borrowers are good, but because not enough time has passed.</p>
+          </div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('checked')">
+          <div class="check-icon">✓</div>
+          <div class="check-body">
+            <strong>Meaningful signal-to-noise ratio?</strong>
+            <p>Quick check: point-biserial correlation between top candidate features and the default label. If the strongest feature is below 0.05, the data may not support a useful model.</p>
+          </div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('checked')">
+          <div class="check-icon">✓</div>
+          <div class="check-body">
+            <strong>Baseline performance documented?</strong>
+            <p>What NPL rate and approval rate does the current policy (bureau cutoff / manual underwriting) achieve? The ML model must credibly beat this — not just in AUC, but in an operational scenario.</p>
+          </div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('checked')">
+          <div class="check-icon">✓</div>
+          <div class="check-body">
+            <strong>Features serviceable at inference time?</strong>
+            <p>Inference happens when the applicant submits — often within 2 seconds. Any feature requiring overnight batch computation needs a feature store cache. A feature that adds 800ms latency may not be worth it.</p>
+          </div>
+        </div>
+        <div class="check-item" onclick="this.classList.toggle('checked')">
+          <div class="check-icon">✓</div>
+          <div class="check-body">
+            <strong>Cost asymmetry quantified?</strong>
+            <p>The false negative cost (approving a defaulter = principal + collection costs) is typically 3–5× the false positive cost (rejecting a good borrower = foregone margin). This ratio determines the production decision threshold.</p>
+          </div>
+        </div>
       </div>
+
+      <!-- Cost asymmetry visual -->
+      <div class="cost-grid">
+        <div class="cost-card fn">
+          <div class="cost-card-head">False Negative — High Cost</div>
+          <div class="cost-card-title">Approve a borrower who defaults</div>
+          <ul>
+            <li>Loan principal (partially unrecovered)</li>
+            <li>Lost interest income</li>
+            <li>Collection & legal costs</li>
+            <li>Provisioning hit to P&amp;L</li>
+            <li>Typical cost: <strong>~50% of loan principal</strong></li>
+          </ul>
+        </div>
+        <div class="cost-card fp">
+          <div class="cost-card-head">False Positive — Lower Cost</div>
+          <div class="cost-card-title">Reject a borrower who would have repaid</div>
+          <ul>
+            <li>Foregone net interest income</li>
+            <li>Lost cross-sell opportunity</li>
+            <li>Potential fairness / regulatory scrutiny</li>
+            <li>Customer churn to competitor</li>
+            <li>Typical cost: <strong>~10–15% of loan principal</strong></li>
+          </ul>
+        </div>
+      </div>
+      <div class="figure-caption" style="text-align:left; margin-top:-0.5rem;">Fig 3 — Cost asymmetry in credit scoring. FN costs ~3–5× more than FP. This ratio shifts the optimal decision threshold above 0.5.</div>
 
       <hr>
 
       <h2>Output of This Stage</h2>
-      <p>By the end of problem formulation, the team should have a written one-pager covering: the ML task definition (binary classification, DPD90+, 12-month window), the performance targets (minimum Gini, target approval rate, acceptable NPL rate), the feasibility assessment (data availability, baseline benchmark, feature latency constraints), and the cost asymmetry framing that will drive threshold selection. This document becomes the source of truth that aligns data scientists, risk stakeholders, and engineering as the project progresses.</p>
+      <p>By the end of problem formulation, the team should have a written one-pager that serves as the source of truth for the entire project:</p>
+
+      <div class="output-list">
+        <div class="output-item">
+          <span class="output-num">01</span>
+          <p><strong>ML task definition</strong> — binary classification, DPD90+ label, 12-month performance window, population scope (product, channel, customer segment)</p>
+        </div>
+        <div class="output-item">
+          <span class="output-num">02</span>
+          <p><strong>Performance targets</strong> — minimum Gini (e.g., 0.40), target approval rate, acceptable NPL rate per score band</p>
+        </div>
+        <div class="output-item">
+          <span class="output-num">03</span>
+          <p><strong>Feasibility assessment</strong> — data availability, baseline benchmark, feature latency constraints, any open risks</p>
+        </div>
+        <div class="output-item">
+          <span class="output-num">04</span>
+          <p><strong>Cost asymmetry framing</strong> — FN/FP cost ratio that will determine the production decision threshold and evaluation protocol</p>
+        </div>
+        <div class="output-item">
+          <span class="output-num">05</span>
+          <p><strong>Stakeholder sign-off</strong> — risk team, product, legal/compliance, and engineering aligned before any data work begins</p>
+        </div>
+      </div>
 
     </div>
 
@@ -215,6 +431,13 @@
       localStorage.setItem('theme', dark ? 'dark' : 'light');
     }
     if (localStorage.getItem('theme') === 'dark') toggleDark();
+
+    function switchDPD(id) {
+      document.querySelectorAll('.dpd-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
   </script>
 </body>
 </html>

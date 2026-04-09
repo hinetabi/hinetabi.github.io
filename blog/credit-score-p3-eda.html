@@ -12,12 +12,19 @@
       --text-primary: #1a1a18; --text-secondary: #6b6b67;
       --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
       --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --amber: #D97706; --amber-bg: #FEF3C7; --amber-text: #92400E;
+      --red: #EF4444; --red-bg: #FEE2E2; --red-text: #991B1B;
+      --blue: #3B82F6; --blue-bg: #EFF6FF; --blue-text: #1D4ED8;
       --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
     }
     body.dark {
       --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1c1c1a;
       --text-primary: #f0ede6; --text-secondary: #888780;
       --border: rgba(255,255,255,0.09); --border-hover: rgba(255,255,255,0.18);
+      --green-bg: rgba(29,158,117,0.12); --green-text: #6ee9c0;
+      --amber-bg: rgba(217,119,6,0.12); --amber-text: #fcd34d;
+      --red-bg: rgba(239,68,68,0.12); --red-text: #fca5a5;
+      --blue-bg: rgba(59,130,246,0.12); --blue-text: #93c5fd;
     }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
     .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
@@ -40,14 +47,20 @@
     .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
     .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
     .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
-    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
-    .callout p { margin-bottom: 0; font-size: 14px; }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .callout { background: var(--green-bg); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+    .callout p { color: var(--green-text); margin-bottom: 0; font-size: 14px; }
+    .callout.amber { background: var(--amber-bg); border-left-color: var(--amber); }
+    .callout.amber p { color: var(--amber-text); }
+    .callout.red { background: var(--red-bg); border-left-color: var(--red); }
+    .callout.red p { color: var(--red-text); }
     .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
     hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
     .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
     .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
     .post-nav a:hover { color: var(--green); }
     @media (max-width: 600px) { .post-title { font-size: 24px; } }
+
     /* ── FIGURES ── */
     .figure {
       background: var(--bg-secondary);
@@ -65,21 +78,133 @@
       font-family: 'DM Mono', monospace;
       letter-spacing: 0.02em;
     }
-    /* ── DESIGN POLISH ── */
-    .callout {
-      background: var(--green-bg) !important;
-      border-left: 3px solid var(--green) !important;
-      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
-      padding: 1rem 1.25rem !important;
-      margin-bottom: 1.5rem !important;
+
+    /* ── NULL RATE TABLE ── */
+    .null-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+      margin: 1rem 0;
     }
-    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
-    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
-    body.dark .callout p { color: #6ee9c0 !important; }
-    .post-content strong { color: var(--text-primary); font-weight: 500; }
-    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
-    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
-    .post-nav a:hover { color: var(--green); }
+    .null-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .null-table td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 0.5px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+    .null-table tr:last-child td { border-bottom: none; }
+    .null-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .null-bar-bg { background: var(--border); border-radius: 99px; height: 6px; flex: 1; overflow: hidden; min-width: 60px; }
+    .null-bar-fill { height: 100%; border-radius: 99px; }
+    .null-bar-fill.green { background: var(--green); }
+    .null-bar-fill.amber { background: var(--amber); }
+    .null-bar-fill.red { background: var(--red); }
+    .null-pct { font-size: 12px; color: var(--text-primary); min-width: 30px; }
+    .badge {
+      display: inline-flex; align-items: center;
+      font-size: 11px; font-weight: 500;
+      padding: 2px 8px; border-radius: var(--radius-pill);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .badge.green { background: var(--green-bg); color: var(--green-text); }
+    .badge.amber { background: var(--amber-bg); color: var(--amber-text); }
+    .badge.red   { background: var(--red-bg);   color: var(--red-text);   }
+
+    /* ── CHECK GRID ── */
+    .check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+    }
+    @media (max-width: 520px) { .check-grid { grid-template-columns: 1fr; } }
+    .check-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+    }
+    .check-card-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
+    }
+    .check-card ul { padding-left: 1rem; margin-bottom: 0; }
+    .check-card li { font-size: 13px; color: var(--text-secondary); margin-bottom: 0.25rem; line-height: 1.6; }
+
+    /* ── WOE INTERACTIVE ── */
+    .woe-tab-row {
+      display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;
+    }
+    .woe-tab-btn {
+      font-size: 12px; font-family: 'DM Mono', monospace;
+      padding: 5px 13px; border: 0.5px solid var(--border-hover);
+      border-radius: var(--radius-pill);
+      background: var(--bg-secondary); color: var(--text-secondary);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .woe-tab-btn.active {
+      background: var(--green); color: #fff; border-color: var(--green);
+    }
+    .woe-panel { display: none; }
+    .woe-panel.active { display: block; }
+
+    /* ── SPLIT DIAGRAM ── */
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+    @media (max-width: 520px) { .split-grid { grid-template-columns: 1fr; } }
+    .split-card {
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      border: 0.5px solid var(--border);
+    }
+    .split-card.correct { background: var(--green-bg); border-color: var(--green); }
+    .split-card.wrong   { background: var(--red-bg);   border-color: var(--red); }
+    .split-card-label {
+      font-size: 11px; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.08em; font-family: 'DM Mono', monospace;
+      margin-bottom: 0.65rem;
+    }
+    .split-card.correct .split-card-label { color: var(--green-text); }
+    .split-card.wrong   .split-card-label { color: var(--red-text); }
+    .split-card ul { padding-left: 1rem; margin: 0; }
+    .split-card li { font-size: 13px; margin-bottom: 0.3rem; line-height: 1.6; }
+    .split-card.correct li { color: var(--green-text); }
+    .split-card.wrong   li { color: var(--red-text); }
+
+    /* ── OUTPUT LIST ── */
+    .output-list { list-style: none; padding: 0; margin: 1.25rem 0; }
+    .output-item {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 0.7rem 0; border-bottom: 0.5px solid var(--border);
+    }
+    .output-item:last-child { border-bottom: none; }
+    .output-num {
+      min-width: 22px; height: 22px;
+      background: var(--green); color: #fff;
+      border-radius: 50%;
+      font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .output-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+    .output-text strong { color: var(--text-primary); }
   </style>
 </head>
 <body>
@@ -104,7 +229,11 @@
 
     <div class="post-content">
 
-      <p>After the data source register is built in Part 2, EDA is where the data tells you whether your assumptions were correct. In credit scoring, this step has a specific character: you are not just exploring the data to understand its shape — you are running a systematic quality gate that determines whether the data is safe to train on. Skipping or rushing this stage is one of the most reliable ways to build a model that looks good in development and fails in production.</p>
+      <p>EDA in credit scoring is not pure exploration — it is a systematic quality gate. After the data source register is built in Part 2, this step determines whether each source is safe to train on. Missing here is one of the most reliable paths to a model that passes dev review and quietly fails in production.</p>
+
+      <div class="callout">
+        <p>EDA output is also regulatory evidence. The risk team and model governance committee will review this stage before approving the model. Transparency is not optional.</p>
+      </div>
 
       <hr>
 
@@ -112,37 +241,164 @@
       <h2>Quality Checks on the Credit Dataset</h2>
 
       <h3>Missing values</h3>
-      <p>In credit data, missingness is rarely random. A null bureau score usually means the applicant is new-to-credit — which is a meaningful signal in itself, not just a gap to fill. A missing declared income field could indicate a self-employed applicant who was not required to submit payslips, or it could indicate a data pipeline failure. The first case should be imputed thoughtfully (e.g., median income of the same product segment); the second should trigger a data quality escalation.</p>
-      <p>For each column, compute the null rate by time period and by product type. A sudden spike in nulls in a particular month often traces back to a system migration, a field being made optional in the loan application form, or an upstream ETL job that broke. These are not model problems — they are data engineering problems that must be resolved before training.</p>
+      <p>Missingness in credit data is rarely random — each null often carries its own meaning and its own fix.</p>
+
+      <div class="check-grid">
+        <div class="check-card">
+          <div class="check-card-title">Intentional nulls</div>
+          <ul>
+            <li>Null bureau score → new-to-credit applicant</li>
+            <li>Missing payslip income → self-employed segment</li>
+            <li>Treat as a signal, impute with segment median</li>
+          </ul>
+        </div>
+        <div class="check-card">
+          <div class="check-card-title">Pipeline failures</div>
+          <ul>
+            <li>Sudden null spike in a specific month</li>
+            <li>Likely cause: ETL breakage, field made optional</li>
+            <li>Escalate as data engineering issue before training</li>
+          </ul>
+        </div>
+        <div class="check-card">
+          <div class="check-card-title">How to investigate</div>
+          <ul>
+            <li>Compute null rate by time period and product type</li>
+            <li>Plot null rate trend — spikes indicate incidents</li>
+            <li>Cross-reference with system migration logs</li>
+          </ul>
+        </div>
+        <div class="check-card">
+          <div class="check-card-title">Resolution</div>
+          <ul>
+            <li>Document every null decision in the EDA report</li>
+            <li>Unresolved nulls = accepted risk, must be noted</li>
+            <li>Do <strong>not</strong> drop rows without understanding why</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Null Rate Table -->
+      <div class="figure">
+        <div class="step-label" style="margin-bottom:0.75rem;">NULL RATE BY FEATURE — SAMPLE AUDIT</div>
+        <table class="null-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Null Rate</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>bureau_score</code></td>
+              <td>
+                <div class="null-bar-wrap">
+                  <div class="null-bar-bg"><div class="null-bar-fill amber" style="width:18%"></div></div>
+                  <span class="null-pct">18%</span>
+                </div>
+              </td>
+              <td><span class="badge amber">Watch</span></td>
+              <td>Flag as new-to-credit segment</td>
+            </tr>
+            <tr>
+              <td><code>declared_income</code></td>
+              <td>
+                <div class="null-bar-wrap">
+                  <div class="null-bar-bg"><div class="null-bar-fill green" style="width:4%"></div></div>
+                  <span class="null-pct">4%</span>
+                </div>
+              </td>
+              <td><span class="badge green">OK</span></td>
+              <td>Median impute by product</td>
+            </tr>
+            <tr>
+              <td><code>employer_tenure</code></td>
+              <td>
+                <div class="null-bar-wrap">
+                  <div class="null-bar-bg"><div class="null-bar-fill amber" style="width:22%"></div></div>
+                  <span class="null-pct">22%</span>
+                </div>
+              </td>
+              <td><span class="badge amber">Watch</span></td>
+              <td>Self-employed → separate bin</td>
+            </tr>
+            <tr>
+              <td><code>dpd_prev_12m</code></td>
+              <td>
+                <div class="null-bar-wrap">
+                  <div class="null-bar-bg"><div class="null-bar-fill green" style="width:6%"></div></div>
+                  <span class="null-pct">6%</span>
+                </div>
+              </td>
+              <td><span class="badge green">OK</span></td>
+              <td>Zero-impute (no history = clean)</td>
+            </tr>
+            <tr>
+              <td><code>app_device_model</code></td>
+              <td>
+                <div class="null-bar-wrap">
+                  <div class="null-bar-bg"><div class="null-bar-fill red" style="width:41%"></div></div>
+                  <span class="null-pct">41%</span>
+                </div>
+              </td>
+              <td><span class="badge red">Escalate</span></td>
+              <td>ETL gap — resolve at pipeline</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="figure-caption">Fig 1 — Sample null-rate audit. Features with &gt;30% null that can't be explained should be escalated to data engineering.</div>
+      </div>
 
       <h3>Class imbalance</h3>
-      <p>Default rates in retail banking are typically between 2% and 10% depending on the product and market. A 95:5 good-to-bad ratio is common. This matters because naive training on an imbalanced dataset produces a model that predicts "good" for almost everything and achieves 95% accuracy while being essentially useless for its actual purpose. Standard approaches include class weighting (passing <code>class_weight='balanced'</code> in scikit-learn), oversampling the minority class with SMOTE, or adjusting the decision threshold post-training. For a credit scorecard, class weighting is usually preferred because it preserves the true score distribution without introducing synthetic samples that could distort the score calibration.</p>
+      <p>Default rates in retail banking sit between 2–10%. A naive model that predicts "good" for every applicant scores 93% accuracy but zero utility. Three standard remedies:</p>
+      <ul>
+        <li><strong>Class weighting</strong> — <code>class_weight='balanced'</code> in scikit-learn. Preferred for scorecards because it preserves the true score distribution.</li>
+        <li><strong>SMOTE oversampling</strong> — generates synthetic minority samples. Useful for tree models but can distort score calibration.</li>
+        <li><strong>Threshold calibration</strong> — keep training as-is, adjust the decision cutoff post-training to match business risk appetite.</li>
+      </ul>
 
       <div class="figure">
-        <svg width="100%" viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+        <svg width="100%" viewBox="0 0 520 170" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
           <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">LABEL DISTRIBUTION — TYPICAL RETAIL CREDIT DATASET</text>
           <!-- Good bar -->
-          <rect x="10" y="24" width="440" height="40" rx="6" fill="var(--green-bg)" stroke="var(--border)" stroke-width="0.5"/>
-          <rect x="10" y="24" width="420" height="40" rx="6" fill="var(--green)" opacity="0.75"/>
+          <rect x="10" y="24" width="440" height="40" rx="6" fill="var(--bg)" stroke="var(--border)" stroke-width="0.5"/>
+          <rect x="10" y="24" width="410" height="40" rx="6" fill="var(--green)" opacity="0.75"/>
           <text x="20" y="49" font-family="DM Sans, sans-serif" font-size="13" fill="#fff" font-weight="500">Good borrowers — 93%</text>
-          <text x="460" y="49" font-family="DM Mono, monospace" font-size="12" fill="var(--text-secondary)">93k</text>
+          <text x="458" y="49" font-family="DM Mono, monospace" font-size="12" fill="var(--text-secondary)">93k</text>
           <!-- Bad bar -->
-          <rect x="10" y="76" width="440" height="40" rx="6" fill="var(--green-bg)" stroke="var(--border)" stroke-width="0.5"/>
-          <rect x="10" y="76" width="31" height="40" rx="6" fill="#EF4444" opacity="0.8"/>
-          <text x="48" y="101" font-family="DM Sans, sans-serif" font-size="13" fill="var(--text-secondary)">Bad borrowers (DPD90+) — 7%</text>
-          <text x="460" y="101" font-family="DM Mono, monospace" font-size="12" fill="var(--text-secondary)">7k</text>
-          <!-- Annotation -->
-          <line x1="10" y1="130" x2="510" y2="130" stroke="var(--border)" stroke-width="0.5"/>
-          <text x="10" y="145" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">→ Naive accuracy: 93% (useless). Use class_weight='balanced' or threshold calibration.</text>
+          <rect x="10" y="74" width="440" height="40" rx="6" fill="var(--bg)" stroke="var(--border)" stroke-width="0.5"/>
+          <rect x="10" y="74" width="31" height="40" rx="6" fill="#EF4444" opacity="0.8"/>
+          <text x="48" y="99" font-family="DM Sans, sans-serif" font-size="13" fill="var(--text-secondary)">Bad borrowers (DPD90+) — 7%</text>
+          <text x="458" y="99" font-family="DM Mono, monospace" font-size="12" fill="var(--text-secondary)">7k</text>
+          <!-- Divider -->
+          <line x1="10" y1="126" x2="510" y2="126" stroke="var(--border)" stroke-width="0.5"/>
+          <!-- Callout -->
+          <rect x="10" y="134" width="500" height="22" rx="4" fill="var(--red-bg)" opacity="0.7"/>
+          <text x="18" y="148" font-family="DM Mono, monospace" font-size="10" fill="var(--red-text)">⚠ Naive accuracy: 93% (useless). Use class_weight='balanced' or threshold calibration.</text>
         </svg>
-        <div class="figure-caption">Fig 1 — Class imbalance in a typical retail credit portfolio. A model predicting "good" for everyone scores 93% accuracy but zero utility.</div>
+        <div class="figure-caption">Fig 2 — Class imbalance in a typical retail credit portfolio. 93% accuracy means nothing when the model predicts "good" for everyone.</div>
       </div>
 
       <h3>Schema validation</h3>
-      <p>Credit data flowing from multiple systems is prone to silent type errors: a numeric income field arriving as a string, a date stored as a Unix timestamp in one system and as a formatted string in another, a categorical field with inconsistent encodings across vintages (e.g., employment type encoded as "FT" in 2021 and "Full-time" in 2022). These are caught by comparing the schema of recent data against the schema documented at the source audit stage. Any drift here must be resolved at the ETL layer before it reaches model training.</p>
+      <p>Credit data from multiple systems is prone to silent type drift. Key checks to run against the source audit schema:</p>
+      <ul>
+        <li><strong>Numeric fields arriving as strings</strong> — income, loan amount, bureau balance</li>
+        <li><strong>Inconsistent date formats</strong> — Unix timestamp vs. formatted string across vintages</li>
+        <li><strong>Categorical encoding drift</strong> — e.g. <code>"FT"</code> in 2021 becoming <code>"Full-time"</code> in 2022</li>
+        <li><strong>Undocumented new columns</strong> — new fields added upstream without notifying the model team</li>
+      </ul>
+      <p>Schema drift caught here must be resolved at the ETL layer before training begins — not patched inside the model pipeline.</p>
 
       <h3>Outliers</h3>
-      <p>Income and loan amount fields in credit applications frequently contain extreme outliers — either genuine high-net-worth applicants or data entry errors (someone entering their annual income as their monthly income, or a system that stored values in a different currency before a migration). Winsorization at the 1st and 99th percentile is a common default, but the right approach depends on the feature. For bureau balance fields, a genuinely high balance is important signal and should not be clipped arbitrarily. Always inspect the top and bottom 1% of each numeric field manually before deciding on outlier treatment.</p>
+      <p>Income and loan amount fields frequently contain extreme values — either genuine high-net-worth applicants or data entry errors. The right treatment depends on the field type:</p>
+      <ul>
+        <li><strong>Application fields</strong> (declared income) — winsorize at 1st / 99th percentile by default</li>
+        <li><strong>Bureau balance fields</strong> — a genuinely high balance is predictive signal, don't clip blindly</li>
+        <li><strong>Always inspect</strong> the top and bottom 1% of each numeric field before deciding on treatment</li>
+        <li>Common data errors: income stored as monthly value when system expects annual; currency unit mismatch after migration</li>
+      </ul>
 
       <hr>
 
@@ -150,30 +406,241 @@
       <h2>Feature-Level Checks</h2>
 
       <h3>Target leakage</h3>
-      <p>Target leakage is the most dangerous EDA finding in credit scoring, and it is more common than it should be. Leakage occurs when a feature used at training time incorporates information that would not be available at the time of the actual credit decision. Classic examples in banking include: using a feature that is computed from data generated <em>after</em> the loan was disbursed (e.g., number of missed payments in the first 3 months, included as a "feature" by mistake), or including the loan amount itself when the loan amount was adjusted based on a prior risk assessment that incorporated the default probability.</p>
-      <p>A practical heuristic: any feature that has an abnormally high Information Value (IV > 0.5) on the first pass should be scrutinized for leakage. Legitimate features rarely achieve IV that high. If one does, understand exactly what it measures and when it is generated — before it makes it into the feature set.</p>
+      <p>Leakage is the most dangerous EDA finding in credit scoring — and more common than it should be. A feature leaks if it incorporates information that would not exist at the time of the actual credit decision.</p>
 
-      <h3>Temporal consistency</h3>
-      <p>Credit data has a natural time axis: applications come in over months and years, and the "bad" label is determined with a lag (DPD90+ within 12 months). This means the dataset must be split by time. Training on data from 2020–2022 and validating on 2023 data is the correct setup. Shuffling randomly — which is the default in most ML libraries — leaks future data into the training set and produces optimistically biased validation metrics. The mistake is easy to make and hard to detect after the fact.</p>
-
-      <div class="callout">
-        <p>Always validate the temporal integrity of the dataset by plotting your default rate by origination month. If default rates appear artificially low for recent vintages (the last 12 months), it is likely because those loans have not had enough time to go bad yet — the performance window is incomplete. These recent vintages should be excluded from training or treated as an indeterminate population.</p>
+      <div class="callout red">
+        <p>Any feature with an Information Value &gt; 0.5 on first pass should be treated as a leakage suspect. Legitimate features rarely reach this level. Audit the exact generation timestamp of that field before letting it into the feature set.</p>
       </div>
 
-      <h3>Distribution analysis</h3>
-      <p>Plot the distribution of each numeric feature, segmented by target class (good vs. bad). Income distributions for bad borrowers tend to be left-shifted relative to good borrowers — but the overlap region is where the model earns its value. A feature where the two distributions are nearly identical carries no discriminatory power. Weight of Evidence (WOE) binning is the standard credit risk approach for this: it transforms a continuous feature into log-odds bins, making the monotonic relationship between the feature and default probability explicit and interpretable.</p>
+      <ul>
+        <li><strong>Classic example 1:</strong> "Number of missed payments in first 3 months" included as a feature — it's generated <em>after</em> the loan disbursed</li>
+        <li><strong>Classic example 2:</strong> Loan amount adjusted based on a prior risk score, then used as input — a circular dependency</li>
+        <li><strong>Detection:</strong> for every feature, document the event timestamp of its generation and compare to the loan application timestamp</li>
+        <li><strong>Leaky model symptom:</strong> near-perfect metrics during training, dramatic decay on real-world holdout</li>
+      </ul>
+
+      <h3>Temporal consistency</h3>
+      <p>Credit data has a natural time axis. The "bad" label is determined with a 12-month lag (DPD90+ within 12 months of disbursement). This forces a specific train/validation structure.</p>
+
+      <div class="split-grid">
+        <div class="split-card correct">
+          <div class="split-card-label">✓ Correct: time-based split</div>
+          <ul>
+            <li>Train: 2020 – 2022 applications</li>
+            <li>Validation: 2023 applications</li>
+            <li>Future never leaks into past</li>
+            <li>Reflects real production conditions</li>
+          </ul>
+        </div>
+        <div class="split-card wrong">
+          <div class="split-card-label">✗ Wrong: random shuffle</div>
+          <ul>
+            <li>Train/val split by random seed</li>
+            <li>2023 loans appear in training set</li>
+            <li>Validation metrics are optimistically biased</li>
+            <li>Discovered only after production degradation</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Time-split SVG diagram -->
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 560 130" xmlns="http://www.w3.org/2000/svg" style="max-width:560px; display:block; margin:0 auto;">
+          <!-- Timeline axis -->
+          <line x1="20" y1="100" x2="540" y2="100" stroke="var(--border)" stroke-width="1"/>
+          <!-- Year ticks -->
+          <line x1="60"  y1="97" x2="60"  y2="103" stroke="var(--text-secondary)" stroke-width="1"/>
+          <line x1="175" y1="97" x2="175" y2="103" stroke="var(--text-secondary)" stroke-width="1"/>
+          <line x1="290" y1="97" x2="290" y2="103" stroke="var(--text-secondary)" stroke-width="1"/>
+          <line x1="405" y1="97" x2="405" y2="103" stroke="var(--text-secondary)" stroke-width="1"/>
+          <line x1="520" y1="97" x2="520" y2="103" stroke="var(--text-secondary)" stroke-width="1"/>
+          <text x="55"  y="115" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" text-anchor="middle">2020</text>
+          <text x="175" y="115" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" text-anchor="middle">2021</text>
+          <text x="290" y="115" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" text-anchor="middle">2022</text>
+          <text x="405" y="115" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" text-anchor="middle">2023</text>
+          <text x="520" y="115" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" text-anchor="middle">2024</text>
+          <!-- TRAIN block -->
+          <rect x="55" y="60" width="350" height="28" rx="5" fill="var(--green)" opacity="0.7"/>
+          <text x="230" y="79" font-family="DM Sans, sans-serif" font-size="12" fill="#fff" font-weight="500" text-anchor="middle">TRAIN  (2020 – 2022)</text>
+          <!-- VAL block -->
+          <rect x="408" y="60" width="112" height="28" rx="5" fill="var(--amber)" opacity="0.8"/>
+          <text x="464" y="79" font-family="DM Sans, sans-serif" font-size="12" fill="#fff" font-weight="500" text-anchor="middle">VALIDATE</text>
+          <!-- Divider line -->
+          <line x1="406" y1="50" x2="406" y2="105" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="406" y="44" font-family="DM Mono, monospace" font-size="10" fill="var(--red-text)" text-anchor="middle">cutoff</text>
+          <!-- Arrow -->
+          <polyline points="535,100 545,96 545,104" fill="var(--border)" stroke="var(--text-secondary)" stroke-width="1"/>
+          <text x="543" y="92" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">time</text>
+        </svg>
+        <div class="figure-caption">Fig 3 — Correct time-based split. The dashed cutoff line ensures no 2023+ data appears in the training set.</div>
+      </div>
+
+      <div class="callout amber">
+        <p>Recent vintages (last 12 months) show artificially low default rates — the performance window is incomplete. Exclude them from training or treat them as an indeterminate population.</p>
+      </div>
+
+      <h3>WOE / IV Analysis</h3>
+      <p>Weight of Evidence (WOE) binning transforms a continuous feature into log-odds bins, making the relationship between that feature and default probability explicit. Information Value (IV) summarises the overall predictive power of a feature.</p>
+
+      <!-- WOE Interactive chart -->
+      <div class="figure">
+        <div class="woe-tab-row">
+          <button class="woe-tab-btn active" onclick="switchWOE('income')">Declared income</button>
+          <button class="woe-tab-btn" onclick="switchWOE('bureau')">Bureau score</button>
+          <button class="woe-tab-btn" onclick="switchWOE('dpd')">DPD history</button>
+        </div>
+
+        <!-- Income WOE -->
+        <div id="woe-income" class="woe-panel active">
+          <svg width="100%" viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+            <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">DECLARED INCOME — WOE by bin  |  IV = 0.31 (strong)</text>
+            <!-- Y axis label -->
+            <text x="6" y="105" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" transform="rotate(-90,6,105)">WOE</text>
+            <!-- Zero line -->
+            <line x1="35" y1="105" x2="510" y2="105" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3"/>
+            <!-- Bins: 5 income bins, WOE goes negative (low income = more default) to positive (high income = less default) -->
+            <!-- Bin 1: <5M VND  WOE=-1.2 -->
+            <rect x="45"  y="105" width="75" height="58" rx="4" fill="#EF4444" opacity="0.7"/>
+            <text x="82"  y="172" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">&lt;5M</text>
+            <text x="82"  y="183" font-family="DM Mono, monospace" font-size="9" fill="var(--red-text)" text-anchor="middle">-1.2</text>
+            <!-- Bin 2: 5-10M WOE=-0.55 -->
+            <rect x="130" y="105" width="75" height="27" rx="4" fill="#EF4444" opacity="0.5"/>
+            <text x="167" y="172" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">5-10M</text>
+            <text x="167" y="183" font-family="DM Mono, monospace" font-size="9" fill="var(--red-text)" text-anchor="middle">-0.55</text>
+            <!-- Bin 3: 10-20M WOE=0.05 -->
+            <rect x="215" y="102" width="75" height="5" rx="2" fill="var(--text-secondary)" opacity="0.4"/>
+            <text x="252" y="172" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">10-20M</text>
+            <text x="252" y="183" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">+0.05</text>
+            <!-- Bin 4: 20-40M WOE=0.6 -->
+            <rect x="300" y="75" width="75" height="30" rx="4" fill="var(--green)" opacity="0.55"/>
+            <text x="337" y="172" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">20-40M</text>
+            <text x="337" y="183" font-family="DM Mono, monospace" font-size="9" fill="var(--green-text)" text-anchor="middle">+0.60</text>
+            <!-- Bin 5: >40M WOE=1.1 -->
+            <rect x="385" y="52" width="75" height="53" rx="4" fill="var(--green)" opacity="0.8"/>
+            <text x="422" y="172" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">&gt;40M</text>
+            <text x="422" y="183" font-family="DM Mono, monospace" font-size="9" fill="var(--green-text)" text-anchor="middle">+1.10</text>
+            <!-- Axis -->
+            <line x1="35" y1="20" x2="35" y2="165" stroke="var(--border)" stroke-width="1"/>
+            <line x1="35" y1="165" x2="510" y2="165" stroke="var(--border)" stroke-width="1"/>
+            <!-- WOE line -->
+            <polyline points="82,163 167,132 252,104 337,75 422,52" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="4,2"/>
+          </svg>
+        </div>
+
+        <!-- Bureau score WOE -->
+        <div id="woe-bureau" class="woe-panel">
+          <svg width="100%" viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+            <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">BUREAU SCORE — WOE by bin  |  IV = 0.52 (very strong)</text>
+            <text x="6" y="105" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" transform="rotate(-90,6,105)">WOE</text>
+            <line x1="35" y1="105" x2="510" y2="105" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3"/>
+            <!-- Bin 1: <400 WOE=-1.8 -->
+            <rect x="45"  y="105" width="75" height="72" rx="4" fill="#EF4444" opacity="0.8"/>
+            <text x="82"  y="185" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">&lt;400</text>
+            <text x="82"  y="196" font-family="DM Mono, monospace" font-size="9" fill="var(--red-text)" text-anchor="middle">-1.8</text>
+            <!-- Bin 2: 400-500 WOE=-0.9 -->
+            <rect x="130" y="105" width="75" height="44" rx="4" fill="#EF4444" opacity="0.55"/>
+            <text x="167" y="185" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">400-500</text>
+            <text x="167" y="196" font-family="DM Mono, monospace" font-size="9" fill="var(--red-text)" text-anchor="middle">-0.90</text>
+            <!-- Bin 3: 500-600 WOE=-0.2 -->
+            <rect x="215" y="95" width="75" height="10" rx="2" fill="#EF4444" opacity="0.3"/>
+            <text x="252" y="185" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">500-600</text>
+            <text x="252" y="196" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">-0.20</text>
+            <!-- Bin 4: 600-700 WOE=0.7 -->
+            <rect x="300" y="71" width="75" height="34" rx="4" fill="var(--green)" opacity="0.6"/>
+            <text x="337" y="185" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">600-700</text>
+            <text x="337" y="196" font-family="DM Mono, monospace" font-size="9" fill="var(--green-text)" text-anchor="middle">+0.70</text>
+            <!-- Bin 5: >700 WOE=1.5 -->
+            <rect x="385" y="35" width="75" height="70" rx="4" fill="var(--green)" opacity="0.85"/>
+            <text x="422" y="185" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">&gt;700</text>
+            <text x="422" y="196" font-family="DM Mono, monospace" font-size="9" fill="var(--green-text)" text-anchor="middle">+1.50</text>
+            <line x1="35" y1="20" x2="35" y2="180" stroke="var(--border)" stroke-width="1"/>
+            <line x1="35" y1="180" x2="510" y2="180" stroke="var(--border)" stroke-width="1"/>
+            <polyline points="82,177 167,149 252,105 337,71 422,35" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="4,2"/>
+          </svg>
+        </div>
+
+        <!-- DPD history WOE -->
+        <div id="woe-dpd" class="woe-panel">
+          <svg width="100%" viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+            <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">DPD HISTORY (past 12m) — WOE by bin  |  IV = 0.44 (strong)</text>
+            <text x="6" y="105" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" transform="rotate(-90,6,105)">WOE</text>
+            <line x1="35" y1="105" x2="510" y2="105" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3"/>
+            <!-- Bin 1: No DPD WOE=0.9 -->
+            <rect x="45"  y="60" width="100" height="45" rx="4" fill="var(--green)" opacity="0.8"/>
+            <text x="95"  y="175" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">No DPD</text>
+            <text x="95"  y="186" font-family="DM Mono, monospace" font-size="9" fill="var(--green-text)" text-anchor="middle">+0.90</text>
+            <!-- Bin 2: DPD1-15 WOE=0.1 -->
+            <rect x="155" y="100" width="90" height="8" rx="2" fill="var(--text-secondary)" opacity="0.35"/>
+            <text x="200" y="175" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">DPD1-15</text>
+            <text x="200" y="186" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">+0.10</text>
+            <!-- Bin 3: DPD16-30 WOE=-0.7 -->
+            <rect x="255" y="105" width="90" height="35" rx="4" fill="#EF4444" opacity="0.55"/>
+            <text x="300" y="175" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">DPD16-30</text>
+            <text x="300" y="186" font-family="DM Mono, monospace" font-size="9" fill="var(--red-text)" text-anchor="middle">-0.70</text>
+            <!-- Bin 4: DPD>30 WOE=-1.6 -->
+            <rect x="355" y="105" width="100" height="63" rx="4" fill="#EF4444" opacity="0.8"/>
+            <text x="405" y="175" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" text-anchor="middle">DPD &gt;30</text>
+            <text x="405" y="186" font-family="DM Mono, monospace" font-size="9" fill="var(--red-text)" text-anchor="middle">-1.60</text>
+            <line x1="35" y1="20" x2="35" y2="165" stroke="var(--border)" stroke-width="1"/>
+            <line x1="35" y1="165" x2="510" y2="165" stroke="var(--border)" stroke-width="1"/>
+            <polyline points="95,105 200,101 300,140 405,168" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="4,2"/>
+          </svg>
+        </div>
+
+        <div class="figure-caption">Fig 4 — Interactive WOE analysis. Bars above the zero line = good borrower signal; bars below = bad borrower signal. Toggle between features to compare predictive power.</div>
+      </div>
+
+      <p>IV interpretation guide:</p>
+      <ul>
+        <li><code>IV &lt; 0.02</code> — Useless (do not include)</li>
+        <li><code>0.02 – 0.1</code> — Weak predictor</li>
+        <li><code>0.1 – 0.3</code> — Medium predictor</li>
+        <li><code>0.3 – 0.5</code> — Strong predictor</li>
+        <li><code>IV &gt; 0.5</code> — Suspiciously strong — audit for leakage</li>
+      </ul>
 
       <h3>Correlation and redundancy</h3>
-      <p>In a credit dataset with dozens of bureau attributes, it is common to find groups of highly correlated features (e.g., number of open credit cards, total revolving balance, credit utilization ratio — all three capture aspects of the same underlying behavior). High inter-feature correlation does not hurt tree-based models much, but it can cause instability in logistic regression-based scorecards. Use variance inflation factor (VIF) checks during feature selection and prefer retaining the feature with the highest IV within a correlated cluster rather than all of them.</p>
+      <p>Credit bureau data often yields clusters of correlated features. Three typical clusters in retail credit:</p>
+      <ul>
+        <li><strong>Utilization cluster</strong> — open credit cards, total revolving balance, credit utilization ratio (all measure the same behaviour)</li>
+        <li><strong>Delinquency cluster</strong> — DPD 30+, DPD 60+, DPD 90+ counts over various time windows</li>
+        <li><strong>Income cluster</strong> — declared income, bank transaction income estimate, employer-implied salary band</li>
+      </ul>
+      <p>For logistic regression scorecards, check Variance Inflation Factor (VIF) within each cluster. Keep the single feature with the highest IV per cluster; drop the rest to avoid instability in the model coefficients.</p>
 
       <hr>
 
       <div class="step-label">Output</div>
       <h2>EDA Report and Feature Shortlist</h2>
 
-      <p>The output of EDA is a feature shortlist and an EDA report documenting the quality findings, decisions made, and risks flagged. The feature shortlist should include: the final set of candidate features, the null rate and imputation strategy for each, the WOE/IV analysis summary, any features excluded and why (leakage, low IV, compliance), and any data quality issues that were resolved or that remain open as accepted risks.</p>
+      <p>The EDA stage produces two deliverables: a feature shortlist and a written EDA report that the risk team and model governance committee will review.</p>
 
-      <p>This document is not just for the data scientist — it is the evidentiary record that the risk team and model governance committee will review before approving the model for production. In a regulated environment, the transparency of this stage is not optional.</p>
+      <ul class="output-list">
+        <li class="output-item">
+          <span class="output-num">1</span>
+          <span class="output-text"><strong>Null-rate log</strong> — null rate by feature, time period, and product segment; imputation decision for each</span>
+        </li>
+        <li class="output-item">
+          <span class="output-num">2</span>
+          <span class="output-text"><strong>Schema diff report</strong> — deviations from the source audit schema, resolved vs. unresolved</span>
+        </li>
+        <li class="output-item">
+          <span class="output-num">3</span>
+          <span class="output-text"><strong>WOE / IV table</strong> — all candidate features ranked by IV, with WOE bin charts for the top 20</span>
+        </li>
+        <li class="output-item">
+          <span class="output-num">4</span>
+          <span class="output-text"><strong>Leakage audit log</strong> — features investigated for leakage, evidence reviewed, outcome (keep / exclude)</span>
+        </li>
+        <li class="output-item">
+          <span class="output-num">5</span>
+          <span class="output-text"><strong>Feature shortlist</strong> — final candidate set with justification; features excluded and why (leakage, low IV, compliance)</span>
+        </li>
+        <li class="output-item">
+          <span class="output-num">6</span>
+          <span class="output-text"><strong>Vintage chart</strong> — default rate by origination month, flagging vintages excluded due to incomplete performance window</span>
+        </li>
+      </ul>
 
     </div>
 
@@ -185,6 +652,7 @@
   </div>
 
   <script>
+    /* Dark mode */
     let dark = false;
     function toggleDark() {
       dark = !dark;
@@ -194,6 +662,14 @@
       localStorage.setItem('theme', dark ? 'dark' : 'light');
     }
     if (localStorage.getItem('theme') === 'dark') toggleDark();
+
+    /* WOE tab switcher */
+    function switchWOE(id) {
+      document.querySelectorAll('.woe-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.woe-tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('woe-' + id).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
   </script>
 </body>
 </html>
