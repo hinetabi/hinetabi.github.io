@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Le Thanh Binh — Data Scientist</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fafaf8;
+      --bg-secondary: #f1efea;
+      --bg-card: #ffffff;
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b67;
+      --border: rgba(0,0,0,0.1);
+      --border-hover: rgba(0,0,0,0.2);
+      --green: #1D9E75;
+      --green-bg: #E1F5EE;
+      --green-text: #0F6E56;
+      --radius-md: 8px;
+      --radius-lg: 14px;
+      --radius-pill: 999px;
+      --transition: 0.25s ease;
+    }
+
+    body.dark {
+      --bg: #111110;
+      --bg-secondary: #1c1c1a;
+      --bg-card: #1c1c1a;
+      --text-primary: #f0ede6;
+      --text-secondary: #888780;
+      --border: rgba(255,255,255,0.09);
+      --border-hover: rgba(255,255,255,0.18);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+    }
+
+    .site {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.4rem 0;
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 3.5rem;
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .nav-links { display: flex; gap: 1.75rem; }
+    .nav-links a {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+
+    .toggle-btn {
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      padding: 5px 13px;
+      border: 0.5px solid var(--border-hover);
+      border-radius: var(--radius-pill);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .toggle-btn:hover { border-color: var(--green); }
+
+    /* HERO */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .hero-tag {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--green-text);
+      background: var(--green-bg);
+      padding: 4px 11px;
+      border-radius: var(--radius-pill);
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+      font-size: 34px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.22;
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+      max-width: 430px;
+    }
+
+    .hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 0.5px solid var(--border-hover);
+      padding: 10px 22px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: border-color var(--transition);
+      text-decoration: none;
+    }
+    .btn-secondary:hover { border-color: var(--green); color: var(--green); }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: #9FE1CB;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 500;
+      color: #0F6E56;
+      flex-shrink: 0;
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 0 1px var(--border);
+    }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 3.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 1.1rem;
+      transition: background var(--transition);
+    }
+
+    .stat-num {
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--text-primary);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: -1px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    /* SECTION TITLE */
+    .section-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.25rem;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* SKILLS */
+    .skills-section { margin-bottom: 3.5rem; }
+    .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .skill-pill {
+      font-size: 13px;
+      padding: 5px 13px;
+      border-radius: var(--radius-pill);
+      font-weight: 400;
+      border: 0.5px solid transparent;
+    }
+    .pill-teal  { background: #E1F5EE; color: #0F6E56; border-color: #9FE1CB; }
+    .pill-blue  { background: #E6F1FB; color: #185FA5; border-color: #B5D4F4; }
+    .pill-purple { background: #EEEDFE; color: #534AB7; border-color: #CECBF6; }
+    .pill-amber { background: #FAEEDA; color: #854F0B; border-color: #FAC775; }
+
+    /* BLOG */
+    .blog-section { margin-bottom: 3.5rem; }
+
+    .blog-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1.1rem 0;
+      border-bottom: 0.5px solid var(--border);
+      text-decoration: none;
+      transition: opacity var(--transition);
+    }
+    .blog-item:last-child { border-bottom: none; }
+    .blog-item:hover .blog-title { color: var(--green); }
+
+    .blog-body { flex: 1; }
+
+    .blog-tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      display: inline-block;
+      margin-bottom: 0.55rem;
+    }
+
+    .blog-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+      transition: color var(--transition);
+    }
+
+    .blog-arrow {
+      font-size: 16px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* EXPERIENCE */
+    .exp-section { margin-bottom: 3.5rem; }
+
+    .exp-item {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .exp-item:last-child { border-bottom: none; }
+
+    .exp-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      flex-shrink: 0;
+      font-family: 'DM Mono', monospace;
+      overflow: hidden;
+    }
+
+    .exp-logo.logo-img {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      padding: 4px;
+    }
+    .exp-logo.logo-img img { width: 100%; height: 100%; object-fit: contain; }
+
+    .exp-logo.logo-upp { background: #4B6BFB; }
+
+    .exp-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .exp-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    .exp-bullets {
+      margin-top: 0.6rem;
+      padding-left: 1rem;
+      list-style: disc;
+    }
+    .exp-bullets li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 0.25rem;
+    }
+
+    /* CONTACT */
+    .contact-section {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      transition: background var(--transition);
+    }
+
+    .connect-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .connect-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .contact-links { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .contact-link {
+      font-size: 13px;
+      padding: 8px 18px;
+      border: 0.5px solid var(--border-hover);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      background: var(--bg-card);
+      text-decoration: none;
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .contact-link:hover { border-color: var(--green); color: var(--green); }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .hero { grid-template-columns: 1fr; }
+      .avatar { display: none; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+      .hero h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+
+    <nav>
+      <div class="nav-left">
+        <span class="nav-logo">hinetabi.github.io</span>
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()">
+          <span id="toggleIcon">🌙</span>
+          <span id="toggleLabel">Dark</span>
+        </button>
+      </div>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#writing">Writing</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="about" class="hero">
+      <div>
+        <div class="hero-tag">Data Scientist @ Cake by VP Bank</div>
+        <h1>Hi, I'm<br>Le Thanh Binh</h1>
+        <p class="hero-sub">Data Scientist with 3+ years building production ML systems at scale.</p>
+        <div class="hero-btns">
+          <a class="btn-primary" href="#contact">Get in touch</a>
+          <a class="btn-secondary" href="CV_LeThanhBinh.pdf" download>Download CV</a>
+        </div>
+      </div>
+      <div class="avatar">LB</div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Years experience</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">10+</div>
+        <div class="stat-label">Production ML deployments</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">$ X</div>
+        <div class="stat-label">Impact on revenue</div>
+      </div>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="skills-section">
+      <div class="section-title">Skills</div>
+      <div class="skills-grid">
+        <span class="skill-pill pill-purple">Deep Learning</span>
+        <span class="skill-pill pill-amber">Machine Learning</span>
+        <span class="skill-pill pill-blue">Data Analytics</span>
+        <span class="skill-pill pill-teal">Data Engineering</span>
+      </div>
+    </div>
+
+    <!-- WRITING -->
+    <div id="writing" class="blog-section">
+      <div class="section-title">Writing</div>
+
+      <a class="blog-item" href="#">
+        <div class="blog-body">
+          <span class="blog-tag pill-teal">MLOps</span>
+          <div class="blog-title">Building and Monitoring Machine Learning Models</div>
+        </div>
+        <span class="blog-arrow">→</span>
+      </a>
+
+      <a class="blog-item" href="#">
+        <div class="blog-body">
+          <span class="blog-tag pill-blue">NLP</span>
+          <div class="blog-title">Develop and Deploy Text Embedding Models at Scale</div>
+        </div>
+        <span class="blog-arrow">→</span>
+      </a>
+
+    </div>
+
+    <!-- EXPERIENCE -->
+    <div id="experience" class="exp-section">
+      <div class="section-title">Experience</div>
+
+      <div class="exp-item">
+        <div class="exp-logo logo-img"><img src="resources/logo/cake_by_vp.png" alt="Cake by VP Bank"></div>
+        <div>
+          <div class="exp-title">Data Scientist</div>
+          <div class="exp-meta">Cake by VPBank &nbsp;·&nbsp; 2025 – Present &nbsp;·&nbsp; Ho Chi Minh City</div>
+          <ul class="exp-bullets">
+            <li>Leading digital bank in Vietnam with 6M+ users, offering loans, payments, and personal financial management.</li>
+            <li>Building credit scoring and behavioral models to assess financial risk for consumer lending and digital banking products.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-logo logo-img"><img src="resources/logo/coccoc.png" alt="Coc Coc"></div>
+        <div>
+          <div class="exp-title">Data Scientist</div>
+          <div class="exp-meta">Coc Coc &nbsp;·&nbsp; 2024 – 2025 &nbsp;·&nbsp; Ha Noi</div>
+          <ul class="exp-bullets">
+            <li>Vietnam’s second-largest search engine and browser, serving 25M+ monthly active users.</li>
+            <li>Designed and deployed ML models for search relevance, ad ranking, and recommendation systems, directly impacting millions of users daily.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-logo logo-upp">U</div>
+        <div>
+          <div class="exp-title">Data Scientist</div>
+          <div class="exp-meta">UPP Global Technology JSC &nbsp;·&nbsp; 2022 – 2023 &nbsp;·&nbsp; Ha Noi</div>
+          <ul class="exp-bullets">
+            <li>Early-stage startup delivering enterprise AI and Big Data solutions, including Chatbots, Data Governance frameworks, and Agentic systems.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div id="contact" class="contact-section">
+      <div>
+        <div class="connect-title">Let's connect</div>
+        <div class="connect-sub">Open to collaborations and research opportunities.</div>
+      </div>
+      <div class="contact-links">
+        <a class="contact-link" href="https://www.linkedin.com/in/hinetabi/" target="_blank">LinkedIn</a>
+        <a class="contact-link" href="https://github.com/hinetabi" target="_blank">GitHub</a>
+        <a class="contact-link" href="mailto:binhlethanhfptu@gmail.com">Email</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let dark = false;
+
+    function toggleDark() {
+      dark = !dark;
+      document.body.classList.toggle('dark', dark);
+      document.getElementById('toggleIcon').textContent = dark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+
+    // Restore saved preference
+    if (localStorage.getItem('theme') === 'dark') toggleDark();
+  </script>
+</body>
+</html>
