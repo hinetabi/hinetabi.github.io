@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Building Credit Score Models in a Digital Bank — Le Thanh Binh</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fafaf8;
+      --bg-secondary: #f1efea;
+      --bg-card: #ffffff;
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b67;
+      --border: rgba(0,0,0,0.09);
+      --border-hover: rgba(0,0,0,0.18);
+      --green: #1D9E75;
+      --green-bg: #E1F5EE;
+      --green-text: #0F6E56;
+      --green-mid: #9FE1CB;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 14px;
+      --radius-pill: 999px;
+      --transition: 0.22s ease;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    body.dark {
+      --bg: #111110;
+      --bg-secondary: #1c1c1a;
+      --bg-card: #1e1e1c;
+      --text-primary: #f0ede6;
+      --text-secondary: #888780;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.16);
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+    }
+
+    .site {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 0 1.5rem 6rem;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.4rem 0;
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 3.5rem;
+    }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-logo {
+      font-size: 15px; font-weight: 500;
+      color: var(--text-primary);
+      font-family: 'DM Mono', monospace;
+      text-decoration: none;
+    }
+    .toggle-btn {
+      font-size: 13px; padding: 5px 13px;
+      border: 0.5px solid var(--border-hover);
+      border-radius: var(--radius-pill);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color var(--transition);
+    }
+    .toggle-btn:hover { border-color: var(--green); }
+    .back-link {
+      font-size: 13px; color: var(--text-secondary);
+      text-decoration: none; transition: color var(--transition);
+    }
+    .back-link:hover { color: var(--text-primary); }
+
+    /* ── POST HEADER ── */
+    .post-header { margin-bottom: 2.5rem; }
+    .post-tag {
+      font-size: 12px; font-weight: 500;
+      color: var(--green-text); background: var(--green-bg);
+      padding: 4px 11px; border-radius: var(--radius-pill);
+      display: inline-block; margin-bottom: 1rem;
+    }
+    .post-title {
+      font-size: 32px; font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.22; letter-spacing: -0.6px;
+      margin-bottom: 0.9rem;
+    }
+    .post-meta { font-size: 13px; color: var(--text-secondary); }
+
+    /* ── CONTENT ── */
+    .post-content { line-height: 1.8; }
+    .post-content p {
+      font-size: 15px; color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+    }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .post-content h2 {
+      font-size: 20px; font-weight: 500;
+      color: var(--text-primary);
+      margin-top: 3rem; margin-bottom: 0.85rem;
+      letter-spacing: -0.3px;
+    }
+
+    .callout {
+      background: var(--green-bg);
+      border-left: 3px solid var(--green);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    body.dark .callout { background: rgba(29,158,117,0.1); }
+    .callout p { margin-bottom: 0; font-size: 14px; color: var(--green-text); }
+    body.dark .callout p { color: #6ee9c0; }
+
+    hr {
+      border: none;
+      border-top: 0.5px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* ── PIPELINE DIAGRAM ── */
+    .pipeline-wrap {
+      margin: 2.5rem 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      min-width: 620px;
+      padding: 0.25rem 0;
+    }
+
+    .pipe-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+
+    .pipe-box {
+      width: 100%;
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.7rem 0.5rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      cursor: default;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pipe-box:hover {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(29,158,117,0.12);
+    }
+
+    .pipe-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--green-text);
+      margin-bottom: 3px;
+    }
+    body.dark .pipe-num { color: #6ee9c0; }
+
+    .pipe-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .pipe-arrow {
+      width: 28px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--border-hover);
+      font-size: 14px;
+      z-index: 0;
+    }
+
+    /* feedback arrow */
+    .pipeline-feedback {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 0 0.25rem 0;
+      min-width: 620px;
+      gap: 0;
+      position: relative;
+    }
+
+    .feedback-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-family: 'DM Mono', monospace;
+      white-space: nowrap;
+      margin-right: 0.5rem;
+    }
+
+    .feedback-arrow {
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ── SERIES CARDS ── */
+    .series-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+
+    .series-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      text-decoration: none;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .series-card:hover {
+      border-color: var(--green);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .series-card-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--green-text);
+      background: var(--green-bg);
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .series-card-body { flex: 1; }
+
+    .series-card-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+      line-height: 1.4;
+    }
+
+    .series-card-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .series-card-arrow {
+      font-size: 14px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: color var(--transition), transform var(--transition);
+    }
+
+    .series-card:hover .series-card-arrow {
+      color: var(--green);
+      transform: translateX(4px);
+    }
+
+    /* ── WHY SECTION ── */
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+
+    .why-card {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+    }
+
+    .why-card-label {
+      font-size: 11px;
+      font-weight: 500;
+      font-family: 'DM Mono', monospace;
+      color: var(--green-text);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+    body.dark .why-card-label { color: #6ee9c0; }
+
+    .why-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 0;
+      line-height: 1.6;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .post-title { font-size: 26px; }
+      .why-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+
+    <nav>
+      <div class="nav-left">
+        <a class="nav-logo" href="../index.html">hinetabi.github.io</a>
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()">
+          <span id="toggleIcon">🌙</span>
+          <span id="toggleLabel">Dark</span>
+        </button>
+      </div>
+      <a class="back-link" href="../index.html#writing">← Writing</a>
+    </nav>
+
+    <div class="post-header">
+      <span class="post-tag">MLOps · Series · 7 parts</span>
+      <h1 class="post-title">Building Credit Score Models<br>in a Digital Bank</h1>
+      <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
+    </div>
+
+    <div class="post-content">
+
+      <p>Shipping a credit score model is not just about training accuracy. It requires translating a regulatory-constrained business problem into a well-defined ML task, auditing messy banking data, running rigorous experiments, estimating business impact in terms stakeholders actually care about, and keeping the model healthy long after deployment.</p>
+
+      <p>This series walks through the <strong>full ML lifecycle</strong> scoped to one concrete use case: building a credit scoring model at a digital bank. Each post covers one stage in depth. The stages follow each other, but the lifecycle is a loop — monitoring feeds back into problem formulation, and every retrain makes the next one faster.</p>
+
+      <!-- ── PIPELINE DIAGRAM ── -->
+      <div class="pipeline-wrap">
+        <div class="pipeline">
+          <div class="pipe-step">
+            <div class="pipe-box">
+              <div class="pipe-num">01</div>
+              <div class="pipe-label">Problem<br>Formulation</div>
+            </div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box">
+              <div class="pipe-num">02</div>
+              <div class="pipe-label">Data Source<br>Check</div>
+            </div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box">
+              <div class="pipe-num">03</div>
+              <div class="pipe-label">EDA &amp;<br>Quality</div>
+            </div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box">
+              <div class="pipe-num">04</div>
+              <div class="pipe-label">Train &amp;<br>Experiment</div>
+            </div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box">
+              <div class="pipe-num">05</div>
+              <div class="pipe-label">Business<br>Impact</div>
+            </div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box">
+              <div class="pipe-num">06</div>
+              <div class="pipe-label">Deploy<br>Model</div>
+            </div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box" style="border-color: var(--green); box-shadow: 0 0 0 2px rgba(29,158,117,0.15);">
+              <div class="pipe-num">07</div>
+              <div class="pipe-label">Monitor<br>Model</div>
+            </div>
+          </div>
+        </div>
+        <!-- feedback arrow row -->
+        <div style="display:flex; align-items:center; min-width:620px; justify-content:flex-end; padding: 4px 0 0 0; gap: 6px;">
+          <svg width="340" height="22" viewBox="0 0 340 22" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.45; flex-shrink:0;">
+            <path d="M335 6 L335 16 L10 16 L10 6" stroke="var(--green)" stroke-width="1.2" stroke-dasharray="4 3" fill="none"/>
+            <polygon points="10,2 6,10 14,10" fill="var(--green)"/>
+          </svg>
+          <span style="font-size:10px; font-family:'DM Mono',monospace; color:var(--text-secondary); flex-shrink:0; margin-right:2px;">monitoring feeds back</span>
+        </div>
+      </div>
+
+      <hr>
+
+      <h2>Series Outline</h2>
+
+      <div class="series-list">
+
+        <a class="series-card" href="credit-score-p1-problem-formulation.html">
+          <span class="series-card-num">Part 1</span>
+          <div class="series-card-body">
+            <div class="series-card-title">Problem Formulation</div>
+            <p class="series-card-desc">Map "assess borrower risk" to a precise ML objective. Define DPD90+ target, Gini/KS metrics, and the business metric. Run a feasibility check before committing to the pipeline.</p>
+          </div>
+          <span class="series-card-arrow">→</span>
+        </a>
+
+        <a class="series-card" href="credit-score-p2-data-source.html">
+          <span class="series-card-num">Part 2</span>
+          <div class="series-card-body">
+            <div class="series-card-title">Data Source Check</div>
+            <p class="series-card-desc">Audit application data, bureau pulls, internal transaction history, and alternative data. Assess coverage, relevance, compliance, and training-serving consistency.</p>
+          </div>
+          <span class="series-card-arrow">→</span>
+        </a>
+
+        <a class="series-card" href="credit-score-p3-eda.html">
+          <span class="series-card-num">Part 3</span>
+          <div class="series-card-body">
+            <div class="series-card-title">Exploratory Data Analysis</div>
+            <p class="series-card-desc">Systematic quality gate on credit data. Check class imbalance, target leakage, temporal consistency, and WOE/IV analysis before touching a model.</p>
+          </div>
+          <span class="series-card-arrow">→</span>
+        </a>
+
+        <a class="series-card" href="credit-score-p4-model-training.html">
+          <span class="series-card-num">Part 4</span>
+          <div class="series-card-body">
+            <div class="series-card-title">Model Training &amp; Experimentation</div>
+            <p class="series-card-desc">From logistic regression scorecard to gradient-boosted models. Systematic experiment tracking. Model audit with adversarial tests, PSI, and KS.</p>
+          </div>
+          <span class="series-card-arrow">→</span>
+        </a>
+
+        <a class="series-card" href="credit-score-p5-business-impact.html">
+          <span class="series-card-num">Part 5</span>
+          <div class="series-card-body">
+            <div class="series-card-title">Business Impact Estimation</div>
+            <p class="series-card-desc">Lift curves, cost-benefit framing on the confusion matrix, and retrospective simulation. Translate Gini into NPL reduction and approval rate impact.</p>
+          </div>
+          <span class="series-card-arrow">→</span>
+        </a>
+
+        <a class="series-card" href="credit-score-p6-deploy.html">
+          <span class="series-card-num">Part 6</span>
+          <div class="series-card-body">
+            <div class="series-card-title">Deploy Model</div>
+            <p class="series-card-desc">Package and serve the scoring model. Shadow mode → canary → full cutover. Latency budgets, circuit breakers, and rollback conditions.</p>
+          </div>
+          <span class="series-card-arrow">→</span>
+        </a>
+
+        <a class="series-card" href="credit-score-p7-monitoring.html">
+          <span class="series-card-num">Part 7</span>
+          <div class="series-card-body">
+            <div class="series-card-title">Monitor Model</div>
+            <p class="series-card-desc">Data drift, score distribution shift, and concept drift. Vintage analysis, PSI alerting thresholds, and retraining triggers grounded in business risk tolerance.</p>
+          </div>
+          <span class="series-card-arrow">→</span>
+        </a>
+
+      </div>
+
+      <hr>
+
+      <h2>Why Credit Scoring?</h2>
+
+      <p>Credit scoring is one of the most consequential ML applications in financial services — and one of the most technically demanding. It sits at the intersection of four challenges that test every stage of the lifecycle:</p>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-card-label">Regulated</div>
+          <p>Certain features are prohibited. Models must be explainable to regulators and model governance committees. Fairness across segments is not optional.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-label">Censored data</div>
+          <p>The bank only observes outcomes for approved borrowers. Every model operates on a biased sample — those it previously decided to approve.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-label">Asymmetric cost</div>
+          <p>A false negative (approving a defaulter) costs principal + collection. A false positive costs foregone margin. The optimal threshold is a business decision, not a statistical one.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-card-label">Concept drift</div>
+          <p>Borrower behavior shifts with economic cycles. A model trained before a recession will be miscalibrated after it. Monitoring here is not operational hygiene — it is a risk management function.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p>Each post can be read independently, but the full value comes from reading in order — each stage builds on decisions made in the previous one. Start at Part 1 or jump directly to the stage most relevant to where you are.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let dark = false;
+    function toggleDark() {
+      dark = !dark;
+      document.body.classList.toggle('dark', dark);
+      document.getElementById('toggleIcon').textContent = dark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('theme') === 'dark') toggleDark();
+  </script>
+</body>
+</html>

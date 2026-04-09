@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Part 7: Monitor Model — Credit Score Model — Le Thanh Binh</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #fafaf8; --bg-secondary: #f1efea; --bg-card: #ffffff;
+      --text-primary: #1a1a18; --text-secondary: #6b6b67;
+      --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
+      --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
+    }
+    body.dark {
+      --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1c1c1a;
+      --text-primary: #f0ede6; --text-secondary: #888780;
+      --border: rgba(255,255,255,0.09); --border-hover: rgba(255,255,255,0.18);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
+    .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 0; border-bottom: 0.5px solid var(--border); margin-bottom: 3.5rem; }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-logo { font-size: 15px; font-weight: 500; color: var(--text-primary); font-family: 'DM Mono', monospace; text-decoration: none; }
+    .toggle-btn { font-size: 13px; font-family: 'DM Sans', sans-serif; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background var(--transition), border-color var(--transition); }
+    .toggle-btn:hover { border-color: var(--green); }
+    .back-link { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .back-link:hover { color: var(--text-primary); }
+    .post-header { margin-bottom: 3rem; }
+    .post-tag { font-size: 12px; font-weight: 500; color: var(--green-text); background: var(--green-bg); padding: 4px 11px; border-radius: var(--radius-pill); display: inline-block; margin-bottom: 1rem; }
+    .series-nav-label { font-size: 12px; color: var(--text-secondary); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; }
+    .post-title { font-size: 30px; font-weight: 500; color: var(--text-primary); line-height: 1.25; letter-spacing: -0.5px; margin-bottom: 0.85rem; }
+    .post-meta { font-size: 13px; color: var(--text-secondary); }
+    .post-content { line-height: 1.8; }
+    .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
+    .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
+    .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
+    .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
+    .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
+    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+    .callout p { margin-bottom: 0; font-size: 14px; }
+    .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
+    hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
+    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
+    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
+    .post-nav a:hover { color: var(--green); }
+    @media (max-width: 600px) { .post-title { font-size: 24px; } }
+    /* ── FIGURES ── */
+    .figure {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.5rem 1rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+    .figure-caption {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.85rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.02em;
+    }
+    /* ── DESIGN POLISH ── */
+    .callout {
+      background: var(--green-bg) !important;
+      border-left: 3px solid var(--green) !important;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+      padding: 1rem 1.25rem !important;
+      margin-bottom: 1.5rem !important;
+    }
+    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
+    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
+    body.dark .callout p { color: #6ee9c0 !important; }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
+    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .post-nav a:hover { color: var(--green); }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <nav>
+      <div class="nav-left">
+        <a class="nav-logo" href="../index.html">hinetabi.github.io</a>
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()">
+          <span id="toggleIcon">🌙</span>
+          <span id="toggleLabel">Dark</span>
+        </button>
+      </div>
+      <a class="back-link" href="building-credit-score-models-in-digital-bank.html">← Series overview</a>
+    </nav>
+
+    <div class="post-header">
+      <span class="post-tag">MLOps · Part 7 of 7</span>
+      <div class="series-nav-label">Building and Monitoring a Credit Score Model</div>
+      <h1 class="post-title">Monitor Model</h1>
+      <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
+    </div>
+
+    <div class="post-content">
+
+      <p>Deployment is not the end of the lifecycle — it is the beginning of a different kind of responsibility. A credit score model operates in a world that keeps changing: borrower behavior shifts with macroeconomic conditions, the bank's product mix evolves, new customer segments are acquired. The model was trained on a snapshot of that world. Monitoring is the discipline of detecting, as early as possible, when the gap between the model's world and the current world has grown too large to ignore.</p>
+
+      <hr>
+
+      <div class="step-label">Data Drift</div>
+      <h2>Monitoring Input Feature Distributions</h2>
+
+      <p>Data drift means the statistical properties of the model's input features have shifted relative to the training data. In credit scoring, this can happen for several reasons: a new product launch that brings in a different demographic, a change in the loan application form that affects how income is reported, or an economic shock (like a recession or the aftermath of a pandemic) that changes the distribution of declared incomes, employment types, and existing liabilities across the applicant pool.</p>
+
+      <h3>PSI on input features</h3>
+      <p>The Population Stability Index (PSI) is computed monthly for each key feature, comparing the current month's applicant distribution against the training data distribution. The threshold from the model audit in Part 4 applies here as an operational threshold: PSI below 0.1 is stable, 0.1–0.2 is a monitoring flag, above 0.2 triggers an investigation.</p>
+      <p>Features are not all equally important. Prioritize PSI monitoring on the top features by SHAP importance — the features that drive the most variance in the model's output. A drift in an unimportant feature has less consequence than drift in income or bureau score. Build the monitoring dashboard with this priority ordering rather than treating all features equally.</p>
+
+      <h3>Missing rate monitoring</h3>
+      <p>Track the null rate for each feature over time. A sudden increase in the missing rate for a bureau field may indicate a change in the bureau API response format, a coverage issue with a specific applicant segment, or a pipeline failure in the feature store. Each of these has a different root cause and remediation — but all of them affect the model's behavior in production if the imputation strategy was designed for a lower null rate.</p>
+
+      <hr>
+
+      <div class="step-label">Score Drift</div>
+      <h2>Monitoring the Score Distribution</h2>
+
+      <p>The model's output score distribution is a leading indicator of problems, and it is observable before ground truth labels are available. Plot the score distribution (density of predicted default probabilities) weekly, overlaid against the training-period distribution.</p>
+
+      <h3>What shifts mean</h3>
+      <p>A leftward shift in the score distribution (more applicants receiving low-risk scores) without a corresponding improvement in the actual portfolio quality suggests the model is being too optimistic about the current applicant population — possibly because the population has shifted in a way the model interprets as lower risk when it is not. A rightward shift (more high-risk scores) may indicate that a stricter applicant segment is entering the funnel, or that a feature has drifted upward in a way that inflates the predicted risk.</p>
+      <p>Track the percentage of applicants in each score band (A/B/C/D/E) month over month. A 5-percentage-point shift in the proportion of applicants in the top risk band warrants investigation, even if downstream NPL rates have not yet changed — because the NPL impact of that shift will not be visible for another 12 months.</p>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 520 190" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+          <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">MODEL MONITORING — SCORE DISTRIBUTION SHIFT OVER TIME</text>
+          <!-- Axes -->
+          <line x1="50" y1="20" x2="50" y2="155" stroke="var(--border-hover)" stroke-width="1"/>
+          <line x1="50" y1="155" x2="500" y2="155" stroke="var(--border-hover)" stroke-width="1"/>
+          <!-- Y labels -->
+          <text x="44" y="24" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">High</text>
+          <text x="44" y="155" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">Low</text>
+          <text x="28" y="90" text-anchor="middle" transform="rotate(-90,28,90)" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">Score density</text>
+          <!-- X labels -->
+          <text x="50" y="169" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">Jan</text>
+          <text x="175" y="169" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">Apr</text>
+          <text x="300" y="169" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">Jul</text>
+          <text x="425" y="169" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">Oct</text>
+          <!-- Training baseline score dist (green, normal bell) -->
+          <path d="M50,155 C80,155 100,140 130,90 C160,40 190,25 220,25 C250,25 270,40 300,90 C330,140 360,155 390,155 L500,155" stroke="var(--green)" stroke-width="2" fill="var(--green)" fill-opacity="0.12"/>
+          <!-- Current score dist (shifted right = more risk / drift) -->
+          <path d="M50,155 C90,155 130,150 180,110 C220,72 260,40 310,35 C350,30 390,50 430,110 C460,145 490,155 500,155" stroke="#F59E0B" stroke-width="2" fill="#F59E0B" fill-opacity="0.12" stroke-dasharray="5,3"/>
+          <!-- PSI alert line -->
+          <line x1="50" y1="35" x2="500" y2="35" stroke="#EF4444" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.6"/>
+          <text x="504" y="38" font-family="DM Mono, monospace" font-size="9" fill="#EF4444" opacity="0.8">PSI alert</text>
+          <!-- Legend -->
+          <rect x="60" y="168" width="14" height="8" rx="2" fill="var(--green)" fill-opacity="0.5"/>
+          <text x="78" y="176" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Training baseline (Jan)</text>
+          <rect x="240" y="168" width="14" height="8" rx="2" fill="#F59E0B" fill-opacity="0.5"/>
+          <text x="258" y="176" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Current distribution (Oct)</text>
+        </svg>
+        <div class="figure-caption">Fig 1 — Score distribution drift over time. The Oct distribution has shifted right (more applicants scoring as high risk), triggering a PSI investigation.</div>
+      </div>
+
+      <hr>
+
+      <div class="step-label">Concept Drift</div>
+      <h2>Monitoring Model Performance on Outcomes</h2>
+
+      <p>Concept drift is the most serious form of model degradation: the relationship between the features and the default outcome has changed, so the model's predictions are no longer well-calibrated to reality. In credit scoring, concept drift can be caused by macroeconomic changes (a recession increases default rates across all risk bands), behavioral changes (borrowers increasingly taking multiple loans simultaneously, a pattern not well-represented in training data), or structural changes in the loan product (a change in the interest rate or tenor that affects repayment capacity).</p>
+
+      <h3>The 12-month lag problem</h3>
+      <p>Detecting concept drift in credit scoring is harder than in most ML applications because the ground truth label — did this borrower default within 12 months? — is only available with a 12-month lag. By the time you observe that the model's Gini has dropped significantly on a recent vintage, the loans that will materialize those defaults have already been approved and disbursed.</p>
+      <p>Early warning signals that can be observed before the 12-month outcome window closes: the rate of DPD30 (30+ days past due) in the first 3–6 months of a loan is a leading indicator of eventual DPD90 default. Track the early delinquency rate for recent vintages and compare against what the model predicted for those borrowers. A gap is an early signal of concept drift even before the full 12-month outcome is available.</p>
+
+      <h3>Vintage analysis</h3>
+      <p>Organize the approved portfolio by origination month (vintage) and track the cumulative default rate of each vintage as it ages. Plot these curves on a single chart. In a stable model environment, vintage curves for consecutive months should track close together. Separation — newer vintages defaulting at higher rates at the same loan age — indicates deterioration in credit quality, which may be due to model drift, population shift, or macroeconomic factors. Vintage analysis distinguishes between these causes: if all vintages show higher defaults simultaneously, it is likely a macro effect; if only recent vintages show higher defaults, it points to model or population drift.</p>
+
+      <hr>
+
+      <div class="step-label">Alerting</div>
+      <h2>Alerting Thresholds and Retraining Triggers</h2>
+
+      <p>Monitoring without action is just observation. Define explicit alerting thresholds that trigger a structured response:</p>
+      <ul>
+        <li>PSI > 0.2 on any top-5 feature by SHAP importance → immediate investigation, root cause identification within 48 hours.</li>
+        <li>Score band distribution shift > 5 percentage points in any band month-over-month → monitoring flag, risk team review.</li>
+        <li>Early delinquency rate (DPD30 at 3 months) exceeds training-period rate by more than 20% for the most recent vintage → escalation to risk committee, retraining assessment.</li>
+        <li>Gini on a 6-month evaluation window falls below the minimum acceptable threshold defined in Part 1 → mandatory retraining or model replacement.</li>
+      </ul>
+
+      <div class="callout">
+        <p>The first response to any alert should be: is this a data pipeline problem or a genuine model problem? A PSI spike caused by a broken feature store feed looks identical on the dashboard to genuine population drift. Before initiating a retraining, verify the data pipeline integrity. Retraining on bad data produces a bad model faster — not a better one.</p>
+      </div>
+
+      <h3>Scheduled model review</h3>
+      <p>Even without an alert firing, schedule a quarterly model review. In the review: examine PSI trends for all features, check vintage curves, compare the model's score distribution against the same period last year, and assess whether any significant market or regulatory changes have occurred that would warrant a model refresh. Credit scoring models in stable markets typically have a useful life of 18–24 months before a full retrain is warranted. Models deployed during or after a major economic event may need refresh within 12 months.</p>
+
+      <hr>
+
+      <h2>Closing: The Lifecycle Loops Back</h2>
+      <p>This is the final post in the series, but it is not the end of the process. Every signal from monitoring feeds back into the earlier stages. A feature that is drifting heavily may point to a new data source that should be audited (Part 2). An early delinquency rate that is spiking may indicate a new borrower segment that requires its own problem formulation and feasibility assessment (Part 1). The vintage curves that show concept drift define the new training window and performance monitoring period for the next model version (Part 3 and Part 4).</p>
+      <p>The habits and systems built across this series — problem documentation, data source registers, EDA reports, experiment tracking, deployment guardrails, and monitoring dashboards — are what make the second iteration of the model faster and higher quality than the first. The lifecycle is a loop, and the quality of each loop compounds.</p>
+
+    </div>
+
+    <div class="post-nav">
+      <a href="credit-score-p6-deploy.html">← Part 6: Deploy Model</a>
+      <a href="building-monitoring-ml-models.html">← Back to series overview</a>
+    </div>
+
+  </div>
+
+  <script>
+    let dark = false;
+    function toggleDark() {
+      dark = !dark;
+      document.body.classList.toggle('dark', dark);
+      document.getElementById('toggleIcon').textContent = dark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('theme') === 'dark') toggleDark();
+  </script>
+</body>
+</html>

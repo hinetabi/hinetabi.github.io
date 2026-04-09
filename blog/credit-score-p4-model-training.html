@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Part 4: Model Training & Experimentation — Credit Score Model — Le Thanh Binh</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #fafaf8; --bg-secondary: #f1efea; --bg-card: #ffffff;
+      --text-primary: #1a1a18; --text-secondary: #6b6b67;
+      --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
+      --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
+    }
+    body.dark {
+      --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1c1c1a;
+      --text-primary: #f0ede6; --text-secondary: #888780;
+      --border: rgba(255,255,255,0.09); --border-hover: rgba(255,255,255,0.18);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
+    .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 0; border-bottom: 0.5px solid var(--border); margin-bottom: 3.5rem; }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-logo { font-size: 15px; font-weight: 500; color: var(--text-primary); font-family: 'DM Mono', monospace; text-decoration: none; }
+    .toggle-btn { font-size: 13px; font-family: 'DM Sans', sans-serif; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background var(--transition), border-color var(--transition); }
+    .toggle-btn:hover { border-color: var(--green); }
+    .back-link { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .back-link:hover { color: var(--text-primary); }
+    .post-header { margin-bottom: 3rem; }
+    .post-tag { font-size: 12px; font-weight: 500; color: var(--green-text); background: var(--green-bg); padding: 4px 11px; border-radius: var(--radius-pill); display: inline-block; margin-bottom: 1rem; }
+    .series-nav-label { font-size: 12px; color: var(--text-secondary); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; }
+    .post-title { font-size: 30px; font-weight: 500; color: var(--text-primary); line-height: 1.25; letter-spacing: -0.5px; margin-bottom: 0.85rem; }
+    .post-meta { font-size: 13px; color: var(--text-secondary); }
+    .post-content { line-height: 1.8; }
+    .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
+    .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
+    .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
+    .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
+    .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
+    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+    .callout p { margin-bottom: 0; font-size: 14px; }
+    .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
+    hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
+    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
+    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
+    .post-nav a:hover { color: var(--green); }
+    @media (max-width: 600px) { .post-title { font-size: 24px; } }
+    /* ── FIGURES ── */
+    .figure {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.5rem 1rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+    .figure-caption {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.85rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.02em;
+    }
+    /* ── DESIGN POLISH ── */
+    .callout {
+      background: var(--green-bg) !important;
+      border-left: 3px solid var(--green) !important;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+      padding: 1rem 1.25rem !important;
+      margin-bottom: 1.5rem !important;
+    }
+    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
+    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
+    body.dark .callout p { color: #6ee9c0 !important; }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
+    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .post-nav a:hover { color: var(--green); }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <nav>
+      <div class="nav-left">
+        <a class="nav-logo" href="../index.html">hinetabi.github.io</a>
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()">
+          <span id="toggleIcon">🌙</span>
+          <span id="toggleLabel">Dark</span>
+        </button>
+      </div>
+      <a class="back-link" href="building-credit-score-models-in-digital-bank.html">← Series overview</a>
+    </nav>
+
+    <div class="post-header">
+      <span class="post-tag">MLOps · Part 4 of 7</span>
+      <div class="series-nav-label">Building and Monitoring a Credit Score Model</div>
+      <h1 class="post-title">Model Training &amp; Experimentation</h1>
+      <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
+    </div>
+
+    <div class="post-content">
+
+      <p>With a clean feature shortlist from EDA and a well-defined target, training begins. This part covers three connected activities: building and iterating on the model (4.1), tracking experiments systematically so results are reproducible and comparable (4.2), and auditing the model rigorously before it is declared production-ready (4.3). In a regulated industry like banking, the audit step is not optional — it is the basis on which model governance will approve or reject deployment.</p>
+
+      <hr>
+
+      <div class="step-label">4.1</div>
+      <h2>Training</h2>
+
+      <h3>Start with a logistic regression scorecard</h3>
+      <p>The traditional credit scorecard is a logistic regression model applied to WOE-transformed features. Despite being decades old, it remains the standard in many banks — not because it is the most accurate, but because it is interpretable, auditable, and accepted by regulators. Each feature's contribution to the final score is a simple additive points system: a borrower with a monthly income between 10M–20M VND gets +25 points; a bureau score below 500 gets −40 points. The total score maps directly to an approval band.</p>
+      <p>Start here, even if the eventual model will be a gradient-boosted tree. The logistic regression gives you a meaningful baseline, validates that the WOE-transformed features carry real signal, and produces a model that the risk team can reason about without a black-box explanation tool.</p>
+
+      <h3>Time-based train/validation/test split</h3>
+      <p>The dataset is split strictly by origination date. A common structure for a 3-year dataset: train on months 1–24, validate on months 25–30, test on months 31–36. The test set is held out and touched only once — at the final model evaluation. Using time-based splits ensures that the model is evaluated on its ability to generalize forward in time, which is the actual task it will face in production.</p>
+
+      <h3>Feature pipeline inside a transformer</h3>
+      <p>All preprocessing — WOE encoding, missing value imputation, outlier clipping, scaling for logistic regression — must be implemented inside a scikit-learn <code>Pipeline</code> or equivalent. This is not just engineering hygiene; it is the mechanism that ensures the training and serving transformations are identical. Any transformation applied outside the pipeline is a potential source of training-serving skew. The pipeline object is what gets serialized and deployed, not just the model weights.</p>
+
+      <h3>Iterating to gradient boosting</h3>
+      <p>Once the logistic regression baseline is established, gradient-boosted models (LightGBM or XGBoost) are typically the next step. They handle non-linear relationships, require less manual feature engineering, and generally outperform logistic regression by 5–10 Gini points on complex credit datasets with many interaction effects. The tradeoff is interpretability: SHAP values become necessary for explaining individual decisions, and model governance may require additional documentation to justify the complexity.</p>
+
+      <div class="callout">
+        <p>In banking, model complexity is a governance cost, not just a technical one. A gradient boosting model that improves Gini by 3 points over a logistic regression may not be worth the additional audit burden if the bank's risk committee requires manual review of the explanation method. Calibrate complexity to the institutional context.</p>
+      </div>
+
+      <hr>
+
+      <div class="step-label">4.2</div>
+      <h2>Experiment Tracking</h2>
+
+      <p>Credit scoring projects often run for months, with multiple data scientists running parallel experiments on different feature sets, model families, and hyperparameter configurations. Without systematic experiment tracking, the team quickly loses the ability to reproduce results or understand why a particular model version performed better than another.</p>
+
+      <h3>What to log for every experiment</h3>
+      <p>Every training run should capture: the dataset version and date range used, the feature list and preprocessing configuration, all hyperparameters, evaluation metrics on train/validation/test (AUC, Gini, KS, log loss), the model artifact and serialization path, and the training timestamp and environment. Tools like <code>MLflow</code> handle this automatically when wrapped around the training loop. The goal is that any experiment from the past six months can be reproduced exactly by any team member.</p>
+
+      <h3>Model versioning</h3>
+      <p>Register each candidate model in a model registry with a semantic version (v1.0, v2.0, v2.1). Tag models by their status: development, staging, production, retired. When a new model version is promoted to staging, the previous staging version is automatically demoted. This prevents the ambiguity of multiple "candidate" models floating around without a clear decision on which one is advancing.</p>
+
+      <hr>
+
+      <div class="step-label">4.3</div>
+      <h2>Model Audit</h2>
+
+      <p>Standard validation metrics (AUC, Gini, KS on the test set) are necessary but not sufficient before deploying a credit model. A structured audit covers three additional dimensions: adversarial robustness, stability analysis, and subgroup performance.</p>
+
+      <h3>Adversarial testing</h3>
+      <p>Construct synthetic applicant profiles that test the model at its edges. What score does the model assign to an applicant with completely missing bureau data? Does it degrade gracefully (assign a conservative score), or does it produce an error or an extreme prediction? What happens when income is entered as zero — a common input error? What about applicants with a declared income that is 10x the training data maximum? These edge cases are not hypothetical — they will appear in production, and the model's behavior in these cases should be defined and tested before deployment, not discovered by a loan officer.</p>
+
+      <h3>PSI — Population Stability Index</h3>
+      <p>PSI measures how much the distribution of a variable has shifted between two populations. In the context of model audit, it is used to compare the score distribution in the training set against the score distribution in a recent out-of-time validation window:</p>
+      <p><code>PSI = Σ (Actual% − Expected%) × ln(Actual% / Expected%)</code></p>
+      <p>A PSI below 0.1 indicates no meaningful shift. Between 0.1 and 0.2 warrants investigation. Above 0.2 suggests the model may no longer be representative of the current applicant population. If PSI is already high at the time of model audit — before deployment — it typically means the training data is too old to represent the current market, and the dataset needs to be refreshed before proceeding.</p>
+
+      <h3>KS Statistic</h3>
+      <p>The KS statistic is the maximum difference between the cumulative distribution functions of good and bad borrowers across the score range. It measures the model's ability to separate the two classes at its most discriminating point. For retail credit scorecards, a KS above 30% is generally considered acceptable. The KS chart also reveals where in the score range the model discriminates best — which informs where to set the approval cutoff for maximum effectiveness.</p>
+
+      <h3>Subgroup performance</h3>
+      <p>Evaluate the model's metrics across key segments: loan products (personal loan vs. credit card vs. cash advance), customer segments (new-to-bank vs. existing customer, salaried vs. self-employed), and geographic regions if applicable. A model with a portfolio Gini of 0.50 may have a Gini of 0.30 on the self-employed segment — which is below the acceptable threshold defined in Part 1. This finding must be resolved before deployment: either by building a separate model for that segment, by excluding the segment from ML-driven scoring, or by accepting the lower performance with documented justification.</p>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 520 180" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+          <!-- Title -->
+          <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">KS CHART — SCORE SEPARATION BETWEEN GOOD AND BAD BORROWERS</text>
+          <!-- Axes -->
+          <line x1="40" y1="20" x2="40" y2="155" stroke="var(--border-hover)" stroke-width="1"/>
+          <line x1="40" y1="155" x2="500" y2="155" stroke="var(--border-hover)" stroke-width="1"/>
+          <!-- Y labels -->
+          <text x="35" y="24" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">100%</text>
+          <text x="35" y="88" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">50%</text>
+          <text x="35" y="155" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">0%</text>
+          <!-- X labels -->
+          <text x="40" y="168" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">Low risk</text>
+          <text x="430" y="168" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">High risk</text>
+          <!-- Good CDF curve (rises slowly) -->
+          <path d="M40,155 C120,148 200,130 280,100 C360,70 420,40 500,20" stroke="var(--green)" stroke-width="2" fill="none"/>
+          <!-- Bad CDF curve (rises steeply) -->
+          <path d="M40,155 C80,120 140,70 200,38 C260,18 340,18 500,16" stroke="#EF4444" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+          <!-- KS annotation -->
+          <line x1="190" y1="42" x2="190" y2="108" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <text x="196" y="78" font-family="DM Mono, monospace" font-size="10" fill="#F59E0B">KS = 66%</text>
+          <!-- Legend -->
+          <line x1="300" y1="30" x2="325" y2="30" stroke="var(--green)" stroke-width="2"/>
+          <text x="330" y="34" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Good CDF</text>
+          <line x1="300" y1="48" x2="325" y2="48" stroke="#EF4444" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="330" y="52" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Bad CDF</text>
+        </svg>
+        <div class="figure-caption">Fig 1 — KS chart showing cumulative score distributions of good vs. bad borrowers. KS = max vertical separation. Target: KS &gt; 30%.</div>
+      </div>
+
+      <div class="callout">
+        <p>The model audit report is the primary deliverable for model governance review. It should document all findings — including unfavorable ones — with the remediation actions taken or the rationale for accepting the finding as a residual risk. Governance committees review the integrity of the process, not just the headline metrics.</p>
+      </div>
+
+    </div>
+
+    <div class="post-nav">
+      <a href="credit-score-p3-eda.html">← Part 3: EDA</a>
+      <a href="credit-score-p5-business-impact.html">Part 5: Business Impact →</a>
+    </div>
+
+  </div>
+
+  <script>
+    let dark = false;
+    function toggleDark() {
+      dark = !dark;
+      document.body.classList.toggle('dark', dark);
+      document.getElementById('toggleIcon').textContent = dark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('theme') === 'dark') toggleDark();
+  </script>
+</body>
+</html>

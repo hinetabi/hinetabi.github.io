@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Part 6: Deploy Model — Credit Score Model — Le Thanh Binh</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #fafaf8; --bg-secondary: #f1efea; --bg-card: #ffffff;
+      --text-primary: #1a1a18; --text-secondary: #6b6b67;
+      --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
+      --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
+    }
+    body.dark {
+      --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1c1c1a;
+      --text-primary: #f0ede6; --text-secondary: #888780;
+      --border: rgba(255,255,255,0.09); --border-hover: rgba(255,255,255,0.18);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
+    .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 0; border-bottom: 0.5px solid var(--border); margin-bottom: 3.5rem; }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-logo { font-size: 15px; font-weight: 500; color: var(--text-primary); font-family: 'DM Mono', monospace; text-decoration: none; }
+    .toggle-btn { font-size: 13px; font-family: 'DM Sans', sans-serif; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background var(--transition), border-color var(--transition); }
+    .toggle-btn:hover { border-color: var(--green); }
+    .back-link { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .back-link:hover { color: var(--text-primary); }
+    .post-header { margin-bottom: 3rem; }
+    .post-tag { font-size: 12px; font-weight: 500; color: var(--green-text); background: var(--green-bg); padding: 4px 11px; border-radius: var(--radius-pill); display: inline-block; margin-bottom: 1rem; }
+    .series-nav-label { font-size: 12px; color: var(--text-secondary); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; }
+    .post-title { font-size: 30px; font-weight: 500; color: var(--text-primary); line-height: 1.25; letter-spacing: -0.5px; margin-bottom: 0.85rem; }
+    .post-meta { font-size: 13px; color: var(--text-secondary); }
+    .post-content { line-height: 1.8; }
+    .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
+    .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
+    .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
+    .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
+    .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
+    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+    .callout p { margin-bottom: 0; font-size: 14px; }
+    .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
+    hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
+    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
+    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
+    .post-nav a:hover { color: var(--green); }
+    @media (max-width: 600px) { .post-title { font-size: 24px; } }
+    /* ── FIGURES ── */
+    .figure {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.5rem 1rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+    .figure-caption {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.85rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.02em;
+    }
+    /* ── DESIGN POLISH ── */
+    .callout {
+      background: var(--green-bg) !important;
+      border-left: 3px solid var(--green) !important;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+      padding: 1rem 1.25rem !important;
+      margin-bottom: 1.5rem !important;
+    }
+    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
+    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
+    body.dark .callout p { color: #6ee9c0 !important; }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
+    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .post-nav a:hover { color: var(--green); }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <nav>
+      <div class="nav-left">
+        <a class="nav-logo" href="../index.html">hinetabi.github.io</a>
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()">
+          <span id="toggleIcon">🌙</span>
+          <span id="toggleLabel">Dark</span>
+        </button>
+      </div>
+      <a class="back-link" href="building-credit-score-models-in-digital-bank.html">← Series overview</a>
+    </nav>
+
+    <div class="post-header">
+      <span class="post-tag">MLOps · Part 6 of 7</span>
+      <div class="series-nav-label">Building and Monitoring a Credit Score Model</div>
+      <h1 class="post-title">Deploy Model</h1>
+      <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
+    </div>
+
+    <div class="post-content">
+
+      <p>The model has passed governance review and the business case has been signed off. Now comes the engineering work of making the credit score reliably available to every loan application processed by the bank's origination system. Deployment in banking is not a one-time event — it is a carefully staged rollout with defined checkpoints, fallback mechanisms, and a clear definition of what "done" means.</p>
+
+      <hr>
+
+      <div class="step-label">Packaging</div>
+      <h2>Packaging and Serving the Model</h2>
+
+      <h3>Model serialization</h3>
+      <p>The scikit-learn pipeline (including preprocessing and the model itself) is serialized using <code>joblib</code> or <code>pickle</code>. For models that need to run across different environments or languages, <code>ONNX</code> format provides a more portable option. The serialized artifact is stored in the model registry with its version tag, not on a local filesystem where it can be silently overwritten.</p>
+      <p>One critical check: load the serialized artifact in a clean environment (no shared state with the training environment) and verify that it produces identical predictions on a fixed set of test cases. This catches library version mismatches — a model serialized with scikit-learn 1.2 may behave differently when deserialized under scikit-learn 1.4 if any preprocessing behavior changed between versions.</p>
+
+      <h3>Serving architecture</h3>
+      <p>For a credit scoring use case with real-time loan origination, the scoring service typically exposes a REST API. The request payload contains the applicant's raw features (from the application form and the bureau pull); the service preprocesses them through the pipeline and returns a probability of default, a credit score band, and a recommended decision (approve/decline/refer for manual review). Response time must be within the SLA of the loan origination system — typically 500ms to 2 seconds including the upstream bureau call.</p>
+      <p>The service is containerized in Docker with all dependencies pinned. It is deployed on Kubernetes (or an equivalent orchestration layer) for horizontal scaling during peak periods — month-end salary periods typically see a 3–5x spike in loan application volume in Vietnamese retail banking.</p>
+
+      <h3>Feature store integration</h3>
+      <p>For features that require historical aggregation (e.g., average balance over the past 3 months, number of missed payments in the past 6 months), the serving layer reads from a feature store rather than recomputing on the fly. The feature store pre-computes and caches these values with a defined refresh schedule. The serving code must handle the case where a feature store lookup returns a stale or missing value — with a defined fallback: either use a conservative default value, or escalate the application for manual underwriting.</p>
+
+      <hr>
+
+      <div class="step-label">Rollout Strategy</div>
+      <h2>Staged Rollout</h2>
+
+      <h3>Shadow mode</h3>
+      <p>The new model runs in parallel with the existing decisioning system for the first 2–4 weeks. Every application is processed by both the old system and the new model. The new model's decisions are logged but not acted upon. This period answers: does the new model produce scores within the expected distribution? Are there any applicants for whom the model fails to return a score (due to feature unavailability or edge case handling issues)? How often does the new model agree with the old system, and where does it disagree?</p>
+      <p>Shadow mode data is reviewed daily for the first week, then weekly. Anomalies — sudden spikes in null scores, unexpected score distribution shifts, high disagreement rates for a specific product type — should be investigated and resolved before advancing to the next phase.</p>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 540 120" xmlns="http://www.w3.org/2000/svg" style="max-width:540px; display:block; margin:0 auto;">
+          <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">STAGED ROLLOUT — TRAFFIC ALLOCATION OVER TIME</text>
+          <!-- Shadow phase -->
+          <rect x="10" y="24" width="140" height="50" rx="6" fill="var(--bg-card)" stroke="var(--border)" stroke-width="0.5"/>
+          <text x="80" y="44" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="var(--text-primary)" font-weight="500">Shadow</text>
+          <text x="80" y="60" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">0% live traffic</text>
+          <text x="80" y="73" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">Wk 1–4 · observe only</text>
+          <!-- Canary phase -->
+          <rect x="170" y="24" width="140" height="50" rx="6" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="240" y="44" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="var(--green-text)" font-weight="500">Canary</text>
+          <text x="240" y="60" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="var(--green-text)">5% → 25% → 50%</text>
+          <text x="240" y="73" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--green-text)">Wk 5–8 · compare vs ctrl</text>
+          <!-- Full cutover -->
+          <rect x="330" y="24" width="140" height="50" rx="6" fill="var(--green)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="400" y="44" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#fff" font-weight="500">Full Cutover</text>
+          <text x="400" y="60" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="#fff">100% traffic</text>
+          <text x="400" y="73" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="rgba(255,255,255,0.8)">Wk 9+ · rollback ready</text>
+          <!-- Arrows -->
+          <line x1="152" y1="49" x2="168" y2="49" stroke="var(--border-hover)" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="312" y1="49" x2="328" y2="49" stroke="var(--border-hover)" stroke-width="1.5"/>
+          <polygon points="322,44 330,49 322,54" fill="var(--border-hover)"/>
+          <polygon points="162,44 170,49 162,54" fill="var(--border-hover)"/>
+          <!-- Rollback arrow -->
+          <path d="M480,78 Q480,100 400,100 Q240,100 80,100 Q30,100 20,78" stroke="#EF4444" stroke-width="1" fill="none" stroke-dasharray="4,3" opacity="0.6"/>
+          <polygon points="16,73 20,82 24,73" fill="#EF4444" opacity="0.6"/>
+          <text x="270" y="115" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#EF4444" opacity="0.7">rollback path (2-week window)</text>
+        </svg>
+        <div class="figure-caption">Fig 1 — Staged rollout: shadow (observe only) → canary (partial traffic) → full cutover with a rollback path kept warm.</div>
+      </div>
+
+      <h3>Canary release</h3>
+      <p>Route a small fraction of live traffic (typically 5–10%) to the new model's decisions. The remaining traffic continues to use the existing system. Monitor approval rates and score distributions for the canary segment against the control segment for 2–4 weeks. If key metrics (approval rate, score distribution shape) are within expected bounds and the service is stable under load, expand the canary percentage progressively: 10% → 25% → 50% → 100%.</p>
+
+      <h3>Full cutover and rollback</h3>
+      <p>The full cutover switches 100% of traffic to the new model. At this point, the old model is kept warm (not decommissioned) for a defined rollback window — typically 2 weeks. If a critical issue emerges post-cutover (e.g., the new model is found to have a systematic bias for a specific applicant segment that was not caught during audit), traffic can be immediately re-routed to the old model without requiring a new deployment.</p>
+
+      <div class="callout">
+        <p>In banking, the rollback decision should be pre-agreed: define, before the cutover, the specific conditions (metric thresholds, incident severity levels) that trigger an automatic rollback vs. a manual investigation. A rollback decision made under pressure after an incident is rarely made well. Making it in advance removes the uncertainty.</p>
+      </div>
+
+      <hr>
+
+      <div class="step-label">Operations</div>
+      <h2>Load Testing and Latency Budgets</h2>
+
+      <p>Before the canary release, load test the scoring service at 2× the expected peak traffic. Define latency SLAs: P95 response time under 500ms, P99 under 1 second. If the service cannot meet these targets under load, investigate whether the bottleneck is the model inference itself (unlikely for a gradient boosted model — inference is fast), the feature store lookup latency, or the downstream bureau API call. Each bottleneck has a different remediation: model optimization, feature store caching, or circuit breaker patterns for the bureau API.</p>
+
+      <p>Define and instrument a circuit breaker: if the bureau API is unavailable, the scoring service should fall back to an application-data-only score (lower accuracy but operational) rather than failing the entire application. This fallback behavior must be documented, tested under simulated bureau outage conditions, and approved by the risk team — since the fallback score may have a different accuracy profile than the full model.</p>
+
+    </div>
+
+    <div class="post-nav">
+      <a href="credit-score-p5-business-impact.html">← Part 5: Business Impact</a>
+      <a href="credit-score-p7-monitoring.html">Part 7: Monitor Model →</a>
+    </div>
+
+  </div>
+
+  <script>
+    let dark = false;
+    function toggleDark() {
+      dark = !dark;
+      document.body.classList.toggle('dark', dark);
+      document.getElementById('toggleIcon').textContent = dark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('theme') === 'dark') toggleDark();
+  </script>
+</body>
+</html>

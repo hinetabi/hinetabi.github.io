@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Part 3: EDA — Credit Score Model — Le Thanh Binh</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #fafaf8; --bg-secondary: #f1efea; --bg-card: #ffffff;
+      --text-primary: #1a1a18; --text-secondary: #6b6b67;
+      --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
+      --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
+    }
+    body.dark {
+      --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1c1c1a;
+      --text-primary: #f0ede6; --text-secondary: #888780;
+      --border: rgba(255,255,255,0.09); --border-hover: rgba(255,255,255,0.18);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
+    .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 0; border-bottom: 0.5px solid var(--border); margin-bottom: 3.5rem; }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-logo { font-size: 15px; font-weight: 500; color: var(--text-primary); font-family: 'DM Mono', monospace; text-decoration: none; }
+    .toggle-btn { font-size: 13px; font-family: 'DM Sans', sans-serif; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background var(--transition), border-color var(--transition); }
+    .toggle-btn:hover { border-color: var(--green); }
+    .back-link { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .back-link:hover { color: var(--text-primary); }
+    .post-header { margin-bottom: 3rem; }
+    .post-tag { font-size: 12px; font-weight: 500; color: var(--green-text); background: var(--green-bg); padding: 4px 11px; border-radius: var(--radius-pill); display: inline-block; margin-bottom: 1rem; }
+    .series-nav-label { font-size: 12px; color: var(--text-secondary); font-family: 'DM Mono', monospace; margin-bottom: 0.5rem; }
+    .post-title { font-size: 30px; font-weight: 500; color: var(--text-primary); line-height: 1.25; letter-spacing: -0.5px; margin-bottom: 0.85rem; }
+    .post-meta { font-size: 13px; color: var(--text-secondary); }
+    .post-content { line-height: 1.8; }
+    .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
+    .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
+    .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
+    .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+    .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
+    .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
+    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+    .callout p { margin-bottom: 0; font-size: 14px; }
+    .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
+    hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
+    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
+    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
+    .post-nav a:hover { color: var(--green); }
+    @media (max-width: 600px) { .post-title { font-size: 24px; } }
+    /* ── FIGURES ── */
+    .figure {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.5rem 1rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+    .figure-caption {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.85rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.02em;
+    }
+    /* ── DESIGN POLISH ── */
+    .callout {
+      background: var(--green-bg) !important;
+      border-left: 3px solid var(--green) !important;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+      padding: 1rem 1.25rem !important;
+      margin-bottom: 1.5rem !important;
+    }
+    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
+    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
+    body.dark .callout p { color: #6ee9c0 !important; }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
+    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .post-nav a:hover { color: var(--green); }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <nav>
+      <div class="nav-left">
+        <a class="nav-logo" href="../index.html">hinetabi.github.io</a>
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()">
+          <span id="toggleIcon">🌙</span>
+          <span id="toggleLabel">Dark</span>
+        </button>
+      </div>
+      <a class="back-link" href="building-credit-score-models-in-digital-bank.html">← Series overview</a>
+    </nav>
+
+    <div class="post-header">
+      <span class="post-tag">MLOps · Part 3 of 7</span>
+      <div class="series-nav-label">Building and Monitoring a Credit Score Model</div>
+      <h1 class="post-title">EDA: Data Source Quality</h1>
+      <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
+    </div>
+
+    <div class="post-content">
+
+      <p>After the data source register is built in Part 2, EDA is where the data tells you whether your assumptions were correct. In credit scoring, this step has a specific character: you are not just exploring the data to understand its shape — you are running a systematic quality gate that determines whether the data is safe to train on. Skipping or rushing this stage is one of the most reliable ways to build a model that looks good in development and fails in production.</p>
+
+      <hr>
+
+      <div class="step-label">Data Quality</div>
+      <h2>Quality Checks on the Credit Dataset</h2>
+
+      <h3>Missing values</h3>
+      <p>In credit data, missingness is rarely random. A null bureau score usually means the applicant is new-to-credit — which is a meaningful signal in itself, not just a gap to fill. A missing declared income field could indicate a self-employed applicant who was not required to submit payslips, or it could indicate a data pipeline failure. The first case should be imputed thoughtfully (e.g., median income of the same product segment); the second should trigger a data quality escalation.</p>
+      <p>For each column, compute the null rate by time period and by product type. A sudden spike in nulls in a particular month often traces back to a system migration, a field being made optional in the loan application form, or an upstream ETL job that broke. These are not model problems — they are data engineering problems that must be resolved before training.</p>
+
+      <h3>Class imbalance</h3>
+      <p>Default rates in retail banking are typically between 2% and 10% depending on the product and market. A 95:5 good-to-bad ratio is common. This matters because naive training on an imbalanced dataset produces a model that predicts "good" for almost everything and achieves 95% accuracy while being essentially useless for its actual purpose. Standard approaches include class weighting (passing <code>class_weight='balanced'</code> in scikit-learn), oversampling the minority class with SMOTE, or adjusting the decision threshold post-training. For a credit scorecard, class weighting is usually preferred because it preserves the true score distribution without introducing synthetic samples that could distort the score calibration.</p>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+          <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">LABEL DISTRIBUTION — TYPICAL RETAIL CREDIT DATASET</text>
+          <!-- Good bar -->
+          <rect x="10" y="24" width="440" height="40" rx="6" fill="var(--green-bg)" stroke="var(--border)" stroke-width="0.5"/>
+          <rect x="10" y="24" width="420" height="40" rx="6" fill="var(--green)" opacity="0.75"/>
+          <text x="20" y="49" font-family="DM Sans, sans-serif" font-size="13" fill="#fff" font-weight="500">Good borrowers — 93%</text>
+          <text x="460" y="49" font-family="DM Mono, monospace" font-size="12" fill="var(--text-secondary)">93k</text>
+          <!-- Bad bar -->
+          <rect x="10" y="76" width="440" height="40" rx="6" fill="var(--green-bg)" stroke="var(--border)" stroke-width="0.5"/>
+          <rect x="10" y="76" width="31" height="40" rx="6" fill="#EF4444" opacity="0.8"/>
+          <text x="48" y="101" font-family="DM Sans, sans-serif" font-size="13" fill="var(--text-secondary)">Bad borrowers (DPD90+) — 7%</text>
+          <text x="460" y="101" font-family="DM Mono, monospace" font-size="12" fill="var(--text-secondary)">7k</text>
+          <!-- Annotation -->
+          <line x1="10" y1="130" x2="510" y2="130" stroke="var(--border)" stroke-width="0.5"/>
+          <text x="10" y="145" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">→ Naive accuracy: 93% (useless). Use class_weight='balanced' or threshold calibration.</text>
+        </svg>
+        <div class="figure-caption">Fig 1 — Class imbalance in a typical retail credit portfolio. A model predicting "good" for everyone scores 93% accuracy but zero utility.</div>
+      </div>
+
+      <h3>Schema validation</h3>
+      <p>Credit data flowing from multiple systems is prone to silent type errors: a numeric income field arriving as a string, a date stored as a Unix timestamp in one system and as a formatted string in another, a categorical field with inconsistent encodings across vintages (e.g., employment type encoded as "FT" in 2021 and "Full-time" in 2022). These are caught by comparing the schema of recent data against the schema documented at the source audit stage. Any drift here must be resolved at the ETL layer before it reaches model training.</p>
+
+      <h3>Outliers</h3>
+      <p>Income and loan amount fields in credit applications frequently contain extreme outliers — either genuine high-net-worth applicants or data entry errors (someone entering their annual income as their monthly income, or a system that stored values in a different currency before a migration). Winsorization at the 1st and 99th percentile is a common default, but the right approach depends on the feature. For bureau balance fields, a genuinely high balance is important signal and should not be clipped arbitrarily. Always inspect the top and bottom 1% of each numeric field manually before deciding on outlier treatment.</p>
+
+      <hr>
+
+      <div class="step-label">Feature Analysis</div>
+      <h2>Feature-Level Checks</h2>
+
+      <h3>Target leakage</h3>
+      <p>Target leakage is the most dangerous EDA finding in credit scoring, and it is more common than it should be. Leakage occurs when a feature used at training time incorporates information that would not be available at the time of the actual credit decision. Classic examples in banking include: using a feature that is computed from data generated <em>after</em> the loan was disbursed (e.g., number of missed payments in the first 3 months, included as a "feature" by mistake), or including the loan amount itself when the loan amount was adjusted based on a prior risk assessment that incorporated the default probability.</p>
+      <p>A practical heuristic: any feature that has an abnormally high Information Value (IV > 0.5) on the first pass should be scrutinized for leakage. Legitimate features rarely achieve IV that high. If one does, understand exactly what it measures and when it is generated — before it makes it into the feature set.</p>
+
+      <h3>Temporal consistency</h3>
+      <p>Credit data has a natural time axis: applications come in over months and years, and the "bad" label is determined with a lag (DPD90+ within 12 months). This means the dataset must be split by time. Training on data from 2020–2022 and validating on 2023 data is the correct setup. Shuffling randomly — which is the default in most ML libraries — leaks future data into the training set and produces optimistically biased validation metrics. The mistake is easy to make and hard to detect after the fact.</p>
+
+      <div class="callout">
+        <p>Always validate the temporal integrity of the dataset by plotting your default rate by origination month. If default rates appear artificially low for recent vintages (the last 12 months), it is likely because those loans have not had enough time to go bad yet — the performance window is incomplete. These recent vintages should be excluded from training or treated as an indeterminate population.</p>
+      </div>
+
+      <h3>Distribution analysis</h3>
+      <p>Plot the distribution of each numeric feature, segmented by target class (good vs. bad). Income distributions for bad borrowers tend to be left-shifted relative to good borrowers — but the overlap region is where the model earns its value. A feature where the two distributions are nearly identical carries no discriminatory power. Weight of Evidence (WOE) binning is the standard credit risk approach for this: it transforms a continuous feature into log-odds bins, making the monotonic relationship between the feature and default probability explicit and interpretable.</p>
+
+      <h3>Correlation and redundancy</h3>
+      <p>In a credit dataset with dozens of bureau attributes, it is common to find groups of highly correlated features (e.g., number of open credit cards, total revolving balance, credit utilization ratio — all three capture aspects of the same underlying behavior). High inter-feature correlation does not hurt tree-based models much, but it can cause instability in logistic regression-based scorecards. Use variance inflation factor (VIF) checks during feature selection and prefer retaining the feature with the highest IV within a correlated cluster rather than all of them.</p>
+
+      <hr>
+
+      <div class="step-label">Output</div>
+      <h2>EDA Report and Feature Shortlist</h2>
+
+      <p>The output of EDA is a feature shortlist and an EDA report documenting the quality findings, decisions made, and risks flagged. The feature shortlist should include: the final set of candidate features, the null rate and imputation strategy for each, the WOE/IV analysis summary, any features excluded and why (leakage, low IV, compliance), and any data quality issues that were resolved or that remain open as accepted risks.</p>
+
+      <p>This document is not just for the data scientist — it is the evidentiary record that the risk team and model governance committee will review before approving the model for production. In a regulated environment, the transparency of this stage is not optional.</p>
+
+    </div>
+
+    <div class="post-nav">
+      <a href="credit-score-p2-data-source.html">← Part 2: Data Source Check</a>
+      <a href="credit-score-p4-model-training.html">Part 4: Model Training →</a>
+    </div>
+
+  </div>
+
+  <script>
+    let dark = false;
+    function toggleDark() {
+      dark = !dark;
+      document.body.classList.toggle('dark', dark);
+      document.getElementById('toggleIcon').textContent = dark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('theme') === 'dark') toggleDark();
+  </script>
+</body>
+</html>
