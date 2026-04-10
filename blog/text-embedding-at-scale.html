@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Develop & Deploy Text Embedding Models at Scale — Le Thanh Binh</title>
+  <meta name="description" content="A practical guide to building and serving text embedding models in production: model selection, domain fine-tuning, ONNX quantization, Triton serving, vector databases, and production evaluation." />
+  <meta name="author" content="Le Thanh Binh" />
+  <link rel="canonical" href="https://hinetabi.github.io/blog/text-embedding-at-scale.html" />
+  <!-- Open Graph -->
+  <meta property="og:type"        content="article" />
+  <meta property="og:url"         content="https://hinetabi.github.io/blog/text-embedding-at-scale.html" />
+  <meta property="og:site_name"   content="Le Thanh Binh" />
+  <meta property="og:title"       content="Develop & Deploy Text Embedding Models at Scale" />
+  <meta property="og:description" content="A practical guide to building and serving text embedding models in production: model selection, domain fine-tuning, ONNX quantization, Triton serving, vector databases, and production evaluation." />
+  <meta property="article:author"        content="Le Thanh Binh" />
+  <meta property="article:published_time" content="2026-04-10" />
+  <meta property="article:tag"           content="NLP, MLOps, Text Embeddings, Machine Learning" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Develop & Deploy Text Embedding Models at Scale" />
+  <meta name="twitter:description" content="A practical guide to building and serving text embedding models in production: fine-tuning, ONNX quantization, Triton serving, and vector databases." />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #fafaf8; --bg-secondary: #f1efea; --bg-card: #ffffff;
+      --text-primary: #1a1a18; --text-secondary: #6b6b67;
+      --border: rgba(0,0,0,0.09); --border-hover: rgba(0,0,0,0.18);
+      --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --blue: #3B82F6; --blue-bg: #E6F1FB; --blue-text: #185FA5;
+      --amber: #F59E0B; --amber-bg: #FEF3C7; --amber-text: #92400E;
+      --purple: #8B5CF6; --purple-bg: #EEEDFE; --purple-text: #534AB7;
+      --red: #EF4444; --red-bg: #FEE2E2; --red-text: #991B1B;
+      --radius-sm: 5px; --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px;
+      --transition: 0.22s ease;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    body.dark {
+      --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1e1e1c;
+      --text-primary: #f0ede6; --text-secondary: #888780;
+      --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.16);
+      --green-bg: rgba(29,158,117,0.12); --green-text: #6ee9c0;
+      --blue-bg: rgba(59,130,246,0.12); --blue-text: #93c5fd;
+      --amber-bg: rgba(245,158,11,0.12); --amber-text: #fcd34d;
+      --purple-bg: rgba(139,92,246,0.12); --purple-text: #c4b5fd;
+      --red-bg: rgba(239,68,68,0.12); --red-text: #fca5a5;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
+    .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 6rem; }
+
+    /* NAV */
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 0; border-bottom: 0.5px solid var(--border); margin-bottom: 3.5rem; }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-logo { font-size: 15px; font-weight: 500; color: var(--text-primary); font-family: 'DM Mono', monospace; text-decoration: none; }
+    .toggle-btn { font-size: 13px; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: border-color var(--transition); }
+    .toggle-btn:hover { border-color: var(--blue); }
+    .back-link { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .back-link:hover { color: var(--text-primary); }
+
+    /* HEADER */
+    .post-header { margin-bottom: 3rem; }
+    .post-tag { font-size: 12px; font-weight: 500; color: var(--blue-text); background: var(--blue-bg); padding: 4px 11px; border-radius: var(--radius-pill); display: inline-block; margin-bottom: 1rem; }
+    .post-title { font-size: 30px; font-weight: 500; color: var(--text-primary); line-height: 1.25; letter-spacing: -0.5px; margin-bottom: 0.85rem; }
+    .post-meta { font-size: 13px; color: var(--text-secondary); }
+
+    /* CONTENT */
+    .post-content { line-height: 1.8; }
+    .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.1rem; }
+    .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
+    .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.55rem; }
+    .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.1rem; }
+    .post-content li { font-size: 14.5px; color: var(--text-secondary); margin-bottom: 0.35rem; line-height: 1.7; }
+    .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
+    .post-content em { color: var(--text-primary); }
+    .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
+    hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
+
+    /* CALLOUT */
+    .callout { background: var(--blue-bg); border-left: 3px solid var(--blue); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .callout p { margin-bottom: 0; font-size: 14px; color: var(--blue-text); }
+    .callout.amber { background: var(--amber-bg); border-color: var(--amber); }
+    .callout.amber p { color: var(--amber-text); }
+    .callout.green { background: var(--green-bg); border-color: var(--green); }
+    .callout.green p { color: var(--green-text); }
+
+    /* FIGURE */
+    .figure { background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem 1.5rem 1rem; margin: 1.75rem 0; overflow-x: auto; }
+    .figure-caption { font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: 0.85rem; font-family: 'DM Mono', monospace; letter-spacing: 0.02em; }
+
+    /* CODE BLOCK */
+    .code-block { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin: 1.75rem 0; overflow-x: auto; }
+    .code-block-label { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+    .code-block pre { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text-primary); white-space: pre; line-height: 1.7; }
+    .code-block .kw  { color: var(--purple-text); }
+    .code-block .fn  { color: var(--blue-text); }
+    .code-block .str { color: var(--green-text); }
+    .code-block .cm  { color: var(--text-secondary); font-style: italic; }
+    .code-block .num { color: var(--amber-text); }
+
+    /* TAB ROW */
+    .tab-row { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab-btn { font-size: 12px; font-family: 'DM Mono', monospace; padding: 5px 14px; border-radius: var(--radius-pill); border: 0.5px solid var(--border-hover); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; transition: all var(--transition); }
+    .tab-btn:hover { border-color: var(--blue); color: var(--blue-text); }
+    .tab-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* COMPARISON GRID */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 1rem 0; }
+    .compare-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 1rem 1.1rem; }
+    .compare-card-head { font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    .compare-card.pro .compare-card-head { color: var(--green-text); }
+    .compare-card.con .compare-card-head { color: var(--red-text); }
+    .compare-card ul { padding-left: 1rem; }
+    .compare-card li { font-size: 13px; color: var(--text-secondary); margin-bottom: 3px; line-height: 1.5; }
+
+    /* STAT ROW */
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 1.25rem 0; }
+    .stat-cell { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 0.85rem 1rem; }
+    .stat-cell-label { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-secondary); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-cell-val { font-size: 18px; font-weight: 500; color: var(--text-primary); font-family: 'DM Mono', monospace; }
+    .stat-cell-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* PIPELINE STEPS */
+    .pipeline { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; }
+    .pipe-step { display: flex; gap: 1rem; align-items: flex-start; position: relative; padding-bottom: 1.25rem; }
+    .pipe-step:last-child { padding-bottom: 0; }
+    .pipe-line-col { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .pipe-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--blue-bg); border: 1.5px solid var(--blue); display: flex; align-items: center; justify-content: center; font-size: 12px; font-family: 'DM Mono', monospace; color: var(--blue-text); font-weight: 500; flex-shrink: 0; }
+    .pipe-connector { flex: 1; width: 1.5px; background: var(--border); margin-top: 4px; min-height: 24px; }
+    .pipe-step:last-child .pipe-connector { display: none; }
+    .pipe-body { padding-top: 3px; }
+    .pipe-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 3px; }
+    .pipe-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+
+    /* TAG PILLS */
+    .tag-green { display: inline-block; font-size: 11px; font-weight: 500; color: var(--green-text); background: var(--green-bg); padding: 2px 8px; border-radius: var(--radius-pill); }
+    .tag-blue  { display: inline-block; font-size: 11px; font-weight: 500; color: var(--blue-text);  background: var(--blue-bg);  padding: 2px 8px; border-radius: var(--radius-pill); }
+    .tag-amber { display: inline-block; font-size: 11px; font-weight: 500; color: var(--amber-text); background: var(--amber-bg); padding: 2px 8px; border-radius: var(--radius-pill); }
+    .tag-red   { display: inline-block; font-size: 11px; font-weight: 500; color: var(--red-text);   background: var(--red-bg);   padding: 2px 8px; border-radius: var(--radius-pill); }
+
+    /* POST NAV */
+    .post-nav { display: flex; justify-content: flex-start; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
+    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
+    .post-nav a:hover { color: var(--blue); }
+
+    @media (max-width: 600px) {
+      .post-title { font-size: 24px; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <nav>
+      <div class="nav-left">
+        <a class="nav-logo" href="../index.html">hinetabi.github.io</a>
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()">
+          <span id="toggleIcon">🌙</span>
+          <span id="toggleLabel">Dark</span>
+        </button>
+      </div>
+      <a class="back-link" href="../index.html">← Back</a>
+    </nav>
+
+    <div class="post-header">
+      <span class="post-tag">NLP · MLOps</span>
+      <h1 class="post-title">Develop & Deploy Text Embedding Models at Scale</h1>
+      <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; 18 min read</div>
+    </div>
+
+    <!-- Hero diagram: embedding pipeline -->
+    <div style="background:var(--bg-secondary);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:3rem;">
+      <svg width="100%" viewBox="0 0 700 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+        <!-- Box 1 -->
+        <rect x="20" y="20" width="120" height="70" rx="10" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+        <text x="80" y="45" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--blue-text)" letter-spacing="0.07em">RAW TEXT</text>
+        <text x="80" y="65" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" fill="var(--text-primary)">"query..."</text>
+        <text x="80" y="81" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--text-secondary)">Tokenize</text>
+        <!-- Arrow 1 -->
+        <line x1="140" y1="55" x2="178" y2="55" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="178,51 186,55 178,59" fill="var(--border-hover)"/>
+        <!-- Box 2 highlighted -->
+        <rect x="187" y="20" width="130" height="70" rx="10" fill="var(--blue-bg)" stroke="var(--blue)" stroke-width="1.5"/>
+        <text x="252" y="45" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--blue-text)" letter-spacing="0.07em">ENCODER</text>
+        <text x="252" y="64" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" fill="var(--text-primary)">Transformer</text>
+        <text x="252" y="81" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--text-secondary)">Fine-tuned</text>
+        <!-- Arrow 2 -->
+        <line x1="317" y1="55" x2="355" y2="55" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="355,51 363,55 355,59" fill="var(--border-hover)"/>
+        <!-- Box 3 -->
+        <rect x="364" y="20" width="130" height="70" rx="10" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+        <text x="429" y="45" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--blue-text)" letter-spacing="0.07em">VECTOR [1×768]</text>
+        <text x="429" y="64" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="500" fill="var(--text-primary)">[0.12, -0.84…]</text>
+        <text x="429" y="81" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--text-secondary)">Normalized</text>
+        <!-- Arrow 3 -->
+        <line x1="494" y1="55" x2="532" y2="55" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="532,51 540,55 532,59" fill="var(--border-hover)"/>
+        <!-- Box 4 -->
+        <rect x="541" y="20" width="138" height="70" rx="10" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+        <text x="610" y="45" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--blue-text)" letter-spacing="0.07em">VECTOR DB</text>
+        <text x="610" y="64" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" fill="var(--text-primary)">ANN Search</text>
+        <text x="610" y="81" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--text-secondary)">HNSW / IVF</text>
+      </svg>
+    </div>
+
+    <div class="post-content">
+
+      <p>Text embeddings are one of the most quietly powerful primitives in modern ML. They turn unstructured text into dense vectors that capture semantic meaning — enabling semantic search, RAG pipelines, deduplication, clustering, and recommendations. Getting an embedding model to work in a notebook is easy. Getting it to work <em>reliably at scale</em> — low latency, high throughput, domain-accurate — is a different challenge entirely.</p>
+
+      <p>This post is a practical guide covering the full lifecycle: choosing a model, fine-tuning for your domain, optimizing inference, serving at scale, and evaluating in production. It draws from experience building embedding-powered systems at Coc Coc (search relevance for 25M+ monthly users) and Cake by VPBank (document understanding pipelines).</p>
+
+      <hr>
+
+      <div class="step-label">Section 1</div>
+      <h2>What Are Text Embeddings, and Why Do They Matter?</h2>
+
+      <p>An embedding model maps a piece of text — a word, sentence, or document — to a fixed-size vector in a high-dimensional space. The key property: <strong>semantically similar texts end up near each other</strong>. "How do I reset my password?" and "I forgot my login credentials" will cluster together, even though they share no keywords.</p>
+
+      <p>This unlocks capabilities that keyword-based systems simply can't do:</p>
+      <ul>
+        <li><strong>Semantic search</strong> — retrieve documents by meaning, not just lexical overlap</li>
+        <li><strong>RAG (Retrieval-Augmented Generation)</strong> — ground LLM outputs in relevant context chunks</li>
+        <li><strong>Deduplication</strong> — detect near-duplicate content across millions of records</li>
+        <li><strong>Zero-shot classification</strong> — classify without labeled examples, using embedding similarity</li>
+        <li><strong>Recommendation</strong> — find similar items based on textual descriptions</li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>The scale problem.</strong> Encoding 10 million documents at 20ms/doc takes ~55 hours on a single CPU. Serving 1,000 QPS at 50ms p99 requires careful batching, hardware selection, and concurrency design. These are engineering problems, not just ML ones.</p>
+      </div>
+
+      <hr>
+
+      <div class="step-label">Section 2</div>
+      <h2>Choosing the Right Model</h2>
+
+      <p>The first decision is whether to use a proprietary API or run an open-source model yourself. Both are valid — the right answer depends on your latency budget, data privacy requirements, and traffic volume.</p>
+
+      <div class="figure">
+        <div class="tab-row">
+          <button class="tab-btn active" onclick="switchTab('modelTab', 'tabOpenSource')">Open-Source</button>
+          <button class="tab-btn" onclick="switchTab('modelTab', 'tabProprietary')">Proprietary API</button>
+        </div>
+
+        <div id="tabOpenSource" class="tab-panel active" data-group="modelTab">
+          <div class="stat-row">
+            <div class="stat-cell">
+              <div class="stat-cell-label">Latency</div>
+              <div class="stat-cell-val">2–20ms</div>
+              <div class="stat-cell-sub">On GPU (A10G), batched</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-label">Cost at 10M docs</div>
+              <div class="stat-cell-val">~$2–5</div>
+              <div class="stat-cell-sub">GPU compute only</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-label">Data privacy</div>
+              <div class="stat-cell-val">Full</div>
+              <div class="stat-cell-sub"><span class="tag-green">On-prem / VPC</span></div>
+            </div>
+          </div>
+          <div style="margin-top: 1rem;">
+            <p style="font-size:14px;"><strong>Recommended models:</strong> <code>BAAI/bge-m3</code> (multilingual, 1024-dim), <code>intfloat/e5-large-v2</code> (English, strong on MTEB), <code>sentence-transformers/all-MiniLM-L6-v2</code> (fast, lightweight). For Vietnamese text, <code>bge-m3</code> or <code>multilingual-e5-large</code> are the go-to choices.</p>
+          </div>
+        </div>
+
+        <div id="tabProprietary" class="tab-panel" data-group="modelTab">
+          <div class="stat-row">
+            <div class="stat-cell">
+              <div class="stat-cell-label">Latency</div>
+              <div class="stat-cell-val">50–200ms</div>
+              <div class="stat-cell-sub">Network + API overhead</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-label">Cost at 10M docs</div>
+              <div class="stat-cell-val">$10–130</div>
+              <div class="stat-cell-sub">Per-token pricing</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-label">Data privacy</div>
+              <div class="stat-cell-val">Limited</div>
+              <div class="stat-cell-sub"><span class="tag-amber">Data leaves VPC</span></div>
+            </div>
+          </div>
+          <div style="margin-top: 1rem;">
+            <p style="font-size:14px;"><strong>Recommended APIs:</strong> <code>text-embedding-3-large</code> (OpenAI, 3072-dim), <code>embed-v3</code> (Cohere, strong multilingual). Best when: you need a quick prototype, have low volume (&lt;1M docs/month), or don't have ML infra to self-host.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Benchmarking with MTEB</h3>
+      <p>The <strong>Massive Text Embedding Benchmark (MTEB)</strong> is the standard leaderboard for embedding models. It covers 56 datasets across 8 task types: retrieval, clustering, classification, semantic similarity, and more. Before picking a model, check its MTEB score — but also run your own domain-specific eval, because general benchmarks often don't reflect performance on specialized vocabulary (medical, legal, fintech).</p>
+
+      <div class="callout amber">
+        <p><strong>Tip:</strong> Dimensionality matters for storage and retrieval speed. A 1536-dim vector costs 2× more to store and index than a 768-dim one. Use <strong>Matryoshka Representation Learning (MRL)</strong> models like <code>text-embedding-3-large</code> to truncate dimensions without re-embedding — you can drop from 3072 to 256 dims with minimal quality loss.</p>
+      </div>
+
+      <hr>
+
+      <div class="step-label">Section 3</div>
+      <h2>Fine-tuning for Your Domain</h2>
+
+      <p>General-purpose models are trained on web-crawl data. If your documents contain domain-specific terminology — financial reports, medical records, legal contracts, Vietnamese colloquial text — a fine-tuned model will consistently outperform an off-the-shelf one on retrieval tasks.</p>
+
+      <h3>The Training Objective: Contrastive Learning</h3>
+      <p>Embedding models are typically fine-tuned with a contrastive loss. The key idea: given a query <em>q</em>, pull its positive passage <em>p⁺</em> closer in vector space, and push negative passages <em>p⁻</em> further away.</p>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+
+          <defs>
+            <marker id="arr-green" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <polygon points="0 1, 7 4, 0 7" fill="var(--green)"/>
+            </marker>
+            <marker id="arr-red" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <polygon points="0 1, 7 4, 0 7" fill="var(--red)" opacity="0.75"/>
+            </marker>
+          </defs>
+
+          <!-- Background card -->
+          <rect x="10" y="10" width="620" height="158" rx="12" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+
+          <!-- Zone labels -->
+          <text x="175" y="30" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.07em" opacity="0.85">SIMILAR SPACE</text>
+          <text x="480" y="30" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--red-text)" letter-spacing="0.07em" opacity="0.85">DISSIMILAR SPACE</text>
+
+          <!-- Divider -->
+          <line x1="330" y1="36" x2="330" y2="155" stroke="var(--border-hover)" stroke-width="1" stroke-dasharray="5,4" opacity="0.6"/>
+
+          <!-- ── QUERY node — left anchor ── -->
+          <circle cx="90" cy="95" r="20" fill="var(--blue)" opacity="0.92"/>
+          <text x="90" y="100" text-anchor="middle" font-family="DM Mono,monospace" font-size="13" fill="white" font-weight="500">q</text>
+
+          <!-- ── POSITIVE node — nearby, same side ── -->
+          <circle cx="220" cy="85" r="16" fill="var(--green)" opacity="0.88"/>
+          <text x="220" y="90" text-anchor="middle" font-family="DM Mono,monospace" font-size="11" fill="white" font-weight="500">p⁺</text>
+
+          <!-- Pull arrow: p⁺ → q (arrowhead points at q, showing q being pulled toward p⁺) -->
+          <line x1="202" y1="84" x2="112" y2="89" stroke="var(--green)" stroke-width="2.2" marker-end="url(#arr-green)"/>
+          <!-- Pull label above arrow -->
+          <text x="158" y="74" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--green-text)" font-weight="500">pull</text>
+
+          <!-- ── NEGATIVE nodes — right side ── -->
+          <circle cx="440" cy="58"  r="15" fill="var(--red)" opacity="0.65"/>
+          <text x="440" y="63"  text-anchor="middle" font-family="DM Mono,monospace" font-size="10" fill="white" font-weight="500">p⁻</text>
+
+          <circle cx="535" cy="95"  r="15" fill="var(--red)" opacity="0.65"/>
+          <text x="535" y="100" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" fill="white" font-weight="500">p⁻</text>
+
+          <circle cx="455" cy="138" r="15" fill="var(--red)" opacity="0.55"/>
+          <text x="455" y="143" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" fill="white" font-weight="500">p⁻</text>
+
+          <!-- Push arrows: all originate from q (x≈110) toward each p⁻ -->
+          <line x1="110" y1="88"  x2="424" y2="61"  stroke="var(--red)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.65" marker-end="url(#arr-red)"/>
+          <line x1="110" y1="96"  x2="518" y2="95"  stroke="var(--red)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.65" marker-end="url(#arr-red)"/>
+          <line x1="110" y1="103" x2="439" y2="133" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.55" marker-end="url(#arr-red)"/>
+
+          <!-- Push label -->
+          <text x="390" y="76" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--red-text)" font-weight="500">push</text>
+
+          <!-- Bottom caption -->
+          <text x="320" y="172" text-anchor="middle" font-family="DM Mono,monospace" font-size="9.5" fill="var(--text-secondary)">Contrastive loss: minimize dist(q, p⁺),  maximize dist(q, p⁻)</text>
+        </svg>
+      </div>
+
+      <h3>Data Preparation: The Critical Step</h3>
+      <p>The quality of your training data matters more than the choice of architecture. A model trained on 10,000 high-quality (query, passage) pairs will outperform one trained on 100,000 noisy pairs. Here's the pipeline I use:</p>
+
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="pipe-line-col">
+            <div class="pipe-dot">01</div>
+            <div class="pipe-connector"></div>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-title">Mine positive pairs</div>
+            <div class="pipe-desc">Collect (query, relevant document) pairs from user logs (click data, search sessions). If logs aren't available, generate synthetic queries with an LLM given a passage as input.</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-line-col">
+            <div class="pipe-dot">02</div>
+            <div class="pipe-connector"></div>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-title">Mine hard negatives</div>
+            <div class="pipe-desc">Use BM25 or a weak embedding model to retrieve top-k candidates for each query, then treat non-relevant ones as hard negatives. Easy negatives (random docs) are not enough — the model needs to learn fine-grained distinctions.</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-line-col">
+            <div class="pipe-dot">03</div>
+            <div class="pipe-connector"></div>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-title">Filter with a cross-encoder</div>
+            <div class="pipe-desc">A cross-encoder reranker (e.g., <code>cross-encoder/ms-marco-MiniLM-L-6-v2</code>) can score (query, passage) pairs with high accuracy. Use it to remove false negatives — passages that are actually relevant but weren't labeled as such.</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-line-col">
+            <div class="pipe-dot">04</div>
+            <div class="pipe-connector"></div>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-title">Train with in-batch negatives</div>
+            <div class="pipe-desc">With in-batch negatives, every other example in the batch serves as a negative. This makes large batches critical — use <code>GradCache</code> or gradient checkpointing to fit large batch sizes without OOM errors.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-label">Python · Fine-tuning with sentence-transformers</div>
+        <pre><span class="kw">from</span> sentence_transformers <span class="kw">import</span> SentenceTransformer, losses
+<span class="kw">from</span> sentence_transformers.training_args <span class="kw">import</span> SentenceTransformerTrainingArguments
+<span class="kw">from</span> datasets <span class="kw">import</span> Dataset
+
+<span class="cm"># Load base model</span>
+model = <span class="fn">SentenceTransformer</span>(<span class="str">"BAAI/bge-m3"</span>)
+
+<span class="cm"># Build dataset: {"anchor": query, "positive": doc, "negative": hard_neg}</span>
+train_dataset = Dataset.<span class="fn">from_list</span>(triplets)
+
+<span class="cm"># MultipleNegativesRankingLoss: treats in-batch samples as negatives</span>
+loss = losses.<span class="fn">MultipleNegativesRankingLoss</span>(model)
+
+args = <span class="fn">SentenceTransformerTrainingArguments</span>(
+    output_dir=<span class="str">"bge-m3-finetuned"</span>,
+    num_train_epochs=<span class="num">3</span>,
+    per_device_train_batch_size=<span class="num">64</span>,   <span class="cm"># bigger = more in-batch negatives</span>
+    warmup_ratio=<span class="num">0.1</span>,
+    fp16=<span class="kw">True</span>,
+)
+
+trainer = <span class="fn">SentenceTransformerTrainer</span>(
+    model=model, args=args,
+    train_dataset=train_dataset, loss=loss,
+)
+trainer.<span class="fn">train</span>()</pre>
+      </div>
+
+      <hr>
+
+      <div class="step-label">Section 4</div>
+      <h2>Optimizing for Inference Speed</h2>
+
+      <p>A 110M-parameter BERT-based model can process ~100 sentences/second on a single CPU core. To hit production throughput targets, you need a combination of hardware, batching, and model compression strategies.</p>
+
+      <h3>Quantization with ONNX Runtime</h3>
+      <p>Exporting a model to ONNX and applying INT8 quantization typically yields a <strong>2–4× speedup</strong> with less than 1% quality degradation on most retrieval benchmarks. This is almost always the first optimization to reach for.</p>
+
+      <div class="code-block">
+        <div class="code-block-label">Python · Export to ONNX + INT8 Quantization</div>
+        <pre><span class="kw">from</span> optimum.onnxruntime <span class="kw">import</span> ORTModelForFeatureExtraction
+<span class="kw">from</span> optimum.onnxruntime.configuration <span class="kw">import</span> AutoQuantizationConfig
+
+<span class="cm"># Export to ONNX</span>
+ort_model = ORTModelForFeatureExtraction.<span class="fn">from_pretrained</span>(
+    <span class="str">"bge-m3-finetuned"</span>, export=<span class="kw">True</span>
+)
+
+<span class="cm"># INT8 dynamic quantization (CPU-friendly)</span>
+qconfig = AutoQuantizationConfig.<span class="fn">arm64</span>(is_static=<span class="kw">False</span>, per_channel=<span class="kw">False</span>)
+quantizer.<span class="fn">quantize</span>(
+    save_dir=<span class="str">"bge-m3-onnx-int8"</span>,
+    quantization_config=qconfig,
+)</pre>
+      </div>
+
+      <h3>Batching Strategy</h3>
+      <p>The single biggest throughput lever for GPU inference is <strong>batch size</strong>. But dynamic traffic makes static batching wasteful — use a queue-based micro-batcher that accumulates requests over a short window (5–10ms) and fires them as a single batch.</p>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 600 90" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+          <!-- Requests flowing in -->
+          <rect x="20" y="30" width="60" height="28" rx="6" fill="var(--blue-bg)" stroke="var(--blue)" stroke-width="1"/>
+          <text x="50" y="48" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--blue-text)">req_1</text>
+          <rect x="20" y="62" width="60" height="20" rx="6" fill="var(--blue-bg)" stroke="var(--blue)" stroke-width="1" opacity="0.6"/>
+          <text x="50" y="76" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--blue-text)">req_2</text>
+          <!-- Arrow -->
+          <line x1="82" y1="44" x2="130" y2="44" stroke="var(--border-hover)" stroke-width="1.5"/>
+          <polygon points="130,40 138,44 130,48" fill="var(--border-hover)"/>
+          <!-- Queue/batcher -->
+          <rect x="139" y="18" width="110" height="62" rx="8" fill="var(--amber-bg)" stroke="var(--amber)" stroke-width="1.2"/>
+          <text x="194" y="38" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--amber-text)" letter-spacing="0.06em">MICRO-BATCHER</text>
+          <text x="194" y="56" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="var(--text-primary)" font-weight="500">5–10ms window</text>
+          <text x="194" y="72" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--text-secondary)">Accumulate reqs</text>
+          <!-- Arrow -->
+          <line x1="249" y1="44" x2="297" y2="44" stroke="var(--border-hover)" stroke-width="1.5"/>
+          <polygon points="297,40 305,44 297,48" fill="var(--border-hover)"/>
+          <!-- GPU model -->
+          <rect x="306" y="18" width="110" height="62" rx="8" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.2"/>
+          <text x="361" y="38" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.06em">GPU ENCODER</text>
+          <text x="361" y="56" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="var(--text-primary)" font-weight="500">Batch = 32–128</text>
+          <text x="361" y="72" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--text-secondary)">2–15ms/batch</text>
+          <!-- Arrow -->
+          <line x1="416" y1="44" x2="464" y2="44" stroke="var(--border-hover)" stroke-width="1.5"/>
+          <polygon points="464,40 472,44 464,48" fill="var(--border-hover)"/>
+          <!-- Results -->
+          <rect x="473" y="18" width="105" height="62" rx="8" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+          <text x="525" y="38" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)" letter-spacing="0.06em">VECTORS</text>
+          <text x="525" y="56" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="var(--text-primary)" font-weight="500">Dispatch back</text>
+          <text x="525" y="72" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--text-secondary)">to requesters</text>
+        </svg>
+        <div class="figure-caption">Queue-based micro-batching — the most practical throughput optimization for GPU serving</div>
+      </div>
+
+      <hr>
+
+      <div class="step-label">Section 5</div>
+      <h2>Serving at Scale</h2>
+
+      <p>Once the model is optimized, the next challenge is packaging it for production serving with proper observability, scaling, and failure handling.</p>
+
+      <h3>Containerizing with Triton Inference Server</h3>
+      <p>NVIDIA Triton is purpose-built for serving ML models at high throughput. It supports ONNX Runtime natively, handles dynamic batching server-side, and exposes both HTTP and gRPC endpoints. For embedding models, it's one of the highest-performance options available.</p>
+
+      <div class="code-block">
+        <div class="code-block-label">Shell · Triton model repository structure</div>
+        <pre>models/
+  bge-m3-int8/
+    config.pbtxt          <span class="cm"># model config (batching, input/output shapes)</span>
+    1/
+      model.onnx          <span class="cm"># quantized ONNX model
+</span>
+<span class="cm"># config.pbtxt (key settings)</span>
+dynamic_batching {
+  preferred_batch_size: [ <span class="num">32</span>, <span class="num">64</span> ]
+  max_queue_delay_microseconds: <span class="num">8000</span>   <span class="cm"># 8ms batching window</span>
+}
+instance_group [{ kind: KIND_GPU, count: <span class="num">2</span> }]</pre>
+      </div>
+
+      <h3>Async Inference for Bulk Encoding</h3>
+      <p>For offline batch encoding (indexing millions of documents), async I/O with a producer-consumer queue dramatically outperforms naive sequential calls. Use a <code>asyncio</code> producer to read documents, a worker pool to call the model, and a consumer to write vectors to the database.</p>
+
+      <h3>Key Metrics to Monitor</h3>
+      <div class="stat-row" style="margin-top:1rem;">
+        <div class="stat-cell">
+          <div class="stat-cell-label">Throughput</div>
+          <div class="stat-cell-val">docs/s</div>
+          <div class="stat-cell-sub">Track GPU utilization alongside</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell-label">Latency p99</div>
+          <div class="stat-cell-val">&lt; 50ms</div>
+          <div class="stat-cell-sub">Real-time query target</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell-label">Embedding drift</div>
+          <div class="stat-cell-val">cosine</div>
+          <div class="stat-cell-sub">Monitor dist. shift over time</div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="step-label">Section 6</div>
+      <h2>Vector Storage & Retrieval</h2>
+
+      <p>Embedding vectors are useless without a storage backend that can find the nearest neighbors efficiently. At scale, you need an Approximate Nearest Neighbor (ANN) index — exact search over millions of 768-dim vectors is too slow.</p>
+
+      <h3>Choosing a Vector Database</h3>
+
+      <div class="figure">
+        <div class="tab-row">
+          <button class="tab-btn active" onclick="switchTab('vdbTab', 'tabQdrant')">Qdrant</button>
+          <button class="tab-btn" onclick="switchTab('vdbTab', 'tabMilvus')">Milvus</button>
+          <button class="tab-btn" onclick="switchTab('vdbTab', 'tabPgvector')">pgvector</button>
+        </div>
+
+        <div id="tabQdrant" class="tab-panel active" data-group="vdbTab">
+          <div class="compare-grid">
+            <div class="compare-card pro">
+              <div class="compare-card-head">Strengths</div>
+              <ul>
+                <li>Written in Rust — excellent performance and memory safety</li>
+                <li>Payload filtering at the index level (fast filtered search)</li>
+                <li>On-disk indexing for cost-efficient large collections</li>
+                <li>Simple to self-host or use Qdrant Cloud</li>
+              </ul>
+            </div>
+            <div class="compare-card con">
+              <div class="compare-card-head">Considerations</div>
+              <ul>
+                <li>Younger ecosystem vs. Milvus/Weaviate</li>
+                <li>No native multi-tenancy until recently</li>
+                <li>Smaller community compared to pgvector</li>
+              </ul>
+            </div>
+          </div>
+          <p style="font-size:13.5px;margin-top:0.85rem;">Best for: new projects, RAG pipelines, real-time filtered semantic search. My go-to for greenfield systems.</p>
+        </div>
+
+        <div id="tabMilvus" class="tab-panel" data-group="vdbTab">
+          <div class="compare-grid">
+            <div class="compare-card pro">
+              <div class="compare-card-head">Strengths</div>
+              <ul>
+                <li>Battle-tested at billion-vector scale (Alibaba, Tencent)</li>
+                <li>Multiple index types: IVF-Flat, HNSW, DiskANN</li>
+                <li>Rich SDK ecosystem (Python, Go, Java)</li>
+                <li>Distributed architecture built-in</li>
+              </ul>
+            </div>
+            <div class="compare-card con">
+              <div class="compare-card-head">Considerations</div>
+              <ul>
+                <li>Complex to operate — depends on etcd, MinIO, Pulsar</li>
+                <li>Overkill for &lt;10M vectors</li>
+                <li>Heavier resource footprint</li>
+              </ul>
+            </div>
+          </div>
+          <p style="font-size:13.5px;margin-top:0.85rem;">Best for: large-scale production deployments where you need fine-grained control over indexing strategy.</p>
+        </div>
+
+        <div id="tabPgvector" class="tab-panel" data-group="vdbTab">
+          <div class="compare-grid">
+            <div class="compare-card pro">
+              <div class="compare-card-head">Strengths</div>
+              <ul>
+                <li>Lives in your existing Postgres — no new infra</li>
+                <li>Transactional consistency with your relational data</li>
+                <li>SQL-native: combine vector search with filters trivially</li>
+                <li>Mature backup, replication tooling</li>
+              </ul>
+            </div>
+            <div class="compare-card con">
+              <div class="compare-card-head">Considerations</div>
+              <ul>
+                <li>HNSW index creation is slow for large tables</li>
+                <li>Query performance degrades beyond ~5M vectors at high QPS</li>
+                <li>HNSW index is not on-disk — high RAM requirement</li>
+              </ul>
+            </div>
+          </div>
+          <p style="font-size:13.5px;margin-top:0.85rem;">Best for: existing Postgres shops, &lt;5M vectors, or when you need vector search alongside SQL joins.</p>
+        </div>
+      </div>
+
+      <h3>HNSW vs. IVF-Flat: Choosing Your Index</h3>
+      <p><strong>HNSW</strong> (Hierarchical Navigable Small World) builds a graph structure that enables fast greedy search. It offers the best query latency at the cost of more RAM and slower build time. <strong>IVF-Flat</strong> clusters vectors into buckets (inverted file), which is faster to build and more memory-efficient but requires tuning the number of probes at query time. For most production use cases under 50M vectors, HNSW wins on query speed.</p>
+
+      <hr>
+
+      <div class="step-label">Section 7</div>
+      <h2>Evaluating in Production</h2>
+
+      <p>Offline MTEB scores tell you how a model ranks globally. They don't tell you whether it's working for <em>your</em> users. Production evaluation requires a different approach.</p>
+
+      <h3>Offline Evaluation: NDCG@k</h3>
+      <p>Build a labeled evaluation set: a set of queries with human-annotated relevant documents. Measure <code>NDCG@10</code> (Normalized Discounted Cumulative Gain) — it rewards systems that rank the most relevant results higher. Run this eval on every model checkpoint before deploying.</p>
+
+      <h3>Online Evaluation: A/B Testing</h3>
+      <p>Shadow the new embedding model alongside the current one, routing a percentage of live traffic to each. Measure the business metric that matters: click-through rate for search, context relevance for RAG (using an LLM-as-judge), or downstream task accuracy. A 2% NDCG improvement offline doesn't always translate to a win in production.</p>
+
+      <div class="callout green">
+        <p><strong>LLM-as-judge for RAG.</strong> For RAG evaluation, use an LLM to score (question, retrieved context, answer) triples on faithfulness and answer relevance. Libraries like <code>RAGAS</code> and <code>TruLens</code> automate this pipeline and give you a dashboard of retrieval quality metrics.</p>
+      </div>
+
+      <h3>Monitoring Embedding Drift</h3>
+      <p>If your document distribution changes over time (new products, new terminology, new user intents), the embedding space can drift — queries that previously retrieved relevant results start failing. Monitor the distribution of cosine similarities between queries and their top-1 retrieved documents. A significant drop in average similarity is a signal to re-index or retrain.</p>
+
+      <hr>
+
+      <div class="step-label">Section 8</div>
+      <h2>Lessons Learned & Pitfalls</h2>
+
+      <p>Here are the issues that bit me most often in practice:</p>
+
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="pipe-line-col">
+            <div class="pipe-dot" style="background:var(--red-bg);border-color:var(--red);color:var(--red-text);">!</div>
+            <div class="pipe-connector"></div>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-title">Always L2-normalize your embeddings</div>
+            <div class="pipe-desc">Cosine similarity = dot product on unit-norm vectors. If you forget to normalize, your retrieval results can be dominated by vector magnitude rather than semantic similarity. Add <code>model.encode(texts, normalize_embeddings=True)</code> — always.</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-line-col">
+            <div class="pipe-dot" style="background:var(--red-bg);border-color:var(--red);color:var(--red-text);">!</div>
+            <div class="pipe-connector"></div>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-title">Prompt prefixes matter more than you think</div>
+            <div class="pipe-desc">Models like BGE and E5 are trained with instruction prefixes: <code>"Represent this sentence for searching relevant passages: "</code> for queries, and no prefix for passages. Omitting the prefix silently degrades retrieval quality by 5–15% on NDCG.</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-line-col">
+            <div class="pipe-dot" style="background:var(--red-bg);border-color:var(--red);color:var(--red-text);">!</div>
+            <div class="pipe-connector"></div>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-title">Stale indexes are a silent killer</div>
+            <div class="pipe-desc">After fine-tuning, you must re-encode <em>all</em> your documents — the vector space has shifted. Partial re-encoding (only new docs) creates inconsistent neighbors and degrades retrieval quality subtly. Always full re-index after a model update.</div>
+          </div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-line-col">
+            <div class="pipe-dot" style="background:var(--red-bg);border-color:var(--red);color:var(--red-text);">!</div>
+            <div class="pipe-connector"></div>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-title">Token truncation is a retrieval trap</div>
+            <div class="pipe-desc">BERT-based models have a 512-token limit. Long documents are truncated silently, and important information at the end is lost. For long-document retrieval, chunk documents into overlapping 256–512 token windows and embed each chunk separately.</div>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="step-label">Section 9</div>
+      <h2>Conclusion</h2>
+
+      <p>Text embedding at scale is a full-stack problem. The ML is only one layer — choosing the right model and fine-tuning it for your domain. The rest is systems engineering: quantization and batching for throughput, Triton or a similar server for deployment, a vector DB with the right index for retrieval, and a robust evaluation loop to catch regressions before they reach users.</p>
+
+      <p>The ecosystem is moving fast. Matryoshka embeddings are making dimension reduction practical. Sparse-dense hybrid retrieval (combining BM25 and dense embeddings) is closing the gap with reranking pipelines. And multimodal embeddings — text + image in a shared space — are opening entirely new use cases.</p>
+
+      <p>If I had to summarize the three things that move the needle most in practice: <strong>mine hard negatives for fine-tuning</strong>, <strong>always normalize embeddings</strong>, and <strong>don't skip the production evaluation loop</strong>. The rest is details you'll work out as you go.</p>
+
+      <div class="callout green">
+        <p>Questions, corrections, or war stories from your own embedding deployments? Reach me at <strong>binh.le@cake.vn</strong> — always happy to compare notes.</p>
+      </div>
+
+    </div>
+
+    <div class="post-nav">
+      <a href="../index.html">← Back to writing</a>
+    </div>
+  </div>
+
+  <script>
+    // Dark mode
+    function toggleDark() {
+      const body = document.body;
+      const isDark = body.classList.toggle('dark');
+      document.getElementById('toggleIcon').textContent = isDark ? '☀️' : '🌙';
+      document.getElementById('toggleLabel').textContent = isDark ? 'Light' : 'Dark';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.body.classList.add('dark');
+        document.getElementById('toggleIcon').textContent = '☀️';
+        document.getElementById('toggleLabel').textContent = 'Light';
+      }
+    })();
+
+    // Generic tab switcher
+    function switchTab(group, activeId) {
+      document.querySelectorAll('[data-group="' + group + '"]').forEach(p => p.classList.remove('active'));
+      document.getElementById(activeId).classList.add('active');
+      // Update buttons
+      const btns = document.querySelectorAll('.tab-btn');
+      btns.forEach(btn => {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(activeId)) {
+          btn.classList.add('active');
+        } else if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(group)) {
+          btn.classList.remove('active');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
