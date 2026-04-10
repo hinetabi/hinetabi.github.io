@@ -260,6 +260,42 @@
       <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
     </div>
 
+    <div style="background:var(--bg-secondary);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:3rem;">
+      <svg width="100%" viewBox="0 0 700 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+        <!-- Zone backgrounds: chart area x=65–650, y=22–100 -->
+        <rect x="65" y="75" width="585" height="25" fill="var(--green-bg)" opacity="0.45"/>
+        <rect x="65" y="52" width="585" height="23" fill="var(--amber-bg)" opacity="0.45"/>
+        <rect x="65" y="22" width="585" height="30" fill="var(--red-bg)" opacity="0.35"/>
+        <!-- Zone boundary lines -->
+        <line x1="65" y1="75" x2="650" y2="75" stroke="var(--green)" stroke-width="0.6" stroke-dasharray="3,3"/>
+        <line x1="65" y1="52" x2="650" y2="52" stroke="var(--amber)" stroke-width="0.6" stroke-dasharray="3,3"/>
+        <!-- Zone labels (right side) -->
+        <text x="658" y="92" font-family="DM Mono,monospace" font-size="8" fill="var(--green-text)">Stable</text>
+        <text x="658" y="67" font-family="DM Mono,monospace" font-size="8" fill="var(--amber-text)">Warn</text>
+        <text x="658" y="40" font-family="DM Mono,monospace" font-size="8" fill="var(--red-text)">Drift</text>
+        <!-- Axes -->
+        <line x1="65" y1="100" x2="650" y2="100" stroke="var(--border)" stroke-width="0.8"/>
+        <line x1="65" y1="22" x2="65" y2="100" stroke="var(--border)" stroke-width="0.8"/>
+        <!-- PSI y-axis labels -->
+        <text x="58" y="103" text-anchor="end" font-family="DM Mono,monospace" font-size="8" fill="var(--text-secondary)">0</text>
+        <text x="58" y="78" text-anchor="end" font-family="DM Mono,monospace" font-size="8" fill="var(--text-secondary)">.10</text>
+        <text x="58" y="55" text-anchor="end" font-family="DM Mono,monospace" font-size="8" fill="var(--text-secondary)">.20</text>
+        <!-- PSI line (12 months, rising from stable → drift) -->
+        <polyline points="65,96 118,94 171,92 224,91 277,89 330,84 383,69 436,62 489,50 542,40 595,30 648,22" stroke="var(--text-primary)" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+        <!-- Alert circle at M9 — first red-zone crossing -->
+        <circle cx="489" cy="50" r="5" fill="none" stroke="var(--red)" stroke-width="1.5"/>
+        <text x="489" y="44" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="var(--red-text)">alert</text>
+        <!-- Month labels -->
+        <text x="65" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="var(--text-secondary)">M1</text>
+        <text x="224" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="var(--text-secondary)">M4</text>
+        <text x="383" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="var(--text-secondary)">M7</text>
+        <text x="542" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="var(--text-secondary)">M10</text>
+        <text x="648" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="var(--text-secondary)">M12</text>
+        <!-- Title -->
+        <text x="72" y="34" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)" letter-spacing="0.06em">PSI DRIFT OVER TIME</text>
+      </svg>
+    </div>
+
     <div class="post-content">
 
       <p>Deployment is not the end of the lifecycle — it is the beginning of a different kind of responsibility. A credit score model operates in a world that keeps changing: borrower behavior shifts with macroeconomic conditions, the bank's product mix evolves, new customer segments are acquired. The model was trained on a snapshot of that world. Monitoring is the discipline of detecting, as early as possible, when the gap between the model's world and the current world has grown too large to ignore.</p>

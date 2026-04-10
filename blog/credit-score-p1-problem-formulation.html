@@ -157,6 +157,32 @@
       <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
     </div>
 
+    <div style="background:var(--bg-secondary);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:3rem;">
+      <svg width="100%" viewBox="0 0 700 118" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+        <!-- Box 1: Business Goal -->
+        <rect x="40" y="24" width="170" height="70" rx="10" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+        <text x="125" y="49" text-anchor="middle" font-family="DM Mono,monospace" font-size="9.5" fill="var(--green-text)" letter-spacing="0.08em">BUSINESS GOAL</text>
+        <text x="125" y="69" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="15" font-weight="500" fill="var(--text-primary)">Minimize NPL</text>
+        <text x="125" y="86" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="var(--text-secondary)">Maximize portfolio profit</text>
+        <!-- Arrow 1→2 -->
+        <line x1="210" y1="59" x2="253" y2="59" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="253,55 261,59 253,63" fill="var(--border-hover)"/>
+        <!-- Box 2: ML Objective (highlighted) -->
+        <rect x="262" y="24" width="178" height="70" rx="10" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.5"/>
+        <text x="351" y="49" text-anchor="middle" font-family="DM Mono,monospace" font-size="9.5" fill="var(--green-text)" letter-spacing="0.08em">ML OBJECTIVE</text>
+        <text x="351" y="69" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="15" font-weight="500" fill="var(--text-primary)">P(default)</text>
+        <text x="351" y="86" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="var(--text-secondary)">Binary classification</text>
+        <!-- Arrow 2→3 -->
+        <line x1="440" y1="59" x2="483" y2="59" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="483,55 491,59 483,63" fill="var(--border-hover)"/>
+        <!-- Box 3: Binary Label -->
+        <rect x="492" y="24" width="168" height="70" rx="10" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+        <text x="576" y="49" text-anchor="middle" font-family="DM Mono,monospace" font-size="9.5" fill="var(--green-text)" letter-spacing="0.08em">BINARY LABEL</text>
+        <text x="576" y="69" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="15" font-weight="500" fill="var(--text-primary)">DPD 90+</text>
+        <text x="576" y="86" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="var(--text-secondary)">within 12 months</text>
+      </svg>
+    </div>
+
     <div class="post-content">
 
       <p>Before writing a single line of code, the most important work in an ML project happens in a whiteboard session with business stakeholders. In credit scoring, the business question sounds deceptively simple: <em>who should we lend to?</em> Unpacking that question carefully is what separates a model that ships and holds up in production from one that looks great on a validation set and fails quietly in the real world.</p>

@@ -358,6 +358,55 @@
       <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
     </div>
 
+    <div style="background:var(--bg-secondary);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:3rem;">
+      <svg width="100%" viewBox="0 0 700 82" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+        <!-- 7-part pipeline: boxes y=14–58 (height=44), start x=51, width=76, gap=11 -->
+        <!-- P1 Problem -->
+        <rect x="51" y="14" width="76" height="44" rx="8" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.2"/>
+        <text x="89" y="33" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.06em">01</text>
+        <text x="89" y="49" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="500" fill="var(--text-primary)">Problem</text>
+        <line x1="127" y1="36" x2="135" y2="36" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="135,33 138,36 135,39" fill="var(--border-hover)"/>
+        <!-- P2 Data -->
+        <rect x="138" y="14" width="76" height="44" rx="8" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.2"/>
+        <text x="176" y="33" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.06em">02</text>
+        <text x="176" y="49" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="500" fill="var(--text-primary)">Data</text>
+        <line x1="214" y1="36" x2="222" y2="36" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="222,33 225,36 222,39" fill="var(--border-hover)"/>
+        <!-- P3 EDA -->
+        <rect x="225" y="14" width="76" height="44" rx="8" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.2"/>
+        <text x="263" y="33" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.06em">03</text>
+        <text x="263" y="49" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="500" fill="var(--text-primary)">EDA</text>
+        <line x1="301" y1="36" x2="309" y2="36" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="309,33 312,36 309,39" fill="var(--border-hover)"/>
+        <!-- P4 Training -->
+        <rect x="312" y="14" width="76" height="44" rx="8" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.2"/>
+        <text x="350" y="33" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.06em">04</text>
+        <text x="350" y="49" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="500" fill="var(--text-primary)">Training</text>
+        <line x1="388" y1="36" x2="396" y2="36" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="396,33 399,36 396,39" fill="var(--border-hover)"/>
+        <!-- P5 Impact -->
+        <rect x="399" y="14" width="76" height="44" rx="8" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.2"/>
+        <text x="437" y="33" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.06em">05</text>
+        <text x="437" y="49" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="500" fill="var(--text-primary)">Impact</text>
+        <line x1="475" y1="36" x2="483" y2="36" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="483,33 486,36 483,39" fill="var(--border-hover)"/>
+        <!-- P6 Deploy -->
+        <rect x="486" y="14" width="76" height="44" rx="8" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.2"/>
+        <text x="524" y="33" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.06em">06</text>
+        <text x="524" y="49" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="500" fill="var(--text-primary)">Deploy</text>
+        <line x1="562" y1="36" x2="570" y2="36" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="570,33 573,36 570,39" fill="var(--border-hover)"/>
+        <!-- P7 Monitor (amber = feedback stage) -->
+        <rect x="573" y="14" width="76" height="44" rx="8" fill="var(--amber-bg)" stroke="var(--amber)" stroke-width="1.2"/>
+        <text x="611" y="33" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--amber-text)" letter-spacing="0.06em">07</text>
+        <text x="611" y="49" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="500" fill="var(--text-primary)">Monitor</text>
+        <!-- Feedback loop: P7 bottom → under all boxes → P1 bottom -->
+        <path d="M 611,58 L 611,70 L 89,70 L 89,58" stroke="var(--amber)" stroke-width="1" stroke-dasharray="4,3" fill="none"/>
+        <polygon points="92,58 89,52 86,58" fill="var(--amber)"/>
+      </svg>
+    </div>
+
     <div class="post-content">
 
       <p>Shipping a credit score model is not just about training accuracy. It requires translating a regulatory-constrained business problem into a well-defined ML task, auditing messy banking data, running rigorous experiments, estimating business impact in terms stakeholders actually care about, and keeping the model healthy long after deployment.</p>

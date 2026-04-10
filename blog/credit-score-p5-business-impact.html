@@ -140,6 +140,36 @@
       <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
     </div>
 
+    <div style="background:var(--bg-secondary);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:3rem;">
+      <svg width="100%" viewBox="0 0 700 118" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+        <!-- Axes: x=70–640 (threshold 0→1), y=18–100 -->
+        <line x1="70" y1="100" x2="640" y2="100" stroke="var(--border)" stroke-width="0.8"/>
+        <line x1="70" y1="18" x2="70" y2="100" stroke="var(--border)" stroke-width="0.8"/>
+        <!-- Threshold tick labels (x = 70 + t*570) -->
+        <text x="70" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">0.0</text>
+        <text x="213" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">0.25</text>
+        <text x="355" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">0.50</text>
+        <text x="498" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">0.75</text>
+        <text x="640" y="113" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">1.0</text>
+        <!-- Profit curve fill -->
+        <path d="M 70,90 C 140,74 195,54 262,34 C 295,24 314,20 327,20 C 340,20 358,22 392,34 C 442,52 494,72 552,86 C 582,92 614,96 640,98 L 640,100 L 70,100 Z" fill="var(--green-bg)" opacity="0.6"/>
+        <!-- Profit curve stroke -->
+        <path d="M 70,90 C 140,74 195,54 262,34 C 295,24 314,20 327,20 C 340,20 358,22 392,34 C 442,52 494,72 552,86 C 582,92 614,96 640,98" stroke="var(--green)" stroke-width="2.5" fill="none"/>
+        <!-- Optimal threshold dashed line at 0.45 → x ≈ 327 -->
+        <line x1="327" y1="20" x2="327" y2="100" stroke="var(--green)" stroke-width="1.2" stroke-dasharray="4,3"/>
+        <!-- Optimal label pill -->
+        <rect x="290" y="6" width="74" height="16" rx="4" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.6"/>
+        <text x="327" y="18" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)">optimal: 0.45</text>
+        <!-- Axis labels -->
+        <text x="62" y="22" text-anchor="end" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">max</text>
+        <text x="62" y="103" text-anchor="end" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">min</text>
+        <!-- Chart title -->
+        <text x="78" y="34" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)" letter-spacing="0.06em">PROFIT VS SCORE THRESHOLD</text>
+        <!-- X label -->
+        <text x="355" y="118" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="var(--text-secondary)">Score threshold</text>
+      </svg>
+    </div>
+
     <div class="post-content">
 
       <p>A model that improves Gini by 5 points over the baseline is a meaningful technical achievement. Whether it is worth deploying is a different question — one that requires translating model performance into the language the business cares about: NPL rate, approval rate, revenue impact, and expected credit losses. This translation is the purpose of business impact estimation, and it is what converts a model evaluation into a deployment decision.</p>

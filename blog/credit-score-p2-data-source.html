@@ -126,6 +126,42 @@
       <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
     </div>
 
+    <div style="background:var(--bg-secondary);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:3rem;">
+      <svg width="100%" viewBox="0 0 700 118" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+        <!-- Source column header -->
+        <text x="90" y="16" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)" letter-spacing="0.06em">RAW SOURCES</text>
+        <!-- Source boxes (stacked) -->
+        <rect x="20" y="22" width="140" height="24" rx="5" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+        <text x="90" y="38" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="var(--text-secondary)">Core Banking (CBS)</text>
+        <rect x="20" y="52" width="140" height="24" rx="5" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+        <text x="90" y="68" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="var(--text-secondary)">Credit Bureau</text>
+        <rect x="20" y="82" width="140" height="24" rx="5" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+        <text x="90" y="98" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="var(--text-secondary)">Application Form</text>
+        <!-- Converging lines to ETL -->
+        <line x1="160" y1="34" x2="200" y2="56" stroke="var(--border-hover)" stroke-width="1"/>
+        <line x1="160" y1="64" x2="200" y2="64" stroke="var(--border-hover)" stroke-width="1"/>
+        <line x1="160" y1="94" x2="200" y2="72" stroke="var(--border-hover)" stroke-width="1"/>
+        <!-- ETL box -->
+        <rect x="200" y="42" width="130" height="44" rx="8" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.2"/>
+        <text x="265" y="60" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.07em">ETL PIPELINE</text>
+        <text x="265" y="77" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" fill="var(--text-primary)">Feature Eng.</text>
+        <!-- Arrow ETL → Feature Store -->
+        <line x1="330" y1="64" x2="368" y2="64" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="368,60 376,64 368,68" fill="var(--border-hover)"/>
+        <!-- Feature Store box -->
+        <rect x="378" y="42" width="138" height="44" rx="8" fill="var(--bg-card)" stroke="var(--border)" stroke-width="1"/>
+        <text x="447" y="60" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.07em">FEATURE STORE</text>
+        <text x="447" y="77" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" fill="var(--text-primary)">Online + Offline</text>
+        <!-- Arrow Feature Store → Model -->
+        <line x1="516" y1="64" x2="554" y2="64" stroke="var(--border-hover)" stroke-width="1.5"/>
+        <polygon points="554,60 562,64 554,68" fill="var(--border-hover)"/>
+        <!-- Model circle -->
+        <circle cx="597" cy="64" r="36" fill="var(--green-bg)" stroke="var(--green)" stroke-width="1.5"/>
+        <text x="597" y="59" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--green-text)" letter-spacing="0.07em">MODEL</text>
+        <text x="597" y="76" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" fill="var(--text-primary)">Score</text>
+      </svg>
+    </div>
+
     <div class="post-content">
 
       <p>With the problem defined in Part 1, the next question is: what data does the bank actually have, and how much of it is usable? In practice, a significant portion of data engineering effort in credit scoring is spent answering this question — not because the data does not exist, but because it is spread across multiple systems with inconsistent formats, ownership boundaries, and freshness guarantees.</p>

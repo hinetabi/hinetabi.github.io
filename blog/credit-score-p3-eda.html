@@ -227,6 +227,41 @@
       <div class="post-meta">Le Thanh Binh &nbsp;·&nbsp; 2026</div>
     </div>
 
+    <div style="background:var(--bg-secondary);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:3rem;">
+      <svg width="100%" viewBox="0 0 700 124" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+        <!-- Title -->
+        <text x="14" y="14" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)" letter-spacing="0.06em">DECLARED INCOME — WOE CHART</text>
+        <!-- Zero axis -->
+        <line x1="360" y1="18" x2="360" y2="110" stroke="var(--border-hover)" stroke-width="1"/>
+        <!-- Axis tick labels -->
+        <text x="288" y="120" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">−1.2</text>
+        <text x="336" y="120" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">−0.4</text>
+        <text x="360" y="120" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">0</text>
+        <text x="408" y="120" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">+0.8</text>
+        <text x="444" y="120" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text-secondary)">+1.4</text>
+        <!-- Bin 1: Income &lt; 3M, WOE=−1.2 → bar from x=288 to 360 (red, left) -->
+        <text x="170" y="33" text-anchor="end" font-family="DM Sans,sans-serif" font-size="11.5" fill="var(--text-secondary)">Income &lt; 3M</text>
+        <rect x="288" y="22" width="72" height="16" rx="3" fill="var(--red-bg)" stroke="var(--red)" stroke-width="0.6"/>
+        <!-- Bin 2: 3–7M, WOE=−0.4 → bar from x=336 to 360 -->
+        <text x="170" y="52" text-anchor="end" font-family="DM Sans,sans-serif" font-size="11.5" fill="var(--text-secondary)">3M – 7M</text>
+        <rect x="336" y="41" width="24" height="16" rx="3" fill="var(--red-bg)" stroke="var(--red)" stroke-width="0.6"/>
+        <!-- Bin 3: 7–15M, WOE=+0.3 → bar from x=360 to 378 -->
+        <text x="170" y="71" text-anchor="end" font-family="DM Sans,sans-serif" font-size="11.5" fill="var(--text-secondary)">7M – 15M</text>
+        <rect x="360" y="60" width="18" height="16" rx="3" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.6"/>
+        <!-- Bin 4: 15–30M, WOE=+0.8 → bar from x=360 to 408 -->
+        <text x="170" y="90" text-anchor="end" font-family="DM Sans,sans-serif" font-size="11.5" fill="var(--text-secondary)">15M – 30M</text>
+        <rect x="360" y="79" width="48" height="16" rx="3" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.6"/>
+        <!-- Bin 5: >30M, WOE=+1.4 → bar from x=360 to 444 -->
+        <text x="170" y="109" text-anchor="end" font-family="DM Sans,sans-serif" font-size="11.5" fill="var(--text-secondary)">Income &gt; 30M</text>
+        <rect x="360" y="98" width="84" height="16" rx="3" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.6"/>
+        <!-- Legend -->
+        <rect x="490" y="34" width="10" height="10" rx="2" fill="var(--red-bg)" stroke="var(--red)" stroke-width="0.6"/>
+        <text x="506" y="43" font-family="DM Sans,sans-serif" font-size="11" fill="var(--text-secondary)">Risky (−WOE)</text>
+        <rect x="490" y="52" width="10" height="10" rx="2" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.6"/>
+        <text x="506" y="61" font-family="DM Sans,sans-serif" font-size="11" fill="var(--text-secondary)">Good (+WOE)</text>
+      </svg>
+    </div>
+
     <div class="post-content">
 
       <p>EDA in credit scoring is not pure exploration — it is a systematic quality gate. After the data source register is built in Part 2, this step determines whether each source is safe to train on. Missing here is one of the most reliable paths to a model that passes dev review and quietly fails in production.</p>
