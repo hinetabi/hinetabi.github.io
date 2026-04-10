@@ -12,6 +12,8 @@
       --text-primary: #1a1a18; --text-secondary: #6b6b67;
       --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
       --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --amber: #D97706; --amber-bg: #FEF3C7; --amber-text: #92400E;
+      --red: #EF4444; --red-bg: #FEE2E2; --red-text: #991B1B;
       --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
     }
     body.dark {
@@ -36,18 +38,26 @@
     .post-content { line-height: 1.8; }
     .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
     .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
+    .step-label + h2 { margin-top: 0.4rem; }
     .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
     .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
     .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
     .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
-    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
-    .callout p { margin-bottom: 0; font-size: 14px; }
+    .callout { background: var(--green-bg) !important; border-left: 3px solid var(--green) !important; border-radius: 0 var(--radius-md) var(--radius-md) 0 !important; padding: 1rem 1.25rem !important; margin-bottom: 1.5rem !important; }
+    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
+    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
+    body.dark .callout p { color: #6ee9c0 !important; }
+    .callout.amber { background: var(--amber-bg) !important; border-left-color: var(--amber) !important; }
+    .callout.amber p { color: var(--amber-text) !important; }
+    .callout.red { background: var(--red-bg) !important; border-left-color: var(--red) !important; }
+    .callout.red p { color: var(--red-text) !important; }
     .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
     hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
     .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
     .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
     .post-nav a:hover { color: var(--green); }
     @media (max-width: 600px) { .post-title { font-size: 24px; } }
+
     /* ── FIGURES ── */
     .figure {
       background: var(--bg-secondary);
@@ -65,21 +75,52 @@
       font-family: 'DM Mono', monospace;
       letter-spacing: 0.02em;
     }
-    /* ── DESIGN POLISH ── */
-    .callout {
-      background: var(--green-bg) !important;
-      border-left: 3px solid var(--green) !important;
-      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
-      padding: 1rem 1.25rem !important;
-      margin-bottom: 1.5rem !important;
-    }
-    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
-    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
-    body.dark .callout p { color: #6ee9c0 !important; }
-    .post-content strong { color: var(--text-primary); font-weight: 500; }
-    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
-    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
-    .post-nav a:hover { color: var(--green); }
+
+    /* ── MODEL COMPARISON GRID ── */
+    .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+    @media (max-width: 520px) { .model-grid { grid-template-columns: 1fr; } }
+    .model-card { border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .model-card-header { padding: 0.65rem 1rem; font-size: 13px; font-weight: 500; }
+    .model-card-header.green { background: var(--green); color: #fff; }
+    .model-card-header.amber { background: var(--amber); color: #fff; }
+    .model-card-body { padding: 0.85rem 1rem; background: var(--bg-card); }
+    .model-card-body ul { padding-left: 1rem; margin: 0; }
+    .model-card-body li { font-size: 13px; color: var(--text-secondary); margin-bottom: 0.3rem; line-height: 1.6; }
+
+    /* ── EXPERIMENT TABS ── */
+    .exp-tab-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .exp-tab-btn { font-size: 12px; font-family: 'DM Mono', monospace; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; transition: all var(--transition); }
+    .exp-tab-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .exp-panel { display: none; }
+    .exp-panel.active { display: block; }
+    .exp-table { width: 100%; border-collapse: collapse; font-size: 13px; font-family: 'DM Mono', monospace; }
+    .exp-table th { text-align: left; font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; padding: 0.5rem 0.75rem; border-bottom: 0.5px solid var(--border); }
+    .exp-table td { padding: 0.55rem 0.75rem; border-bottom: 0.5px solid var(--border); color: var(--text-secondary); }
+    .exp-table tr:last-child td { border-bottom: none; }
+    .exp-table td.highlight { color: var(--green-text); font-weight: 500; }
+
+    /* ── AUDIT GRID ── */
+    .audit-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin: 1.25rem 0; }
+    @media (max-width: 520px) { .audit-grid-3 { grid-template-columns: 1fr 1fr; } }
+    .audit-check { background: var(--bg-card); border: 0.5px solid var(--green); border-radius: var(--radius-md); padding: 0.85rem 1rem; }
+    .audit-check-icon { font-size: 16px; margin-bottom: 0.35rem; }
+    .audit-check-title { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 0.25rem; }
+    .audit-check-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+    /* ── OUTPUT LIST ── */
+    .output-list { list-style: none; padding: 0; margin: 1.25rem 0; }
+    .output-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.7rem 0; border-bottom: 0.5px solid var(--border); }
+    .output-item:last-child { border-bottom: none; }
+    .output-num { min-width: 22px; height: 22px; background: var(--green); color: #fff; border-radius: 50%; font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .output-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+    .output-text strong { color: var(--text-primary); }
+
+    /* ── PSI INTERPRETATION GUIDE ── */
+    .psi-guide { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
+    @media (max-width: 520px) { .psi-guide { grid-template-columns: 1fr; } }
+    .psi-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 0.75rem 0.9rem; }
+    .psi-range { font-size: 12px; font-weight: 500; font-family: 'DM Mono', monospace; color: var(--text-primary); margin-bottom: 0.3rem; }
+    .psi-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -116,13 +157,101 @@
       <p>Start here, even if the eventual model will be a gradient-boosted tree. The logistic regression gives you a meaningful baseline, validates that the WOE-transformed features carry real signal, and produces a model that the risk team can reason about without a black-box explanation tool.</p>
 
       <h3>Time-based train/validation/test split</h3>
-      <p>The dataset is split strictly by origination date. A common structure for a 3-year dataset: train on months 1–24, validate on months 25–30, test on months 31–36. The test set is held out and touched only once — at the final model evaluation. Using time-based splits ensures that the model is evaluated on its ability to generalize forward in time, which is the actual task it will face in production.</p>
+      <ul>
+        <li>Dataset is split strictly by origination date, not randomly — ensures forward-time generalization</li>
+        <li>Typical structure for 3-year dataset: months 1–24 (train), months 25–30 (validation), months 31–36 (test)</li>
+        <li>Test set is held out and touched only once, at final evaluation — prevents information leakage</li>
+        <li>Time-based structure reflects production reality: model scores applications submitted today based on patterns in the past</li>
+      </ul>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 560 148" xmlns="http://www.w3.org/2000/svg" style="max-width:560px; display:block; margin:0 auto;">
+          <!-- Title -->
+          <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">TIME-BASED SPLIT — 36-MONTH ORIGINATION DATASET</text>
+
+          <!-- Purpose labels above each block -->
+          <text x="203" y="30" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">learn patterns</text>
+          <text x="408" y="30" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--amber-text)">select model</text>
+          <text x="490" y="30" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--red-text)">final eval only 🔒</text>
+
+          <!-- Divider lines at split points (drawn first so bars render on top) -->
+          <line x1="368" y1="24" x2="368" y2="92" stroke="var(--border-hover)" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <line x1="449" y1="24" x2="449" y2="92" stroke="var(--border-hover)" stroke-width="0.8" stroke-dasharray="3,3"/>
+
+          <!-- TRAIN block (months 1–24, 67%) -->
+          <rect x="40" y="35" width="327" height="50" rx="5" fill="var(--green)" fill-opacity="0.13" stroke="var(--green)" stroke-width="1"/>
+          <text x="203" y="57" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="13" font-weight="500" fill="var(--green-text)">TRAIN</text>
+          <text x="203" y="74" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="var(--green-text)" opacity="0.8">Months 1 – 24  ·  67%</text>
+
+          <!-- VAL block (months 25–30, 17%) -->
+          <rect x="368" y="35" width="80" height="50" rx="5" fill="var(--amber)" fill-opacity="0.13" stroke="var(--amber)" stroke-width="1"/>
+          <text x="408" y="57" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" font-weight="500" fill="var(--amber-text)">VAL</text>
+          <text x="408" y="74" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="var(--amber-text)" opacity="0.8">25 – 30</text>
+
+          <!-- TEST block (months 31–36, 16%) — dashed border = held-out -->
+          <rect x="449" y="35" width="81" height="50" rx="5" fill="var(--red)" fill-opacity="0.08" stroke="var(--red)" stroke-width="1.2" stroke-dasharray="5,3"/>
+          <text x="490" y="57" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" font-weight="500" fill="var(--red-text)">TEST</text>
+          <text x="490" y="74" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="var(--red-text)" opacity="0.8">31 – 36</text>
+
+          <!-- Time axis with arrow -->
+          <line x1="40" y1="92" x2="533" y2="92" stroke="var(--border-hover)" stroke-width="1"/>
+          <polygon points="529,89 537,92 529,95" fill="var(--text-secondary)" opacity="0.4"/>
+          <text x="540" y="96" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" opacity="0.5">prod</text>
+
+          <!-- Month ticks -->
+          <line x1="40"  y1="90" x2="40"  y2="97" stroke="var(--text-secondary)" stroke-width="1" opacity="0.5"/>
+          <line x1="203" y1="90" x2="203" y2="97" stroke="var(--text-secondary)" stroke-width="1" opacity="0.4"/>
+          <line x1="368" y1="90" x2="368" y2="97" stroke="var(--text-secondary)" stroke-width="1" opacity="0.5"/>
+          <line x1="449" y1="90" x2="449" y2="97" stroke="var(--text-secondary)" stroke-width="1" opacity="0.5"/>
+          <line x1="530" y1="90" x2="530" y2="97" stroke="var(--text-secondary)" stroke-width="1" opacity="0.5"/>
+
+          <!-- Month labels -->
+          <text x="40"  y="109" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">M1</text>
+          <text x="203" y="109" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">M12</text>
+          <text x="368" y="109" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">M24</text>
+          <text x="449" y="109" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">M30</text>
+          <text x="530" y="109" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">M36</text>
+
+          <!-- Rule note -->
+          <text x="10" y="133" font-family="DM Mono, monospace" font-size="9" fill="var(--red-text)" opacity="0.8">✗ wrong:</text>
+          <text x="52" y="133" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" opacity="0.7">random shuffle leaks future loans into training — validation metrics become optimistically biased</text>
+        </svg>
+        <div class="figure-caption">Fig — Time-based split. TRAIN learns, VAL selects the model, TEST is touched exactly once. Dashed border = held-out. No random shuffle permitted.</div>
+      </div>
 
       <h3>Feature pipeline inside a transformer</h3>
-      <p>All preprocessing — WOE encoding, missing value imputation, outlier clipping, scaling for logistic regression — must be implemented inside a scikit-learn <code>Pipeline</code> or equivalent. This is not just engineering hygiene; it is the mechanism that ensures the training and serving transformations are identical. Any transformation applied outside the pipeline is a potential source of training-serving skew. The pipeline object is what gets serialized and deployed, not just the model weights.</p>
+      <ul>
+        <li>All preprocessing — WOE encoding, missing value imputation, outlier clipping, scaling — implemented in scikit-learn <code>Pipeline</code></li>
+        <li>Pipeline is the serialized artifact deployed to production, not just model weights — ensures identical train/serve transformations</li>
+        <li>Any transformation outside the pipeline becomes a potential source of training-serving skew</li>
+        <li>Validates that the feature definitions are identical between development and production environments</li>
+      </ul>
 
-      <h3>Iterating to gradient boosting</h3>
-      <p>Once the logistic regression baseline is established, gradient-boosted models (LightGBM or XGBoost) are typically the next step. They handle non-linear relationships, require less manual feature engineering, and generally outperform logistic regression by 5–10 Gini points on complex credit datasets with many interaction effects. The tradeoff is interpretability: SHAP values become necessary for explaining individual decisions, and model governance may require additional documentation to justify the complexity.</p>
+      <h3>Logistic Regression vs. Gradient Boosting</h3>
+      <div class="model-grid">
+        <div class="model-card">
+          <div class="model-card-header green">Logistic Regression</div>
+          <div class="model-card-body">
+            <ul>
+              <li>Interpretable: each feature's WOE-based points are additive</li>
+              <li>Auditable: regulators accept the methodology and output</li>
+              <li>Baselined: 5–10 Gini points lower than GBDT, but predictable</li>
+              <li>Low governance cost: minimal explanation documentation required</li>
+            </ul>
+          </div>
+        </div>
+        <div class="model-card">
+          <div class="model-card-header amber">LightGBM / XGBoost</div>
+          <div class="model-card-body">
+            <ul>
+              <li>Non-linear: captures feature interactions automatically</li>
+              <li>Higher accuracy: typically 5–10 Gini points above logistic regression</li>
+              <li>Requires SHAP: explanation tools needed for governance review</li>
+              <li>Governance cost: additional audit burden, documentation complexity</li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       <div class="callout">
         <p>In banking, model complexity is a governance cost, not just a technical one. A gradient boosting model that improves Gini by 3 points over a logistic regression may not be worth the additional audit burden if the bank's risk committee requires manual review of the explanation method. Calibrate complexity to the institutional context.</p>
@@ -135,11 +264,107 @@
 
       <p>Credit scoring projects often run for months, with multiple data scientists running parallel experiments on different feature sets, model families, and hyperparameter configurations. Without systematic experiment tracking, the team quickly loses the ability to reproduce results or understand why a particular model version performed better than another.</p>
 
+      <h3>Interactive experiment runs</h3>
+      <p>Below are three representative training runs: a logistic regression baseline, and two iterations of LightGBM with different feature sets and regularization. Click a tab to compare their metrics.</p>
+
+      <div class="exp-tab-row">
+        <button class="exp-tab-btn active" onclick="switchExp('exp-lr')">Logistic Regression</button>
+        <button class="exp-tab-btn" onclick="switchExp('exp-lgb1')">LightGBM v1</button>
+        <button class="exp-tab-btn" onclick="switchExp('exp-lgb2')">LightGBM v2</button>
+      </div>
+
+      <div id="exp-lr" class="exp-panel active">
+        <table class="exp-table">
+          <thead>
+            <tr>
+              <th>Feature Set</th>
+              <th>Train Gini</th>
+              <th>Val Gini</th>
+              <th>Test Gini</th>
+              <th>KS</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>WOE-encoded, 18 features</td>
+              <td>0.58</td>
+              <td>0.55</td>
+              <td class="highlight">0.54</td>
+              <td>38%</td>
+              <td>Baseline — auditable, interpretable</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="exp-lgb1" class="exp-panel">
+        <table class="exp-table">
+          <thead>
+            <tr>
+              <th>Feature Set</th>
+              <th>Train Gini</th>
+              <th>Val Gini</th>
+              <th>Test Gini</th>
+              <th>KS</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Raw + WOE, 32 features</td>
+              <td>0.71</td>
+              <td>0.61</td>
+              <td>0.60</td>
+              <td>46%</td>
+              <td>Overfit — train/val gap too large</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="exp-lgb2" class="exp-panel">
+        <table class="exp-table">
+          <thead>
+            <tr>
+              <th>Feature Set</th>
+              <th>Train Gini</th>
+              <th>Val Gini</th>
+              <th>Test Gini</th>
+              <th>KS</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>WOE-encoded, 24 features, L1 reg</td>
+              <td>0.65</td>
+              <td>0.63</td>
+              <td class="highlight">0.62</td>
+              <td>48%</td>
+              <td>Selected — stable, governance approved</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <h3>What to log for every experiment</h3>
-      <p>Every training run should capture: the dataset version and date range used, the feature list and preprocessing configuration, all hyperparameters, evaluation metrics on train/validation/test (AUC, Gini, KS, log loss), the model artifact and serialization path, and the training timestamp and environment. Tools like <code>MLflow</code> handle this automatically when wrapped around the training loop. The goal is that any experiment from the past six months can be reproduced exactly by any team member.</p>
+      <ul>
+        <li><strong>Dataset version:</strong> date range, row count, and target distribution used for training</li>
+        <li><strong>Features:</strong> complete feature list and preprocessing configuration (WOE bins, imputation strategy)</li>
+        <li><strong>Hyperparameters:</strong> all tuning parameters (learning rate, tree depth, regularization coefficients)</li>
+        <li><strong>Metrics:</strong> AUC, Gini, KS, and log loss on train / validation / test sets</li>
+        <li><strong>Model artifact:</strong> serialized model path and framework version (scikit-learn, LightGBM)</li>
+        <li><strong>Metadata:</strong> training timestamp, environment variables, and experimenter name — enables reproduction</li>
+      </ul>
 
       <h3>Model versioning</h3>
-      <p>Register each candidate model in a model registry with a semantic version (v1.0, v2.0, v2.1). Tag models by their status: development, staging, production, retired. When a new model version is promoted to staging, the previous staging version is automatically demoted. This prevents the ambiguity of multiple "candidate" models floating around without a clear decision on which one is advancing.</p>
+      <ul>
+        <li>Register each candidate model in a model registry with semantic versioning: v1.0, v2.0, v2.1</li>
+        <li>Tag models by status: <code>development</code>, <code>staging</code>, <code>production</code>, <code>retired</code></li>
+        <li>When a new version is promoted to staging, the previous staging version is automatically demoted</li>
+        <li>Prevents ambiguity: the model registry is the single source of truth for which version is active</li>
+      </ul>
 
       <hr>
 
@@ -148,19 +373,74 @@
 
       <p>Standard validation metrics (AUC, Gini, KS on the test set) are necessary but not sufficient before deploying a credit model. A structured audit covers three additional dimensions: adversarial robustness, stability analysis, and subgroup performance.</p>
 
+      <div class="audit-grid-3">
+        <div class="audit-check">
+          <div class="audit-check-icon">✓</div>
+          <div class="audit-check-title">Adversarial Testing</div>
+          <div class="audit-check-desc">Edge cases: missing bureau data, zero income, extreme outliers. Define expected behavior before production.</div>
+        </div>
+        <div class="audit-check">
+          <div class="audit-check-icon">✓</div>
+          <div class="audit-check-title">PSI Analysis</div>
+          <div class="audit-check-desc">Population Stability Index measures score distribution shift. Flag if PSI &gt; 0.1 or &gt; 0.2 pre-deployment.</div>
+        </div>
+        <div class="audit-check">
+          <div class="audit-check-icon">✓</div>
+          <div class="audit-check-title">KS / Gini</div>
+          <div class="audit-check-desc">Ensures discrimination power. Target: KS &gt; 30%, Gini &gt; 0.40 across all segments.</div>
+        </div>
+        <div class="audit-check">
+          <div class="audit-check-icon">✓</div>
+          <div class="audit-check-title">Subgroup Performance</div>
+          <div class="audit-check-desc">Evaluate metrics by product, customer segment, geography. Flag segments below threshold.</div>
+        </div>
+        <div class="audit-check">
+          <div class="audit-check-icon">✓</div>
+          <div class="audit-check-title">Leakage Re-check</div>
+          <div class="audit-check-desc">Verify no future information in features. Re-audit feature definitions and temporal boundaries.</div>
+        </div>
+        <div class="audit-check">
+          <div class="audit-check-icon">✓</div>
+          <div class="audit-check-title">Governance Report</div>
+          <div class="audit-check-desc">Document all findings — favorable and unfavorable — with remediation actions or accepted risk.</div>
+        </div>
+      </div>
+
       <h3>Adversarial testing</h3>
-      <p>Construct synthetic applicant profiles that test the model at its edges. What score does the model assign to an applicant with completely missing bureau data? Does it degrade gracefully (assign a conservative score), or does it produce an error or an extreme prediction? What happens when income is entered as zero — a common input error? What about applicants with a declared income that is 10x the training data maximum? These edge cases are not hypothetical — they will appear in production, and the model's behavior in these cases should be defined and tested before deployment, not discovered by a loan officer.</p>
+      <p>Construct synthetic applicant profiles that test the model at its edges. Example test cases:</p>
+      <ul>
+        <li><strong>Missing bureau data:</strong> What score does the model assign when bureau features are completely null? Does it degrade gracefully or produce extreme predictions?</li>
+        <li><strong>Zero income:</strong> Input error scenario. Verify the model assigns a conservative score or explicitly rejects the application</li>
+        <li><strong>Extreme income:</strong> Applicants with declared income 10x the training maximum. Ensure prediction is reasonable, not extrapolated</li>
+        <li><strong>Age outliers:</strong> Applicants below 18 or above 100 years. Model should handle boundary cases without errors</li>
+        <li><strong>Zero credit age:</strong> Brand new applicants with no credit history. Verify fallback logic (default conservative score, manual review flag)</li>
+      </ul>
+
+      <div class="callout">
+        <p>Edge cases are not hypothetical — they will appear in production, and the model's behavior in these cases should be defined and tested before deployment, not discovered by a loan officer at 10 PM on a Friday.</p>
+      </div>
 
       <h3>PSI — Population Stability Index</h3>
-      <p>PSI measures how much the distribution of a variable has shifted between two populations. In the context of model audit, it is used to compare the score distribution in the training set against the score distribution in a recent out-of-time validation window:</p>
+      <p>PSI measures how much the distribution of a variable has shifted between two populations. In model audit, it compares the score distribution in the training set against a recent out-of-time validation window:</p>
       <p><code>PSI = Σ (Actual% − Expected%) × ln(Actual% / Expected%)</code></p>
-      <p>A PSI below 0.1 indicates no meaningful shift. Between 0.1 and 0.2 warrants investigation. Above 0.2 suggests the model may no longer be representative of the current applicant population. If PSI is already high at the time of model audit — before deployment — it typically means the training data is too old to represent the current market, and the dataset needs to be refreshed before proceeding.</p>
+
+      <div class="psi-guide">
+        <div class="psi-card">
+          <div class="psi-range">PSI &lt; 0.1</div>
+          <div class="psi-desc">No meaningful shift. Training distribution still represents current population. Model remains valid.</div>
+        </div>
+        <div class="psi-card">
+          <div class="psi-range">0.1 ≤ PSI ≤ 0.2</div>
+          <div class="psi-desc">Moderate shift. Investigate cause. May be temporary market conditions or early warning of model drift.</div>
+        </div>
+        <div class="psi-card">
+          <div class="psi-range">PSI &gt; 0.2</div>
+          <div class="psi-desc">Significant shift. Training data no longer representative. Refresh dataset and retrain before deployment.</div>
+        </div>
+      </div>
 
       <h3>KS Statistic</h3>
       <p>The KS statistic is the maximum difference between the cumulative distribution functions of good and bad borrowers across the score range. It measures the model's ability to separate the two classes at its most discriminating point. For retail credit scorecards, a KS above 30% is generally considered acceptable. The KS chart also reveals where in the score range the model discriminates best — which informs where to set the approval cutoff for maximum effectiveness.</p>
-
-      <h3>Subgroup performance</h3>
-      <p>Evaluate the model's metrics across key segments: loan products (personal loan vs. credit card vs. cash advance), customer segments (new-to-bank vs. existing customer, salaried vs. self-employed), and geographic regions if applicable. A model with a portfolio Gini of 0.50 may have a Gini of 0.30 on the self-employed segment — which is below the acceptable threshold defined in Part 1. This finding must be resolved before deployment: either by building a separate model for that segment, by excluding the segment from ML-driven scoring, or by accepting the lower performance with documented justification.</p>
 
       <div class="figure">
         <svg width="100%" viewBox="0 0 520 180" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
@@ -192,9 +472,79 @@
         <div class="figure-caption">Fig 1 — KS chart showing cumulative score distributions of good vs. bad borrowers. KS = max vertical separation. Target: KS &gt; 30%.</div>
       </div>
 
+      <h3>Subgroup performance</h3>
+      <ul>
+        <li>Evaluate model metrics across key segments: loan products (personal loan, credit card, cash advance)</li>
+        <li>Customer segments: new-to-bank vs. existing, salaried vs. self-employed</li>
+        <li>Geographic regions if applicable — some models show regional bias</li>
+        <li>A portfolio Gini of 0.50 may mask a Gini of 0.30 on self-employed segment, below acceptable threshold — resolve before deployment</li>
+      </ul>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+          <!-- Title -->
+          <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">SUBGROUP GINI PERFORMANCE</text>
+
+          <!-- Threshold line at x=180 (0.45 Gini) -->
+          <line x1="180" y1="35" x2="180" y2="195" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <text x="185" y="30" font-family="DM Mono, monospace" font-size="9" fill="#EF4444">Min threshold = 0.45</text>
+
+          <!-- Overall: 0.62 → 248px -->
+          <text x="125" y="55" font-family="DM Mono, monospace" font-size="11" fill="var(--text-secondary)" text-anchor="end">Overall</text>
+          <rect x="135" y="48" width="248" height="14" fill="var(--green)" rx="2"/>
+          <text x="390" y="56" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">0.62</text>
+
+          <!-- Personal Loan: 0.65 → 260px -->
+          <text x="125" y="85" font-family="DM Mono, monospace" font-size="11" fill="var(--text-secondary)" text-anchor="end">Personal Loan</text>
+          <rect x="135" y="78" width="260" height="14" fill="var(--green)" rx="2"/>
+          <text x="402" y="86" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">0.65</text>
+
+          <!-- Credit Card: 0.58 → 232px -->
+          <text x="125" y="115" font-family="DM Mono, monospace" font-size="11" fill="var(--text-secondary)" text-anchor="end">Credit Card</text>
+          <rect x="135" y="108" width="232" height="14" fill="var(--green)" rx="2"/>
+          <text x="374" y="116" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">0.58</text>
+
+          <!-- Cash Advance: 0.60 → 240px -->
+          <text x="125" y="145" font-family="DM Mono, monospace" font-size="11" fill="var(--text-secondary)" text-anchor="end">Cash Advance</text>
+          <rect x="135" y="138" width="240" height="14" fill="var(--green)" rx="2"/>
+          <text x="382" y="146" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">0.60</text>
+
+          <!-- Salaried: 0.68 → 272px -->
+          <text x="125" y="175" font-family="DM Mono, monospace" font-size="11" fill="var(--text-secondary)" text-anchor="end">Salaried</text>
+          <rect x="135" y="168" width="272" height="14" fill="var(--green)" rx="2"/>
+          <text x="414" y="176" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)">0.68</text>
+
+          <!-- Self-employed: 0.42 → 168px (RED - below threshold) -->
+          <text x="125" y="205" font-family="DM Mono, monospace" font-size="11" fill="var(--red-text)" text-anchor="end">Self-employed</text>
+          <rect x="135" y="198" width="168" height="14" fill="#EF4444" rx="2"/>
+          <text x="310" y="206" font-family="DM Mono, monospace" font-size="10" fill="var(--red-text)" font-weight="500">0.42</text>
+        </svg>
+        <div class="figure-caption">Fig 2 — Subgroup Gini across customer segments. Self-employed segment (red) falls below minimum threshold of 0.45 — requires remediation before deployment.</div>
+      </div>
+
       <div class="callout">
         <p>The model audit report is the primary deliverable for model governance review. It should document all findings — including unfavorable ones — with the remediation actions taken or the rationale for accepting the finding as a residual risk. Governance committees review the integrity of the process, not just the headline metrics.</p>
       </div>
+
+      <h3>Outputs of 4.3</h3>
+      <ul class="output-list">
+        <li class="output-item">
+          <div class="output-num">1</div>
+          <div class="output-text"><strong>Model audit report:</strong> documented findings across adversarial testing, PSI, KS/Gini, subgroup performance, and leakage checks</div>
+        </li>
+        <li class="output-item">
+          <div class="output-num">2</div>
+          <div class="output-text"><strong>Selected model version:</strong> promoted from development to staging in the model registry, with governance sign-off</div>
+        </li>
+        <li class="output-item">
+          <div class="output-num">3</div>
+          <div class="output-text"><strong>Governance decision record:</strong> risk committee review notes, approval conditions, and escalation flags if remediation is required</div>
+        </li>
+        <li class="output-item">
+          <div class="output-num">4</div>
+          <div class="output-text"><strong>Deployment checklist:</strong> pre-launch verification that the pipeline is serialized, feature definitions match training, and monitoring infrastructure is ready</div>
+        </li>
+      </ul>
 
     </div>
 
@@ -207,6 +557,7 @@
 
   <script>
     let dark = false;
+
     function toggleDark() {
       dark = !dark;
       document.body.classList.toggle('dark', dark);
@@ -214,6 +565,20 @@
       document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
       localStorage.setItem('theme', dark ? 'dark' : 'light');
     }
+
+    function switchExp(id) {
+      // Hide all panels
+      document.querySelectorAll('.exp-panel').forEach(p => p.classList.remove('active'));
+      // Deactivate all buttons
+      document.querySelectorAll('.exp-tab-btn').forEach(b => b.classList.remove('active'));
+
+      // Show selected panel
+      document.getElementById(id).classList.add('active');
+
+      // Activate corresponding button
+      event.target.classList.add('active');
+    }
+
     if (localStorage.getItem('theme') === 'dark') toggleDark();
   </script>
 </body>

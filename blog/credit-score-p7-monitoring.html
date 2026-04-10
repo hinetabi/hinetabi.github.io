@@ -12,12 +12,17 @@
       --text-primary: #1a1a18; --text-secondary: #6b6b67;
       --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
       --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --amber: #F59E0B; --amber-bg: #FEF3C7; --amber-text: #B45309;
+      --red: #EF4444; --red-bg: #FEE2E2; --red-text: #991B1B;
       --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
     }
     body.dark {
       --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1c1c1a;
       --text-primary: #f0ede6; --text-secondary: #888780;
       --border: rgba(255,255,255,0.09); --border-hover: rgba(255,255,255,0.18);
+      --green-bg: rgba(29,158,117,0.15); --green-text: #6ee9c0;
+      --amber-bg: rgba(245,158,11,0.15); --amber-text: #fcd34d;
+      --red-bg: rgba(239,68,68,0.15); --red-text: #fca5a5;
     }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
     .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
@@ -36,18 +41,21 @@
     .post-content { line-height: 1.8; }
     .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
     .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
+    .step-label + h2 { margin-top: 0.4rem; }
     .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
     .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
     .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
     .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
-    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
-    .callout p { margin-bottom: 0; font-size: 14px; }
+    .callout { background: var(--green-bg); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+    .callout p { margin-bottom: 0; font-size: 14px; color: var(--green-text); }
+    body.dark .callout p { color: #6ee9c0; }
     .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
     hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
     .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
     .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
     .post-nav a:hover { color: var(--green); }
     @media (max-width: 600px) { .post-title { font-size: 24px; } }
+
     /* ── FIGURES ── */
     .figure {
       background: var(--bg-secondary);
@@ -65,21 +73,171 @@
       font-family: 'DM Mono', monospace;
       letter-spacing: 0.02em;
     }
-    /* ── DESIGN POLISH ── */
-    .callout {
-      background: var(--green-bg) !important;
-      border-left: 3px solid var(--green) !important;
-      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
-      padding: 1rem 1.25rem !important;
-      margin-bottom: 1.5rem !important;
+
+    /* ── MONITORING DASHBOARD GRID ── */
+    .mon-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin: 1.5rem 0;
     }
-    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
-    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
-    body.dark .callout p { color: #6ee9c0 !important; }
-    .post-content strong { color: var(--text-primary); font-weight: 500; }
-    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
-    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
-    .post-nav a:hover { color: var(--green); }
+    @media (max-width: 600px) {
+      .mon-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .mon-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      text-align: center;
+    }
+    .mon-icon {
+      font-size: 22px;
+      margin-bottom: 0.35rem;
+    }
+    .mon-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+    .mon-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ── PSI TABLE ── */
+    .null-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+      margin: 1rem 0;
+    }
+    .null-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .null-table td {
+      padding: 0.55rem 0.75rem;
+      border-bottom: 0.5px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+    .null-table tr:last-child td {
+      border-bottom: none;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .badge.green {
+      background: var(--green-bg);
+      color: var(--green-text);
+    }
+    .badge.amber {
+      background: var(--amber-bg);
+      color: var(--amber-text);
+    }
+    .badge.red {
+      background: var(--red-bg);
+      color: var(--red-text);
+    }
+
+    /* ── VINTAGE TABS ── */
+    .vint-tab-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .vint-tab-btn {
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      padding: 5px 13px;
+      border: 0.5px solid var(--border-hover);
+      border-radius: var(--radius-pill);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .vint-tab-btn:hover {
+      border-color: var(--green);
+    }
+    .vint-tab-btn.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    .vint-panel {
+      display: none;
+    }
+    .vint-panel.active {
+      display: block;
+    }
+
+    /* ── ALERT CARDS ── */
+    .alert-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+    }
+    .alert-card {
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      border: 0.5px solid var(--border);
+    }
+    .alert-card.amber {
+      background: var(--amber-bg);
+      border-color: var(--amber);
+    }
+    .alert-card.red {
+      background: var(--red-bg);
+      border-color: var(--red);
+    }
+    .alert-trigger {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+    }
+    .alert-card.amber .alert-trigger {
+      color: var(--amber-text);
+    }
+    .alert-card.red .alert-trigger {
+      color: var(--red-text);
+    }
+    .alert-response {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    .alert-sla {
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      color: var(--text-secondary);
+    }
+
+    /* ── CONTENT ENHANCEMENTS ── */
+    .post-content strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -106,19 +264,103 @@
 
       <p>Deployment is not the end of the lifecycle — it is the beginning of a different kind of responsibility. A credit score model operates in a world that keeps changing: borrower behavior shifts with macroeconomic conditions, the bank's product mix evolves, new customer segments are acquired. The model was trained on a snapshot of that world. Monitoring is the discipline of detecting, as early as possible, when the gap between the model's world and the current world has grown too large to ignore.</p>
 
+      <!-- Monitoring Dashboard Summary -->
+      <div class="mon-grid">
+        <div class="mon-card">
+          <div class="mon-icon">📊</div>
+          <div class="mon-title">Data Drift (PSI)</div>
+          <div class="mon-desc">Detect statistical shifts in input feature distributions</div>
+        </div>
+        <div class="mon-card">
+          <div class="mon-icon">📈</div>
+          <div class="mon-title">Score Distribution</div>
+          <div class="mon-desc">Monitor output score density shifts over time</div>
+        </div>
+        <div class="mon-card">
+          <div class="mon-icon">⚠️</div>
+          <div class="mon-title">Early Delinquency</div>
+          <div class="mon-desc">Track DPD30 rates as leading default signals</div>
+        </div>
+        <div class="mon-card">
+          <div class="mon-icon">📅</div>
+          <div class="mon-title">Vintage Analysis</div>
+          <div class="mon-desc">Measure cumulative defaults by origination cohort</div>
+        </div>
+      </div>
+
       <hr>
 
       <div class="step-label">Data Drift</div>
       <h2>Monitoring Input Feature Distributions</h2>
 
-      <p>Data drift means the statistical properties of the model's input features have shifted relative to the training data. In credit scoring, this can happen for several reasons: a new product launch that brings in a different demographic, a change in the loan application form that affects how income is reported, or an economic shock (like a recession or the aftermath of a pandemic) that changes the distribution of declared incomes, employment types, and existing liabilities across the applicant pool.</p>
+      <p>Data drift means the statistical properties of the model's input features have shifted relative to the training data. This can happen for several key reasons:</p>
+      <ul>
+        <li><strong>Product changes:</strong> A new product launch brings in a different demographic or income profile, shifting the applicant distribution.</li>
+        <li><strong>Form redesigns:</strong> Changes to the loan application form affect how income, employment, or liabilities are reported.</li>
+        <li><strong>Economic shocks:</strong> Recessions, pandemics, or interest rate changes alter the distribution of declared incomes, employment types, and existing liabilities across the applicant pool.</li>
+        <li><strong>Seasonal patterns:</strong> Q4 borrowing behavior differs from Q1, creating cyclical drift in feature distributions.</li>
+      </ul>
 
       <h3>PSI on input features</h3>
-      <p>The Population Stability Index (PSI) is computed monthly for each key feature, comparing the current month's applicant distribution against the training data distribution. The threshold from the model audit in Part 4 applies here as an operational threshold: PSI below 0.1 is stable, 0.1–0.2 is a monitoring flag, above 0.2 triggers an investigation.</p>
-      <p>Features are not all equally important. Prioritize PSI monitoring on the top features by SHAP importance — the features that drive the most variance in the model's output. A drift in an unimportant feature has less consequence than drift in income or bureau score. Build the monitoring dashboard with this priority ordering rather than treating all features equally.</p>
+      <p>The Population Stability Index (PSI) is computed monthly for each key feature, comparing the current month's applicant distribution against the training data distribution. Use these guidelines:</p>
+      <ul>
+        <li><strong>Interpretation:</strong> PSI below 0.1 is stable, 0.1–0.2 is a monitoring flag, above 0.2 triggers an investigation.</li>
+        <li><strong>Frequency:</strong> Compute PSI monthly for all features; track weekly for top-5 features by SHAP importance.</li>
+        <li><strong>Priority ordering:</strong> Not all features matter equally. Prioritize PSI monitoring on the top features by SHAP importance — the features that drive the most variance in the model's output. A drift in an unimportant feature has less consequence than drift in income or bureau score.</li>
+        <li><strong>Dashboard design:</strong> Build the monitoring dashboard with this priority ordering rather than treating all features equally.</li>
+      </ul>
+
+      <h3>PSI Status Table</h3>
+      <table class="null-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>This Month PSI</th>
+            <th>Trend</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>bureau_score</td>
+            <td>0.08</td>
+            <td>→ Stable</td>
+            <td><span class="badge green">OK</span></td>
+          </tr>
+          <tr>
+            <td>declared_income</td>
+            <td>0.14</td>
+            <td>↑ Rising</td>
+            <td><span class="badge amber">Watch</span></td>
+          </tr>
+          <tr>
+            <td>employer_tenure</td>
+            <td>0.07</td>
+            <td>→ Stable</td>
+            <td><span class="badge green">OK</span></td>
+          </tr>
+          <tr>
+            <td>dpd_prev_12m</td>
+            <td>0.22</td>
+            <td>↑ Drift!</td>
+            <td><span class="badge red">Alert</span></td>
+          </tr>
+          <tr>
+            <td>loan_amount</td>
+            <td>0.11</td>
+            <td>↑ Rising</td>
+            <td><span class="badge amber">Watch</span></td>
+          </tr>
+        </tbody>
+      </table>
 
       <h3>Missing rate monitoring</h3>
-      <p>Track the null rate for each feature over time. A sudden increase in the missing rate for a bureau field may indicate a change in the bureau API response format, a coverage issue with a specific applicant segment, or a pipeline failure in the feature store. Each of these has a different root cause and remediation — but all of them affect the model's behavior in production if the imputation strategy was designed for a lower null rate.</p>
+      <p>Track the null rate for each feature over time. Changes can signal deeper problems:</p>
+      <ul>
+        <li><strong>Bureau API issues:</strong> A sudden increase in missing bureau fields may indicate a change in the bureau API response format.</li>
+        <li><strong>Segment gaps:</strong> Missing rates may spike in specific borrower segments, revealing coverage issues or applicant type shifts.</li>
+        <li><strong>Pipeline failures:</strong> An outage in the feature store or data pipeline will manifest as a sharp rise in null rates.</li>
+      </ul>
 
       <hr>
 
@@ -126,10 +368,6 @@
       <h2>Monitoring the Score Distribution</h2>
 
       <p>The model's output score distribution is a leading indicator of problems, and it is observable before ground truth labels are available. Plot the score distribution (density of predicted default probabilities) weekly, overlaid against the training-period distribution.</p>
-
-      <h3>What shifts mean</h3>
-      <p>A leftward shift in the score distribution (more applicants receiving low-risk scores) without a corresponding improvement in the actual portfolio quality suggests the model is being too optimistic about the current applicant population — possibly because the population has shifted in a way the model interprets as lower risk when it is not. A rightward shift (more high-risk scores) may indicate that a stricter applicant segment is entering the funnel, or that a feature has drifted upward in a way that inflates the predicted risk.</p>
-      <p>Track the percentage of applicants in each score band (A/B/C/D/E) month over month. A 5-percentage-point shift in the proportion of applicants in the top risk band warrants investigation, even if downstream NPL rates have not yet changed — because the NPL impact of that shift will not be visible for another 12 months.</p>
 
       <div class="figure">
         <svg width="100%" viewBox="0 0 520 190" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
@@ -162,6 +400,15 @@
         <div class="figure-caption">Fig 1 — Score distribution drift over time. The Oct distribution has shifted right (more applicants scoring as high risk), triggering a PSI investigation.</div>
       </div>
 
+      <h3>What shifts mean</h3>
+      <p>The direction and magnitude of score distribution shifts reveal different problems:</p>
+      <ul>
+        <li><strong>Leftward shift (lower risk scores):</strong> More applicants receiving low-risk scores without a corresponding improvement in portfolio quality suggests the model is being too optimistic about the current applicant population — possibly because the population has shifted in a way the model interprets as lower risk when it is not.</li>
+        <li><strong>Rightward shift (higher risk scores):</strong> More high-risk scores may indicate that a stricter applicant segment is entering the funnel, or that a feature has drifted upward in a way that inflates the predicted risk.</li>
+        <li><strong>Score band tracking:</strong> Track the percentage of applicants in each score band (A/B/C/D/E) month over month to see fine-grained changes.</li>
+        <li><strong>5% threshold rule:</strong> A 5-percentage-point shift in the proportion of applicants in the top risk band warrants investigation, even if downstream NPL rates have not yet changed — because the NPL impact of that shift will not be visible for another 12 months.</li>
+      </ul>
+
       <hr>
 
       <div class="step-label">Concept Drift</div>
@@ -170,11 +417,165 @@
       <p>Concept drift is the most serious form of model degradation: the relationship between the features and the default outcome has changed, so the model's predictions are no longer well-calibrated to reality. In credit scoring, concept drift can be caused by macroeconomic changes (a recession increases default rates across all risk bands), behavioral changes (borrowers increasingly taking multiple loans simultaneously, a pattern not well-represented in training data), or structural changes in the loan product (a change in the interest rate or tenor that affects repayment capacity).</p>
 
       <h3>The 12-month lag problem</h3>
-      <p>Detecting concept drift in credit scoring is harder than in most ML applications because the ground truth label — did this borrower default within 12 months? — is only available with a 12-month lag. By the time you observe that the model's Gini has dropped significantly on a recent vintage, the loans that will materialize those defaults have already been approved and disbursed.</p>
-      <p>Early warning signals that can be observed before the 12-month outcome window closes: the rate of DPD30 (30+ days past due) in the first 3–6 months of a loan is a leading indicator of eventual DPD90 default. Track the early delinquency rate for recent vintages and compare against what the model predicted for those borrowers. A gap is an early signal of concept drift even before the full 12-month outcome is available.</p>
+      <p>Detecting concept drift in credit scoring is harder than in most ML applications because ground truth labels arrive with significant delay:</p>
+      <ul>
+        <li><strong>Delayed labels:</strong> The label "did this borrower default within 12 months?" is only available with a 12-month lag.</li>
+        <li><strong>Sunk cost problem:</strong> By the time you observe that the model's Gini has dropped significantly on a recent vintage, the loans that will materialize those defaults have already been approved and disbursed.</li>
+        <li><strong>Early warning signals:</strong> Use DPD30 (30+ days past due) in the first 3–6 months of a loan as a leading indicator of eventual DPD90 default.</li>
+        <li><strong>Concept drift detection:</strong> Track the early delinquency rate for recent vintages and compare against what the model predicted for those borrowers. A gap is an early signal of concept drift even before the full 12-month outcome is available.</li>
+      </ul>
 
       <h3>Vintage analysis</h3>
-      <p>Organize the approved portfolio by origination month (vintage) and track the cumulative default rate of each vintage as it ages. Plot these curves on a single chart. In a stable model environment, vintage curves for consecutive months should track close together. Separation — newer vintages defaulting at higher rates at the same loan age — indicates deterioration in credit quality, which may be due to model drift, population shift, or macroeconomic factors. Vintage analysis distinguishes between these causes: if all vintages show higher defaults simultaneously, it is likely a macro effect; if only recent vintages show higher defaults, it points to model or population drift.</p>
+      <p>Organize the approved portfolio by origination month (vintage) and track the cumulative default rate of each vintage as it ages. Key insights from vintage analysis:</p>
+      <ul>
+        <li><strong>Tracking curves:</strong> Plot cumulative default curves for each month on a single chart. In a stable model environment, vintage curves for consecutive months should track close together.</li>
+        <li><strong>Separation as a red flag:</strong> Separation — newer vintages defaulting at higher rates at the same loan age — indicates deterioration in credit quality.</li>
+        <li><strong>Root cause diagnosis:</strong> If all vintages show higher defaults simultaneously, it is likely a macro effect; if only recent vintages show higher defaults, it points to model or population drift.</li>
+        <li><strong>Retraining trigger:</strong> When recent vintages diverge noticeably above older ones, it is time to assess whether retraining or model replacement is warranted.</li>
+      </ul>
+
+      <!-- Interactive Vintage Analysis Tabs -->
+      <div class="figure">
+        <div class="vint-tab-row">
+          <button class="vint-tab-btn active" onclick="switchVint('vint-3m')">3-month DPD rate</button>
+          <button class="vint-tab-btn" onclick="switchVint('vint-6m')">6-month DPD rate</button>
+          <button class="vint-tab-btn" onclick="switchVint('vint-12m')">12-month DPD rate</button>
+        </div>
+
+        <!-- 3-month panel -->
+        <div id="vint-3m" class="vint-panel active">
+          <svg width="100%" viewBox="0 0 520 190" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+            <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">VINTAGE ANALYSIS — 3-MONTH CUMULATIVE DPD RATE</text>
+            <!-- Axes -->
+            <line x1="50" y1="20" x2="50" y2="160" stroke="var(--border-hover)" stroke-width="1"/>
+            <line x1="50" y1="160" x2="500" y2="160" stroke="var(--border-hover)" stroke-width="1"/>
+            <!-- Y axis labels -->
+            <text x="44" y="24" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">7%</text>
+            <text x="44" y="90" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">3.5%</text>
+            <text x="44" y="160" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">0%</text>
+            <text x="20" y="90" text-anchor="middle" transform="rotate(-90,20,90)" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">DPD Rate</text>
+            <!-- X axis labels (months) -->
+            <text x="80" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">1m</text>
+            <text x="148" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">2m</text>
+            <text x="216" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">3m</text>
+            <text x="284" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">4m</text>
+            <text x="352" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">5m</text>
+            <text x="420" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">6m</text>
+            <!-- Warning threshold line -->
+            <line x1="50" y1="70" x2="500" y2="70" stroke="#EF4444" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.6"/>
+            <text x="504" y="73" font-family="DM Mono, monospace" font-size="9" fill="#EF4444" opacity="0.8">4.5%</text>
+            <!-- Q1 2023: light green, stable -->
+            <polyline points="80,147 148,137.6 216,129.2 284,122.4 352,118.4 420,115.2" stroke="#6ee9c0" stroke-width="2" fill="none" opacity="0.9"/>
+            <!-- Q2 2023: green -->
+            <polyline points="80,145.6 148,136 216,127.6 284,120 352,116 420,113.2" stroke="var(--green)" stroke-width="2" fill="none" opacity="0.9"/>
+            <!-- Q3 2023: amber, rising -->
+            <polyline points="80,138.4 148,123.2 216,101.6 284,67.6 352,54 420,41.2" stroke="#F59E0B" stroke-width="2.5" fill="none" opacity="0.9"/>
+            <!-- Q4 2023: red, dashed, 3 points only -->
+            <polyline points="80,132.4 148,116.8 216,93.6" stroke="#EF4444" stroke-width="2.5" fill="none" stroke-dasharray="4,2" opacity="0.85"/>
+            <!-- Legend -->
+            <g id="vint-legend">
+              <circle cx="60" cy="170" r="3" fill="#6ee9c0"/>
+              <text x="68" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q1 2023</text>
+              <circle cx="160" cy="170" r="3" fill="var(--green)"/>
+              <text x="168" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q2 2023</text>
+              <circle cx="260" cy="170" r="3" fill="#F59E0B"/>
+              <text x="268" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q3 2023</text>
+              <circle cx="360" cy="170" r="3" fill="#EF4444"/>
+              <text x="368" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q4 2023</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- 6-month panel -->
+        <div id="vint-6m" class="vint-panel">
+          <svg width="100%" viewBox="0 0 520 190" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+            <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">VINTAGE ANALYSIS — 6-MONTH CUMULATIVE DPD RATE</text>
+            <!-- Axes -->
+            <line x1="50" y1="20" x2="50" y2="160" stroke="var(--border-hover)" stroke-width="1"/>
+            <line x1="50" y1="160" x2="500" y2="160" stroke="var(--border-hover)" stroke-width="1"/>
+            <!-- Y axis labels -->
+            <text x="44" y="24" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">9%</text>
+            <text x="44" y="90" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">4.5%</text>
+            <text x="44" y="160" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">0%</text>
+            <text x="20" y="90" text-anchor="middle" transform="rotate(-90,20,90)" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">DPD Rate</text>
+            <!-- X axis labels (months) -->
+            <text x="80" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">1m</text>
+            <text x="148" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">2m</text>
+            <text x="216" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">3m</text>
+            <text x="284" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">4m</text>
+            <text x="352" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">5m</text>
+            <text x="420" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">6m</text>
+            <!-- Warning threshold line -->
+            <line x1="50" y1="75" x2="500" y2="75" stroke="#EF4444" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.6"/>
+            <text x="504" y="78" font-family="DM Mono, monospace" font-size="9" fill="#EF4444" opacity="0.8">5%</text>
+            <!-- Q1 2023: light green -->
+            <polyline points="80,146 148,134.8 216,123.6 284,112.4 352,105.6 420,100.8" stroke="#6ee9c0" stroke-width="2" fill="none" opacity="0.9"/>
+            <!-- Q2 2023: green -->
+            <polyline points="80,144.4 148,132.8 216,120.8 284,109.6 352,102.4 420,97.6" stroke="var(--green)" stroke-width="2" fill="none" opacity="0.9"/>
+            <!-- Q3 2023: amber -->
+            <polyline points="80,136 148,119.2 216,96.4 284,56.8 352,39.6 420,26.4" stroke="#F59E0B" stroke-width="2.5" fill="none" opacity="0.9"/>
+            <!-- Q4 2023: red, dashed -->
+            <polyline points="80,128.4 148,108.4 216,78.8 284,47.2 352,28.4 420,14.4" stroke="#EF4444" stroke-width="2.5" fill="none" stroke-dasharray="4,2" opacity="0.85"/>
+            <!-- Legend -->
+            <g id="vint-legend-6m">
+              <circle cx="60" cy="170" r="3" fill="#6ee9c0"/>
+              <text x="68" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q1 2023</text>
+              <circle cx="160" cy="170" r="3" fill="var(--green)"/>
+              <text x="168" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q2 2023</text>
+              <circle cx="260" cy="170" r="3" fill="#F59E0B"/>
+              <text x="268" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q3 2023</text>
+              <circle cx="360" cy="170" r="3" fill="#EF4444"/>
+              <text x="368" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q4 2023</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- 12-month panel -->
+        <div id="vint-12m" class="vint-panel">
+          <svg width="100%" viewBox="0 0 520 190" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
+            <text x="10" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">VINTAGE ANALYSIS — 12-MONTH CUMULATIVE DPD RATE</text>
+            <!-- Axes -->
+            <line x1="50" y1="20" x2="50" y2="160" stroke="var(--border-hover)" stroke-width="1"/>
+            <line x1="50" y1="160" x2="500" y2="160" stroke="var(--border-hover)" stroke-width="1"/>
+            <!-- Y axis labels -->
+            <text x="44" y="24" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">15%</text>
+            <text x="44" y="90" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">7.5%</text>
+            <text x="44" y="160" text-anchor="end" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">0%</text>
+            <text x="20" y="90" text-anchor="middle" transform="rotate(-90,20,90)" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">DPD Rate</text>
+            <!-- X axis labels (months) -->
+            <text x="80" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">1m</text>
+            <text x="148" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">2m</text>
+            <text x="216" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">3m</text>
+            <text x="284" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">4m</text>
+            <text x="352" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">5m</text>
+            <text x="420" y="175" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">6m</text>
+            <!-- Warning threshold line -->
+            <line x1="50" y1="65" x2="500" y2="65" stroke="#EF4444" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.6"/>
+            <text x="504" y="68" font-family="DM Mono, monospace" font-size="9" fill="#EF4444" opacity="0.8">8%</text>
+            <!-- Q1 2023: light green -->
+            <polyline points="80,142.4 148,126.4 216,110.4 284,94.4 352,82.4 420,72.8" stroke="#6ee9c0" stroke-width="2" fill="none" opacity="0.9"/>
+            <!-- Q2 2023: green -->
+            <polyline points="80,140 148,123.2 216,106.4 284,89.6 352,76.8 420,66.4" stroke="var(--green)" stroke-width="2" fill="none" opacity="0.9"/>
+            <!-- Q3 2023: amber -->
+            <polyline points="80,128.8 148,106.4 216,76.4 284,42.4 352,20.8 420,25.6" stroke="#F59E0B" stroke-width="2.5" fill="none" opacity="0.9"/>
+            <!-- Q4 2023: red, dashed -->
+            <polyline points="80,118.4 148,92 216,56.8 284,18.4 352,8 420,22.4" stroke="#EF4444" stroke-width="2.5" fill="none" stroke-dasharray="4,2" opacity="0.85"/>
+            <!-- Legend -->
+            <g id="vint-legend-12m">
+              <circle cx="60" cy="170" r="3" fill="#6ee9c0"/>
+              <text x="68" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q1 2023</text>
+              <circle cx="160" cy="170" r="3" fill="var(--green)"/>
+              <text x="168" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q2 2023</text>
+              <circle cx="260" cy="170" r="3" fill="#F59E0B"/>
+              <text x="268" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q3 2023</text>
+              <circle cx="360" cy="170" r="3" fill="#EF4444"/>
+              <text x="368" y="173" font-family="DM Sans, sans-serif" font-size="11" fill="var(--text-secondary)">Q4 2023</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="figure-caption">Fig 2 — Vintage analysis with tabs. Newer vintages (Q3/Q4) show divergence upward, indicating concept drift. Compare early-stage and late-stage delinquency rates to assess model performance across the loan lifecycle.</div>
+      </div>
 
       <hr>
 
@@ -182,31 +583,118 @@
       <h2>Alerting Thresholds and Retraining Triggers</h2>
 
       <p>Monitoring without action is just observation. Define explicit alerting thresholds that trigger a structured response:</p>
-      <ul>
-        <li>PSI > 0.2 on any top-5 feature by SHAP importance → immediate investigation, root cause identification within 48 hours.</li>
-        <li>Score band distribution shift > 5 percentage points in any band month-over-month → monitoring flag, risk team review.</li>
-        <li>Early delinquency rate (DPD30 at 3 months) exceeds training-period rate by more than 20% for the most recent vintage → escalation to risk committee, retraining assessment.</li>
-        <li>Gini on a 6-month evaluation window falls below the minimum acceptable threshold defined in Part 1 → mandatory retraining or model replacement.</li>
-      </ul>
+
+      <div class="alert-list">
+        <div class="alert-card amber">
+          <div class="alert-trigger">PSI > 0.2 on any top-5 feature</div>
+          <div class="alert-response">Immediate investigation, root cause identification within 48 hours. Verify data pipeline integrity before retraining.</div>
+          <div class="alert-sla">SLA: 2 days</div>
+        </div>
+        <div class="alert-card amber">
+          <div class="alert-trigger">Score band shift > 5 percentage points</div>
+          <div class="alert-response">Month-over-month change in any score band triggers monitoring flag. Risk team review and decision on investigation depth.</div>
+          <div class="alert-sla">SLA: 1 week</div>
+        </div>
+        <div class="alert-card red">
+          <div class="alert-trigger">Early DPD30 exceeds training rate by 20%+</div>
+          <div class="alert-response">Escalation to risk committee. Immediate assessment of whether recent vintage quality has deteriorated. Consider model refresh.</div>
+          <div class="alert-sla">SLA: 3 days</div>
+        </div>
+        <div class="alert-card red">
+          <div class="alert-trigger">Gini falls below minimum threshold</div>
+          <div class="alert-response">Mandatory retraining or model replacement. This is the highest-priority signal that model assumptions no longer hold.</div>
+          <div class="alert-sla">SLA: 5 days</div>
+        </div>
+      </div>
 
       <div class="callout">
         <p>The first response to any alert should be: is this a data pipeline problem or a genuine model problem? A PSI spike caused by a broken feature store feed looks identical on the dashboard to genuine population drift. Before initiating a retraining, verify the data pipeline integrity. Retraining on bad data produces a bad model faster — not a better one.</p>
       </div>
 
       <h3>Scheduled model review</h3>
-      <p>Even without an alert firing, schedule a quarterly model review. In the review: examine PSI trends for all features, check vintage curves, compare the model's score distribution against the same period last year, and assess whether any significant market or regulatory changes have occurred that would warrant a model refresh. Credit scoring models in stable markets typically have a useful life of 18–24 months before a full retrain is warranted. Models deployed during or after a major economic event may need refresh within 12 months.</p>
+      <p>Even without an alert firing, schedule a quarterly model review to prevent drift from accumulating undetected:</p>
+      <ul>
+        <li><strong>Feature drift audit:</strong> Examine PSI trends for all features, prioritizing those with rising PSI to identify early problems before they become critical.</li>
+        <li><strong>Vintage curve analysis:</strong> Check whether vintage curves are tracking close together or if recent vintages are diverging, indicating population or concept drift.</li>
+        <li><strong>Score distribution comparison:</strong> Compare the model's score distribution against the same period last year to detect seasonal and cyclical drift patterns.</li>
+        <li><strong>Market and regulatory assessment:</strong> Assess whether any significant market or regulatory changes have occurred that would warrant a model refresh independent of performance metrics.</li>
+        <li><strong>Model lifetime planning:</strong> Credit scoring models in stable markets typically have a useful life of 18–24 months before a full retrain is warranted. Models deployed during or after a major economic event may need refresh within 12 months.</li>
+      </ul>
 
       <hr>
 
       <h2>Closing: The Lifecycle Loops Back</h2>
       <p>This is the final post in the series, but it is not the end of the process. Every signal from monitoring feeds back into the earlier stages. A feature that is drifting heavily may point to a new data source that should be audited (Part 2). An early delinquency rate that is spiking may indicate a new borrower segment that requires its own problem formulation and feasibility assessment (Part 1). The vintage curves that show concept drift define the new training window and performance monitoring period for the next model version (Part 3 and Part 4).</p>
+
       <p>The habits and systems built across this series — problem documentation, data source registers, EDA reports, experiment tracking, deployment guardrails, and monitoring dashboards — are what make the second iteration of the model faster and higher quality than the first. The lifecycle is a loop, and the quality of each loop compounds.</p>
+
+      <!-- Lifecycle Loop Diagram -->
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 560 185" xmlns="http://www.w3.org/2000/svg" style="max-width:560px; display:block; margin:0 auto;">
+          <text x="14" y="14" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">CREDIT SCORE MODEL LIFECYCLE — CONTINUOUS LOOP</text>
+
+          <defs>
+            <marker id="lc-arr" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+              <polygon points="0 0, 8 3.5, 0 7" fill="var(--text-secondary)" opacity="0.55"/>
+            </marker>
+            <marker id="lc-arr-amber" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+              <polygon points="0 0, 8 3.5, 0 7" fill="var(--amber)"/>
+            </marker>
+          </defs>
+
+          <!-- ── ROW 1 (left → right): P1 P2 P3 P4 ── -->
+          <rect x="10"  y="28" width="110" height="36" rx="6" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="65"  y="51" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="500" fill="var(--green-text)">P1: Problem</text>
+
+          <rect x="150" y="28" width="110" height="36" rx="6" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="205" y="51" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="500" fill="var(--green-text)">P2: Data</text>
+
+          <rect x="290" y="28" width="110" height="36" rx="6" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="345" y="51" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="500" fill="var(--green-text)">P3: EDA</text>
+
+          <rect x="430" y="28" width="110" height="36" rx="6" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="485" y="51" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="500" fill="var(--green-text)">P4: Training</text>
+
+          <!-- Row 1 arrows →→→ -->
+          <line x1="121" y1="46" x2="148" y2="46" stroke="var(--text-secondary)" stroke-width="1.2" opacity="0.5" marker-end="url(#lc-arr)"/>
+          <line x1="261" y1="46" x2="288" y2="46" stroke="var(--text-secondary)" stroke-width="1.2" opacity="0.5" marker-end="url(#lc-arr)"/>
+          <line x1="401" y1="46" x2="428" y2="46" stroke="var(--text-secondary)" stroke-width="1.2" opacity="0.5" marker-end="url(#lc-arr)"/>
+
+          <!-- P4 ↓ turn connector to P5 (L-shape: down then left) -->
+          <polyline points="485,64 485,92 345,92 345,108" stroke="var(--text-secondary)" stroke-width="1.2" opacity="0.5" fill="none" marker-end="url(#lc-arr)"/>
+
+          <!-- ── ROW 2 (right → left): P5 P6 P7 ── -->
+          <rect x="290" y="110" width="110" height="36" rx="6" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="345" y="133" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="500" fill="var(--green-text)">P5: Business</text>
+
+          <rect x="150" y="110" width="110" height="36" rx="6" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="205" y="133" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="500" fill="var(--green-text)">P6: Deploy</text>
+
+          <!-- P7 Monitor — amber highlight -->
+          <rect x="10"  y="110" width="110" height="36" rx="6" fill="var(--amber-bg)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="65"  y="133" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="500" fill="var(--amber-text)">P7: Monitor</text>
+
+          <!-- Row 2 arrows ←←← -->
+          <line x1="289" y1="128" x2="262" y2="128" stroke="var(--text-secondary)" stroke-width="1.2" opacity="0.5" marker-end="url(#lc-arr)"/>
+          <line x1="149" y1="128" x2="122" y2="128" stroke="var(--text-secondary)" stroke-width="1.2" opacity="0.5" marker-end="url(#lc-arr)"/>
+
+          <!-- ── FEEDBACK: P7 → P1 (amber dashed, left-side L-shape) ── -->
+          <polyline points="10,128 3,128 3,46 10,46" stroke="var(--amber)" stroke-width="1.5" fill="none" stroke-dasharray="4,2" marker-end="url(#lc-arr-amber)"/>
+
+          <!-- Legend -->
+          <line x1="340" y1="165" x2="360" y2="165" stroke="var(--text-secondary)" stroke-width="1.5" opacity="0.5" marker-end="url(#lc-arr)"/>
+          <text x="365" y="169" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">Build flow</text>
+          <line x1="430" y1="165" x2="450" y2="165" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#lc-arr-amber)"/>
+          <text x="455" y="169" font-family="DM Mono, monospace" font-size="9" fill="var(--amber)">Feedback</text>
+        </svg>
+        <div class="figure-caption">Fig 3 — The credit score model lifecycle is a continuous loop. Monitoring signals (P7) feed back into problem identification, data auditing, and model rebuilding for the next iteration.</div>
+      </div>
 
     </div>
 
     <div class="post-nav">
       <a href="credit-score-p6-deploy.html">← Part 6: Deploy Model</a>
-      <a href="building-monitoring-ml-models.html">← Back to series overview</a>
+      <a href="building-credit-score-models-in-digital-bank.html">← Back to series overview</a>
     </div>
 
   </div>
@@ -219,6 +707,21 @@
       document.getElementById('toggleIcon').textContent = dark ? '☀️' : '🌙';
       document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
       localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    function switchVint(panelId) {
+      // Hide all panels
+      const panels = document.querySelectorAll('.vint-panel');
+      panels.forEach(panel => panel.classList.remove('active'));
+
+      // Deactivate all buttons
+      const buttons = document.querySelectorAll('.vint-tab-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      // Show selected panel
+      document.getElementById(panelId).classList.add('active');
+
+      // Activate clicked button
+      event.target.classList.add('active');
     }
     if (localStorage.getItem('theme') === 'dark') toggleDark();
   </script>

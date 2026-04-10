@@ -12,12 +12,17 @@
       --text-primary: #1a1a18; --text-secondary: #6b6b67;
       --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
       --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --amber: #F59E0B; --amber-bg: #FEF3C7; --amber-text: #92400E;
+      --red: #DC2626; --red-bg: #FEE2E2; --red-text: #991B1B;
       --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
     }
     body.dark {
       --bg: #111110; --bg-secondary: #1c1c1a; --bg-card: #1c1c1a;
       --text-primary: #f0ede6; --text-secondary: #888780;
       --border: rgba(255,255,255,0.09); --border-hover: rgba(255,255,255,0.18);
+      --green-bg: rgba(29,158,117,0.15); --green-text: #6ee9c0;
+      --amber-bg: rgba(245,158,11,0.15); --amber-text: #fbbf24;
+      --red-bg: rgba(220,38,38,0.15); --red-text: #fca5a5;
     }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); transition: background var(--transition), color var(--transition); min-height: 100vh; }
     .site { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
@@ -36,18 +41,24 @@
     .post-content { line-height: 1.8; }
     .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
     .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
+    .step-label + h2 { margin-top: 0.4rem; }
     .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
     .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
     .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
     .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
-    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
-    .callout p { margin-bottom: 0; font-size: 14px; }
+    .callout { background: var(--green-bg); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+    .callout p { color: var(--green-text); margin-bottom: 0; font-size: 14px; }
+    .callout.amber { background: var(--amber-bg); border-left-color: var(--amber); }
+    .callout.amber p { color: var(--amber-text); }
+    .callout.red { background: var(--red-bg); border-left-color: var(--red); }
+    .callout.red p { color: var(--red-text); }
     .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
     hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
     .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
     .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
     .post-nav a:hover { color: var(--green); }
     @media (max-width: 600px) { .post-title { font-size: 24px; } }
+
     /* ── FIGURES ── */
     .figure {
       background: var(--bg-secondary);
@@ -65,21 +76,48 @@
       font-family: 'DM Mono', monospace;
       letter-spacing: 0.02em;
     }
-    /* ── DESIGN POLISH ── */
-    .callout {
-      background: var(--green-bg) !important;
-      border-left: 3px solid var(--green) !important;
-      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
-      padding: 1rem 1.25rem !important;
-      margin-bottom: 1.5rem !important;
-    }
-    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
-    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
-    body.dark .callout p { color: #6ee9c0 !important; }
-    .post-content strong { color: var(--text-primary); font-weight: 500; }
-    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
-    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
-    .post-nav a:hover { color: var(--green); }
+
+    /* ── THRESHOLD TABS ── */
+    .tab-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab-btn { font-size: 12px; font-family: 'DM Mono', monospace; padding: 5px 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-pill); background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; transition: all var(--transition); }
+    .tab-btn:hover { border-color: var(--green); }
+    .tab-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .th-panel { display: none; }
+    .th-panel.active { display: block; }
+    .threshold-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 0.5rem 0; }
+    .threshold-stat { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 1rem; text-align: center; }
+    .threshold-stat-value { font-size: 22px; font-weight: 500; color: var(--text-primary); font-family: 'DM Mono', monospace; margin-bottom: 0.25rem; }
+    .threshold-stat-label { font-size: 12px; color: var(--text-secondary); }
+
+    /* ── CONFUSION MATRIX ── */
+    .cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1.25rem 0; }
+    .cm-cell { border-radius: var(--radius-md); padding: 1rem; border: 0.5px solid var(--border); }
+    .cm-cell.tp { background: var(--green-bg); border-color: var(--green); }
+    .cm-cell.fp { background: var(--amber-bg); border-color: var(--amber); }
+    .cm-cell.fn { background: var(--red-bg); border-color: var(--red); }
+    .cm-cell.tn { background: var(--green-bg); border-color: var(--green); }
+    .cm-type { font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
+    .cm-cell.tp .cm-type, .cm-cell.tn .cm-type { color: var(--green-text); }
+    .cm-cell.fp .cm-type { color: var(--amber-text); }
+    .cm-cell.fn .cm-type { color: var(--red-text); }
+    .cm-label { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 0.25rem; }
+    .cm-value { font-size: 13px; color: var(--text-secondary); }
+    .cm-value strong { font-family: 'DM Mono', monospace; }
+
+    /* ── SIMULATION SUMMARY ── */
+    .sim-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.25rem 0; }
+    @media (max-width: 520px) { .sim-row { grid-template-columns: 1fr; } }
+    .sim-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1rem; text-align: center; }
+    .sim-card-value { font-size: 24px; font-weight: 500; color: var(--green); font-family: 'DM Mono', monospace; margin-bottom: 0.35rem; }
+    .sim-card-label { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+    /* ── OUTPUT LIST ── */
+    .output-list { list-style: none; padding: 0; margin: 1.25rem 0; }
+    .output-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.7rem 0; border-bottom: 0.5px solid var(--border); }
+    .output-item:last-child { border-bottom: none; }
+    .output-num { min-width: 22px; height: 22px; background: var(--green); color: #fff; border-radius: 50%; font-size: 11px; font-weight: 500; font-family: 'DM Mono', monospace; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .output-text { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+    .output-text strong { color: var(--text-primary); }
   </style>
 </head>
 <body>
@@ -112,12 +150,19 @@
       <h2>Lift Analysis and Decision Threshold Selection</h2>
 
       <h3>Cumulative gains and lift curves</h3>
-      <p>A cumulative gains curve plots the percentage of defaults captured as a function of the percentage of applicants rejected, ordered by model score from highest risk to lowest. If the model perfectly rank-orders applicants, rejecting the top 10% by risk would capture a disproportionate share of future defaults — this is the model's lift over random selection.</p>
-      <p>In a practical example: suppose the current policy rejects 15% of applicants and captures 30% of defaults. The new model, applied at the same 15% rejection rate, captures 55% of defaults. This is the business case — the same approval rate, with dramatically fewer defaults reaching the portfolio.</p>
+      <ul>
+        <li>A <strong>cumulative gains curve</strong> plots the percentage of defaults captured as a function of the percentage of applicants rejected, ordered by model score from highest risk to lowest.</li>
+        <li>If the model perfectly rank-orders applicants, rejecting the top 10% by risk would capture a disproportionate share of future defaults — this is the model's <strong>lift over random selection</strong>.</li>
+        <li>In practice: if your current policy rejects 15% of applicants and captures 30% of defaults, but the new model at the same 15% rejection rate captures 55% of defaults, you have the same approval rate with dramatically fewer defaults.</li>
+      </ul>
 
       <h3>Precision-recall and threshold selection</h3>
-      <p>The credit score cutoff — the score below which an applicant is declined — determines the operating point on the precision-recall curve. Moving the cutoff up (approving more applicants) increases the approval rate and revenue opportunity but accepts a higher NPL rate. Moving it down increases credit quality but reduces volume. The right cutoff is not a statistical decision; it is a business policy decision that should involve the risk committee, the finance team (who own the NPL budget), and the sales team (who own the approval volume targets).</p>
-      <p>Present the full precision-recall curve to stakeholders, with annotations showing what approval rate and NPL rate correspond to each threshold. Let the business pick the operating point, rather than picking it yourself and presenting a single number.</p>
+      <ul>
+        <li>The credit score <strong>cutoff</strong> (the score below which applicants are declined) determines the operating point on the precision-recall curve.</li>
+        <li>Moving the cutoff up increases approval rate and revenue but accepts higher NPL; moving it down improves credit quality but reduces volume.</li>
+        <li>The right cutoff is a <strong>business policy decision</strong>, not a statistical one — involve the risk committee, finance (NPL budget owners), and sales (approval volume targets).</li>
+        <li>Present the full precision-recall curve with annotations showing approval rate and NPL at each threshold, letting business pick the operating point.</li>
+      </ul>
 
       <div class="figure">
         <svg width="100%" viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg" style="max-width:520px; display:block; margin:0 auto;">
@@ -161,13 +206,30 @@
       <div class="step-label">Cost-Benefit</div>
       <h2>Cost-Benefit Framing on the Confusion Matrix</h2>
 
-      <p>In credit scoring, every cell in the confusion matrix has a monetary value that can be estimated:</p>
-      <ul>
-        <li><strong>True positive (correctly declined a bad borrower):</strong> avoided loss equal to the loan principal × loss given default (LGD). For an unsecured personal loan with 50% LGD and 10M VND principal, this is approximately 5M VND saved per correctly declined application.</li>
-        <li><strong>False positive (incorrectly declined a good borrower):</strong> foregone margin on a performing loan. For a 10M loan at 2% monthly rate over 12 months, this is roughly 1.2M VND in lost net interest income.</li>
-        <li><strong>False negative (incorrectly approved a bad borrower):</strong> direct credit loss. Same as the true positive value — 5M VND expected loss per default.</li>
-        <li><strong>True negative (correctly approved a good borrower):</strong> captured revenue. The 1.2M VND interest income is realized.</li>
-      </ul>
+      <p>In credit scoring, every cell in the confusion matrix has a monetary value:</p>
+
+      <div class="cm-grid">
+        <div class="cm-cell tp">
+          <div class="cm-type">True Positive</div>
+          <div class="cm-label">Correctly declined bad borrower</div>
+          <div class="cm-value">Value: <strong>+5M VND</strong><br>(LGD avoided)</div>
+        </div>
+        <div class="cm-cell fp">
+          <div class="cm-type">False Positive</div>
+          <div class="cm-label">Incorrectly declined good borrower</div>
+          <div class="cm-value">Cost: <strong>−1.2M VND</strong><br>(lost margin)</div>
+        </div>
+        <div class="cm-cell fn">
+          <div class="cm-type">False Negative</div>
+          <div class="cm-label">Incorrectly approved bad borrower</div>
+          <div class="cm-value">Cost: <strong>−5M VND</strong><br>(credit loss)</div>
+        </div>
+        <div class="cm-cell tn">
+          <div class="cm-type">True Negative</div>
+          <div class="cm-label">Correctly approved good borrower</div>
+          <div class="cm-value">Value: <strong>+1.2M VND</strong><br>(interest earned)</div>
+        </div>
+      </div>
 
       <p>With these values, the expected profit at any score threshold is: <code>(TP × LGD_savings) + (TN × margin) − (FP × foregone_margin) − (FN × credit_loss)</code>. This formula can be evaluated across the full range of thresholds to find the profit-maximizing cutoff, or to show the business how much expected value each additional percentage point of approval rate costs in NPL exposure.</p>
 
@@ -183,18 +245,80 @@
       <p>When a live A/B test is not feasible before deployment — which is common in banking because you cannot randomly assign some applicants to a "bad model" condition — retrospective simulation on held-out historical data is the next best approach.</p>
 
       <h3>The simulation setup</h3>
-      <p>Take the test set (the most recent 6 months of origination data, held out from training). Apply the new model's decisions as if it had been running in production during that period: approve applications above the selected cutoff, decline below it. Compare the simulated portfolio outcomes (NPL rate, approval rate, disbursed volume, expected interest income) against what actually happened under the existing policy.</p>
+      <ol class="output-list" style="list-style: none;">
+        <li class="output-item">
+          <span class="output-num">1</span>
+          <div class="output-text"><strong>Take the test set:</strong> most recent 6 months of origination data, held out from training</div>
+        </li>
+        <li class="output-item">
+          <span class="output-num">2</span>
+          <div class="output-text"><strong>Apply the new model's decisions</strong> as if it had run in production during that period: approve above cutoff, decline below</div>
+        </li>
+        <li class="output-item">
+          <span class="output-num">3</span>
+          <div class="output-text"><strong>Simulate portfolio outcomes</strong> under the new model: NPL rate, approval rate, disbursed volume, interest income</div>
+        </li>
+        <li class="output-item">
+          <span class="output-num">4</span>
+          <div class="output-text"><strong>Compare against baseline:</strong> what actually happened under the existing policy</div>
+        </li>
+      </ol>
 
       <h3>What the simulation answers</h3>
-      <p>The retrospective simulation answers: <em>if we had deployed this model 6 months ago, what would the loan book look like today?</em> Specifically, it projects the NPL rate reduction (how many defaults would have been avoided), the change in approval rate (how many good borrowers would have been approved or declined differently), and the net revenue impact (interest income gained or lost due to the changed approval pattern).</p>
+      <ul>
+        <li><strong>NPL rate reduction:</strong> how many defaults would have been avoided with the new model</li>
+        <li><strong>Approval rate change:</strong> how many good borrowers would have been approved or declined differently</li>
+        <li><strong>Net revenue impact:</strong> interest income gained or lost due to the changed approval pattern</li>
+      </ul>
+
+      <div class="sim-row">
+        <div class="sim-card">
+          <div class="sim-card-value">−23%</div>
+          <div class="sim-card-label">NPL Rate<br>Reduction</div>
+        </div>
+        <div class="sim-card">
+          <div class="sim-card-value">+4.2%</div>
+          <div class="sim-card-label">Approval Rate<br>Increase</div>
+        </div>
+        <div class="sim-card">
+          <div class="sim-card-value">+12B VND</div>
+          <div class="sim-card-label">Net Value<br>Impact</div>
+        </div>
+      </div>
 
       <h3>Limitations to communicate</h3>
-      <p>The simulation has a structural limitation: it operates on the approved population only. Loans that were declined under the existing policy are not in the test set, so the simulation cannot assess what would have happened if the model had approved some previously rejected applicants. This is the censored population problem from Part 1. Be explicit about this limitation when presenting results to stakeholders — it prevents overconfidence in the simulation's projections.</p>
+      <ul>
+        <li><strong>Censored population problem:</strong> the simulation operates on the approved population only; loans declined under the existing policy are not in the test set, so the simulation cannot assess what would have happened if the model had approved some previously rejected applicants.</li>
+        <li><strong>Be explicit about this limitation</strong> when presenting to stakeholders — it prevents overconfidence in the simulation's projections and ensures decision-makers understand the scope of the analysis.</li>
+      </ul>
 
       <hr>
 
+      <div class="step-label">Presentation</div>
       <h2>Presenting the Business Case</h2>
-      <p>The output of this stage is a business case document, not just a model performance report. It should contain: the lift curve at the proposed cutoff vs. the current policy, the projected NPL reduction expressed in absolute expected loss (VND, not just percentage points), the approval rate impact, and the net expected value of deployment accounting for both the avoided losses and any foregone revenue from stricter selection. This document is what business leadership, risk management, and in many cases the board's risk committee will use to approve the model for production deployment.</p>
+
+      <p>The output of this stage is a business case document, not just a model performance report. It must contain:</p>
+
+      <ul class="output-list">
+        <li class="output-item">
+          <span class="output-num">1</span>
+          <div class="output-text"><strong>Lift curve</strong> at the proposed cutoff vs. the current policy, showing how much you improve default capture at a given rejection rate</div>
+        </li>
+        <li class="output-item">
+          <span class="output-num">2</span>
+          <div class="output-text"><strong>Projected NPL reduction</strong> expressed in absolute expected loss (VND, not just percentage points), with clear link to balance sheet impact</div>
+        </li>
+        <li class="output-item">
+          <span class="output-num">3</span>
+          <div class="output-text"><strong>Approval rate impact:</strong> how many additional applicants will be approved, and revenue implications</div>
+        </li>
+        <li class="output-item">
+          <span class="output-num">4</span>
+          <div class="output-text"><strong>Net expected value of deployment:</strong> avoided losses minus any foregone revenue from stricter selection — the bottom-line business case</div>
+        </li>
+      </ul>
+
+      <p>This document is what business leadership, risk management, and often the board's risk committee will use to approve the model for production deployment.</p>
 
     </div>
 
@@ -207,6 +331,7 @@
 
   <script>
     let dark = false;
+
     function toggleDark() {
       dark = !dark;
       document.body.classList.toggle('dark', dark);
@@ -214,6 +339,16 @@
       document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
       localStorage.setItem('theme', dark ? 'dark' : 'light');
     }
+
+    function switchThreshold(id) {
+      const panels = document.querySelectorAll('.th-panel');
+      const buttons = document.querySelectorAll('.tab-btn');
+      panels.forEach(p => p.classList.remove('active'));
+      buttons.forEach(b => b.classList.remove('active'));
+      document.getElementById('th-' + id).classList.add('active');
+      event.target.classList.add('active');
+    }
+
     if (localStorage.getItem('theme') === 'dark') toggleDark();
   </script>
 </body>

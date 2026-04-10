@@ -12,6 +12,8 @@
       --text-primary: #1a1a18; --text-secondary: #6b6b67;
       --border: rgba(0,0,0,0.1); --border-hover: rgba(0,0,0,0.2);
       --green: #1D9E75; --green-bg: #E1F5EE; --green-text: #0F6E56;
+      --amber: #D97706; --amber-bg: #FEF3C7; --amber-text: #92400E;
+      --red: #EF4444; --red-bg: #FEE2E2; --red-text: #991B1B;
       --radius-md: 8px; --radius-lg: 14px; --radius-pill: 999px; --transition: 0.25s ease;
     }
     body.dark {
@@ -36,18 +38,23 @@
     .post-content { line-height: 1.8; }
     .post-content p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.25rem; }
     .post-content h2 { font-size: 19px; font-weight: 500; color: var(--text-primary); margin-top: 3rem; margin-bottom: 0.85rem; letter-spacing: -0.3px; }
+    .step-label + h2 { margin-top: 0.4rem; }
     .post-content h3 { font-size: 15px; font-weight: 500; color: var(--text-primary); margin-top: 1.75rem; margin-bottom: 0.6rem; }
     .post-content ul, .post-content ol { padding-left: 1.25rem; margin-bottom: 1.25rem; }
     .post-content li { font-size: 15px; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.75; }
     .post-content code { font-family: 'DM Mono', monospace; font-size: 13px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; color: var(--text-primary); }
-    .callout { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
-    .callout p { margin-bottom: 0; font-size: 14px; }
+    .callout { background: var(--green-bg) !important; border-left: 3px solid var(--green) !important; border-radius: 0 var(--radius-md) var(--radius-md) 0 !important; padding: 1rem 1.25rem !important; margin-bottom: 1.5rem !important; }
+    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
+    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
+    body.dark .callout p { color: #6ee9c0 !important; }
+    .post-content strong { color: var(--text-primary); font-weight: 500; }
     .step-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 0.4rem; }
     hr { border: none; border-top: 0.5px solid var(--border); margin: 2.5rem 0; }
     .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
     .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); display: flex; align-items: center; gap: 0.4rem; }
     .post-nav a:hover { color: var(--green); }
     @media (max-width: 600px) { .post-title { font-size: 24px; } }
+
     /* ── FIGURES ── */
     .figure {
       background: var(--bg-secondary);
@@ -65,21 +72,37 @@
       font-family: 'DM Mono', monospace;
       letter-spacing: 0.02em;
     }
-    /* ── DESIGN POLISH ── */
-    .callout {
-      background: var(--green-bg) !important;
-      border-left: 3px solid var(--green) !important;
-      border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
-      padding: 1rem 1.25rem !important;
-      margin-bottom: 1.5rem !important;
-    }
-    body.dark .callout { background: rgba(29,158,117,0.1) !important; }
-    .callout p { color: var(--green-text) !important; margin-bottom: 0 !important; font-size: 14px !important; }
-    body.dark .callout p { color: #6ee9c0 !important; }
-    .post-content strong { color: var(--text-primary); font-weight: 500; }
-    .post-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 0.5px solid var(--border); gap: 1rem; }
-    .post-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color var(--transition); }
-    .post-nav a:hover { color: var(--green); }
+
+    /* ── GATE CHECKLIST ── */
+    .gate-list { list-style: none; padding: 0; margin: 1.25rem 0; }
+    .gate-item { display: flex; align-items: flex-start; gap: 0.85rem; padding: 0.75rem 0; border-bottom: 0.5px solid var(--border); }
+    .gate-item:last-child { border-bottom: none; }
+    .gate-check { min-width: 24px; height: 24px; background: var(--green); color: #fff; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-weight: 500; }
+    .gate-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+    .gate-desc { font-size: 13px; color: var(--text-secondary); }
+
+    /* ── FEATURE STORE GRID ── */
+    .fs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+    @media (max-width: 520px) { .fs-grid { grid-template-columns: 1fr; } }
+    .fs-card { border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .fs-card-header { padding: 0.65rem 1rem; font-size: 13px; font-weight: 500; }
+    .fs-card-header.green { background: var(--green); color: #fff; }
+    .fs-card-header.amber { background: var(--amber); color: #fff; }
+    .fs-card-body { padding: 0.85rem 1rem; background: var(--bg-card); }
+    .fs-card-body ul { padding-left: 1rem; margin: 0 0 0.5rem; }
+    .fs-card-body li { font-size: 13px; color: var(--text-secondary); margin-bottom: 0.25rem; line-height: 1.6; }
+    .fs-latency { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text-secondary); margin-top: 0.5rem; }
+
+    /* ── CIRCUIT BREAKER ── */
+    .cb-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.25rem 0; }
+    @media (max-width: 520px) { .cb-row { grid-template-columns: 1fr; } }
+    .cb-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 1rem; text-align: center; }
+    .cb-dot { width: 14px; height: 14px; border-radius: 50%; margin: 0 auto 0.5rem; }
+    .cb-dot.green { background: var(--green); }
+    .cb-dot.red { background: var(--red); }
+    .cb-dot.amber { background: var(--amber); }
+    .cb-title { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 0.3rem; }
+    .cb-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -108,19 +131,153 @@
 
       <hr>
 
+      <div class="step-label">Readiness Gate</div>
+      <h2>Deployment Readiness Checklist</h2>
+
+      <p>Before any code touches production, five gates must be passed:</p>
+
+      <ul class="gate-list">
+        <li class="gate-item">
+          <div class="gate-check">✓</div>
+          <div>
+            <div class="gate-title">Model governance sign-off</div>
+            <div class="gate-desc">Risk committee approval document filed and dated.</div>
+          </div>
+        </li>
+        <li class="gate-item">
+          <div class="gate-check">✓</div>
+          <div>
+            <div class="gate-title">Business case approved</div>
+            <div class="gate-desc">Net expected value estimated (Part 5) and signed by finance.</div>
+          </div>
+        </li>
+        <li class="gate-item">
+          <div class="gate-check">✓</div>
+          <div>
+            <div class="gate-title">Audit report complete</div>
+            <div class="gate-desc">KS, Gini, PSI, subgroup tests all passing; no open exceptions.</div>
+          </div>
+        </li>
+        <li class="gate-item">
+          <div class="gate-check">✓</div>
+          <div>
+            <div class="gate-title">Pipeline serialization test</div>
+            <div class="gate-desc">Identical predictions in clean environment verified on test data.</div>
+          </div>
+        </li>
+        <li class="gate-item">
+          <div class="gate-check">✓</div>
+          <div>
+            <div class="gate-title">Rollback plan documented</div>
+            <div class="gate-desc">Old model kept warm; trigger conditions and thresholds defined.</div>
+          </div>
+        </li>
+      </ul>
+
+      <hr>
+
       <div class="step-label">Packaging</div>
       <h2>Packaging and Serving the Model</h2>
 
       <h3>Model serialization</h3>
-      <p>The scikit-learn pipeline (including preprocessing and the model itself) is serialized using <code>joblib</code> or <code>pickle</code>. For models that need to run across different environments or languages, <code>ONNX</code> format provides a more portable option. The serialized artifact is stored in the model registry with its version tag, not on a local filesystem where it can be silently overwritten.</p>
-      <p>One critical check: load the serialized artifact in a clean environment (no shared state with the training environment) and verify that it produces identical predictions on a fixed set of test cases. This catches library version mismatches — a model serialized with scikit-learn 1.2 may behave differently when deserialized under scikit-learn 1.4 if any preprocessing behavior changed between versions.</p>
+      <ul>
+        <li>Serialize the scikit-learn pipeline (preprocessing + model) using <code>joblib</code> or <code>pickle</code>; use <code>ONNX</code> format for cross-environment portability.</li>
+        <li>Store the serialized artifact in the model registry with a version tag, never on a local filesystem where it can be silently overwritten.</li>
+        <li>Load the artifact in a clean environment (no shared state with training) and verify identical predictions on a fixed test set — this catches library version mismatches.</li>
+        <li>A model serialized with scikit-learn 1.2 may behave differently under 1.4 if preprocessing behavior changed; test across dependency versions.</li>
+      </ul>
 
       <h3>Serving architecture</h3>
-      <p>For a credit scoring use case with real-time loan origination, the scoring service typically exposes a REST API. The request payload contains the applicant's raw features (from the application form and the bureau pull); the service preprocesses them through the pipeline and returns a probability of default, a credit score band, and a recommended decision (approve/decline/refer for manual review). Response time must be within the SLA of the loan origination system — typically 500ms to 2 seconds including the upstream bureau call.</p>
-      <p>The service is containerized in Docker with all dependencies pinned. It is deployed on Kubernetes (or an equivalent orchestration layer) for horizontal scaling during peak periods — month-end salary periods typically see a 3–5x spike in loan application volume in Vietnamese retail banking.</p>
+      <ul>
+        <li><strong>REST API.</strong> Expose a scoring endpoint that accepts raw applicant features (application form + bureau pull) and returns probability of default, credit score band, and recommended decision (approve/decline/refer).</li>
+        <li><strong>Docker containerization.</strong> Package the service with all dependencies pinned; deploy on Kubernetes (or equivalent orchestration) for horizontal scaling during peak periods.</li>
+        <li><strong>SLA target.</strong> Response time must be within the loan origination system SLA — typically 500ms to 2 seconds including the upstream bureau call.</li>
+        <li><strong>Peak load.</strong> Vietnamese retail banking sees 3–5x spike in application volume during month-end salary periods; sizing must account for this seasonality.</li>
+      </ul>
 
       <h3>Feature store integration</h3>
-      <p>For features that require historical aggregation (e.g., average balance over the past 3 months, number of missed payments in the past 6 months), the serving layer reads from a feature store rather than recomputing on the fly. The feature store pre-computes and caches these values with a defined refresh schedule. The serving code must handle the case where a feature store lookup returns a stale or missing value — with a defined fallback: either use a conservative default value, or escalate the application for manual underwriting.</p>
+
+      <div class="fs-grid">
+        <div class="fs-card">
+          <div class="fs-card-header green">Online Features</div>
+          <div class="fs-card-body">
+            <ul>
+              <li>Real-time lookup of applicant bureau score (fresh pull)</li>
+              <li>Application form fields submitted by user</li>
+              <li>Device fingerprint / risk signals</li>
+            </ul>
+            <div class="fs-latency">Latency: &lt; 50ms</div>
+          </div>
+        </div>
+        <div class="fs-card">
+          <div class="fs-card-header amber">Offline Features</div>
+          <div class="fs-card-body">
+            <ul>
+              <li>Pre-computed aggregates (avg balance last 3m)</li>
+              <li>Missed payments in last 6 months</li>
+              <li>Transaction count in last 30 days</li>
+            </ul>
+            <div class="fs-latency">Refresh: nightly batch</div>
+          </div>
+        </div>
+      </div>
+
+      <p>Features requiring historical aggregation (e.g., average balance over 3 months, missed payment count) are read from the feature store rather than recomputed on the fly. The feature store pre-computes and caches values on a defined refresh schedule. The serving code must handle stale or missing values with a defined fallback: either use a conservative default, or escalate for manual underwriting.</p>
+
+      <hr>
+
+      <div class="step-label">Latency Budget</div>
+      <h2>Load Testing and Latency Budgets</h2>
+
+      <p>The 500ms SLA is distributed across the service stack:</p>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 520 100" xmlns="http://www.w3.org/2000/svg" style="max-width: 520px; display: block; margin: 0 auto;">
+          <!-- Background -->
+          <rect x="10" y="20" width="500" height="50" rx="4" fill="var(--bg-secondary)" stroke="var(--border)" stroke-width="0.5"/>
+
+          <!-- Bureau API: 200ms (40%, amber) -->
+          <rect x="10" y="20" width="200" height="50" rx="4" fill="var(--amber-bg)" stroke="var(--amber)" stroke-width="0.5"/>
+          <text x="110" y="52" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="var(--amber-text)" font-weight="500">Bureau API</text>
+          <text x="110" y="62" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="var(--amber-text)">200ms</text>
+
+          <!-- Feature store: 80ms (16%, blue) -->
+          <rect x="210" y="20" width="80" height="50" rx="4" fill="#DBEAFE" stroke="#3B82F6" stroke-width="0.5"/>
+          <text x="250" y="52" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="#1E40AF" font-weight="500">Feat Store</text>
+          <text x="250" y="62" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="#1E40AF">80ms</text>
+
+          <!-- Inference: 30ms (6%, green) -->
+          <rect x="290" y="20" width="30" height="50" rx="4" fill="var(--green-bg)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="305" y="52" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--green-text)" font-weight="500">Infer</text>
+          <text x="305" y="62" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--green-text)">30ms</text>
+
+          <!-- Pre/post processing: 50ms (10%, gray) -->
+          <rect x="320" y="20" width="50" height="50" rx="4" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="0.5"/>
+          <text x="345" y="52" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#6B7280" font-weight="500">Pre/Post</text>
+          <text x="345" y="62" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#6B7280">50ms</text>
+
+          <!-- Network: 40ms (8%, light gray) -->
+          <rect x="370" y="20" width="40" height="50" rx="4" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="0.5"/>
+          <text x="390" y="52" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#9CA3AF" font-weight="500">Net</text>
+          <text x="390" y="62" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#9CA3AF">40ms</text>
+
+          <!-- Buffer: 100ms (20%, dashed) -->
+          <rect x="410" y="20" width="100" height="50" rx="4" fill="none" stroke="#6B7280" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="460" y="52" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="#6B7280" font-weight="500">Buffer</text>
+          <text x="460" y="62" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="#6B7280">100ms</text>
+
+          <!-- Total label -->
+          <text x="10" y="95" font-family="DM Mono, monospace" font-size="11" fill="var(--text-secondary)" font-weight="500">Total SLA: 500ms</text>
+        </svg>
+        <div class="figure-caption">Fig 2 — Latency budget breakdown: bureau API dominates, feature store and inference are fast, buffer absorbs variance.</div>
+      </div>
+
+      <ul>
+        <li>Load test the scoring service at 2× expected peak traffic; define SLAs: P95 &lt; 500ms, P99 &lt; 1 second.</li>
+        <li>If targets are not met, identify the bottleneck: model inference (unlikely), feature store lookup, or bureau API call. Each has a different fix.</li>
+        <li>Instrument monitoring for all latency buckets; alert when any percentile approaches the SLA bound.</li>
+        <li>Run failure mode testing: what happens when the feature store is down, slow, or returns partial data?</li>
+      </ul>
 
       <hr>
 
@@ -128,8 +285,110 @@
       <h2>Staged Rollout</h2>
 
       <h3>Shadow mode</h3>
-      <p>The new model runs in parallel with the existing decisioning system for the first 2–4 weeks. Every application is processed by both the old system and the new model. The new model's decisions are logged but not acted upon. This period answers: does the new model produce scores within the expected distribution? Are there any applicants for whom the model fails to return a score (due to feature unavailability or edge case handling issues)? How often does the new model agree with the old system, and where does it disagree?</p>
-      <p>Shadow mode data is reviewed daily for the first week, then weekly. Anomalies — sudden spikes in null scores, unexpected score distribution shifts, high disagreement rates for a specific product type — should be investigated and resolved before advancing to the next phase.</p>
+      <ul>
+        <li>Run the new model in parallel with the existing system for 2–4 weeks; process every application with both but log the new model's decisions without acting on them.</li>
+        <li>Answer critical questions: Are scores within expected distribution? Do any applicants fail to get a score (feature unavailability, edge cases)? How often does the new model agree with the old?</li>
+        <li>Review shadow mode data daily for the first week, then weekly; investigate anomalies (spikes in null scores, unexpected distribution shifts, product-specific disagreements) before advancing.</li>
+        <li>Advancement criteria: score distribution matches validation, null rate &lt; 0.1%, disagreement rate explainable by model differences alone.</li>
+      </ul>
+
+      <h3>Canary release</h3>
+
+      <div class="figure">
+        <svg width="100%" viewBox="0 0 520 140" xmlns="http://www.w3.org/2000/svg" style="max-width: 520px; display: block; margin: 0 auto;">
+          <!-- Y-axis label -->
+          <text x="5" y="25" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">Traffic</text>
+          <text x="5" y="110" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">%</text>
+
+          <!-- X-axis -->
+          <line x1="30" y1="120" x2="510" y2="120" stroke="var(--border)" stroke-width="0.5"/>
+
+          <!-- Week labels -->
+          <text x="50" y="135" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">W1</text>
+          <text x="100" y="135" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">W2</text>
+          <text x="150" y="135" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">W3</text>
+          <text x="200" y="135" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">W4</text>
+          <text x="250" y="135" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">W5</text>
+          <text x="300" y="135" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">W6</text>
+          <text x="350" y="135" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">W7</text>
+          <text x="400" y="135" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)">W8+</text>
+
+          <!-- Week 1-4: Shadow (0% live, gray bar) -->
+          <rect x="35" y="110" width="170" height="8" fill="#D1D5DB" stroke="var(--border)" stroke-width="0.5"/>
+          <text x="120" y="103" font-family="DM Mono, monospace" font-size="9" fill="var(--text-secondary)" font-weight="500">Shadow (0%)</text>
+
+          <!-- Week 5: 5% canary -->
+          <rect x="235" y="107" width="8" height="11" fill="var(--green)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="235" y="103" font-family="DM Mono, monospace" font-size="8" fill="var(--green)" font-weight="500">5%</text>
+
+          <!-- Week 6: 25% canary -->
+          <rect x="285" y="93" width="30" height="25" fill="var(--green)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="300" y="88" font-family="DM Mono, monospace" font-size="8" fill="var(--green)" font-weight="500">25%</text>
+
+          <!-- Week 7: 50% canary -->
+          <rect x="335" y="60" width="60" height="58" fill="var(--green)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="365" y="53" font-family="DM Mono, monospace" font-size="8" fill="var(--green)" font-weight="500">50%</text>
+
+          <!-- Week 8+: 100% cutover -->
+          <rect x="385" y="20" width="120" height="98" fill="var(--green)" stroke="var(--green)" stroke-width="0.5"/>
+          <text x="445" y="13" font-family="DM Mono, monospace" font-size="9" fill="var(--green)" font-weight="500">100%</text>
+
+          <!-- Title -->
+          <text x="10" y="15" font-family="DM Mono, monospace" font-size="10" fill="var(--text-secondary)" font-weight="500">CANARY RELEASE — TRAFFIC RAMP (8 WEEKS)</text>
+        </svg>
+        <div class="figure-caption">Fig 3 — Canary release: traffic allocates 0% live (shadow) → 5% → 25% → 50% → 100% full cutover over 8 weeks.</div>
+      </div>
+
+      <ul>
+        <li>Route a small fraction of live traffic (5–10%) to the new model; remaining traffic uses the existing system.</li>
+        <li>Monitor approval rates and score distributions for the canary segment against the control segment for 2–4 weeks; expand if metrics are within expected bounds and service is stable under load.</li>
+        <li>Progressive expansion: 10% → 25% → 50% → 100%; each stage lasts 1–2 weeks depending on data volumes and metric stability.</li>
+      </ul>
+
+      <h3>Full cutover and rollback</h3>
+      <ul>
+        <li>Switch 100% of traffic to the new model; keep the old model warm (not decommissioned) for a defined rollback window — typically 2 weeks.</li>
+        <li>If a critical issue emerges (e.g., systematic bias for a specific applicant segment not caught during audit), re-route traffic to the old model immediately without requiring a new deployment.</li>
+        <li>Pre-define rollback triggers: specific metric thresholds, incident severity levels, and approval thresholds. Make the rollback decision in advance, not under pressure after an incident.</li>
+      </ul>
+
+      <div class="callout">
+        <p>In banking, the rollback decision should be pre-agreed: define, before the cutover, the specific conditions (metric thresholds, incident severity levels) that trigger an automatic rollback vs. a manual investigation. A rollback decision made under pressure after an incident is rarely made well. Making it in advance removes the uncertainty.</p>
+      </div>
+
+      <hr>
+
+      <div class="step-label">Reliability</div>
+      <h2>Circuit Breaker and Fallback Modes</h2>
+
+      <p>The scoring service must gracefully degrade when external dependencies fail:</p>
+
+      <div class="cb-row">
+        <div class="cb-card">
+          <div class="cb-dot green"></div>
+          <div class="cb-title">Closed (Normal)</div>
+          <div class="cb-desc">All dependencies healthy; requests flow normally. Bureau API responding, feature store online.</div>
+        </div>
+        <div class="cb-card">
+          <div class="cb-dot red"></div>
+          <div class="cb-title">Open (Bureau Down)</div>
+          <div class="cb-desc">Bureau API unavailable; fallback to application-data-only score. Lower accuracy but operational.</div>
+        </div>
+        <div class="cb-card">
+          <div class="cb-dot amber"></div>
+          <div class="cb-title">Half-Open (Recovery)</div>
+          <div class="cb-desc">Testing if bureau is back; periodically retry with limited traffic until confirmed healthy.</div>
+        </div>
+      </div>
+
+      <ul>
+        <li>Define circuit breaker thresholds: if bureau API fails 5 times in 10 requests, trip the circuit and switch to fallback score.</li>
+        <li>The fallback behavior (application-data-only score) must be tested under simulated outage conditions and approved by the risk team, since it may have a different accuracy profile.</li>
+        <li>Document the fallback accuracy impact: "Fallback score has 8% lower AUC but 99.99% availability vs. full model at 97% AUC and 99.5% availability."</li>
+      </ul>
+
+      <!-- Keep the original staged rollout SVG exactly as-is -->
+      <h3>Staged rollout overview</h3>
 
       <div class="figure">
         <svg width="100%" viewBox="0 0 540 120" xmlns="http://www.w3.org/2000/svg" style="max-width:540px; display:block; margin:0 auto;">
@@ -161,25 +420,6 @@
         </svg>
         <div class="figure-caption">Fig 1 — Staged rollout: shadow (observe only) → canary (partial traffic) → full cutover with a rollback path kept warm.</div>
       </div>
-
-      <h3>Canary release</h3>
-      <p>Route a small fraction of live traffic (typically 5–10%) to the new model's decisions. The remaining traffic continues to use the existing system. Monitor approval rates and score distributions for the canary segment against the control segment for 2–4 weeks. If key metrics (approval rate, score distribution shape) are within expected bounds and the service is stable under load, expand the canary percentage progressively: 10% → 25% → 50% → 100%.</p>
-
-      <h3>Full cutover and rollback</h3>
-      <p>The full cutover switches 100% of traffic to the new model. At this point, the old model is kept warm (not decommissioned) for a defined rollback window — typically 2 weeks. If a critical issue emerges post-cutover (e.g., the new model is found to have a systematic bias for a specific applicant segment that was not caught during audit), traffic can be immediately re-routed to the old model without requiring a new deployment.</p>
-
-      <div class="callout">
-        <p>In banking, the rollback decision should be pre-agreed: define, before the cutover, the specific conditions (metric thresholds, incident severity levels) that trigger an automatic rollback vs. a manual investigation. A rollback decision made under pressure after an incident is rarely made well. Making it in advance removes the uncertainty.</p>
-      </div>
-
-      <hr>
-
-      <div class="step-label">Operations</div>
-      <h2>Load Testing and Latency Budgets</h2>
-
-      <p>Before the canary release, load test the scoring service at 2× the expected peak traffic. Define latency SLAs: P95 response time under 500ms, P99 under 1 second. If the service cannot meet these targets under load, investigate whether the bottleneck is the model inference itself (unlikely for a gradient boosted model — inference is fast), the feature store lookup latency, or the downstream bureau API call. Each bottleneck has a different remediation: model optimization, feature store caching, or circuit breaker patterns for the bureau API.</p>
-
-      <p>Define and instrument a circuit breaker: if the bureau API is unavailable, the scoring service should fall back to an application-data-only score (lower accuracy but operational) rather than failing the entire application. This fallback behavior must be documented, tested under simulated bureau outage conditions, and approved by the risk team — since the fallback score may have a different accuracy profile than the full model.</p>
 
     </div>
 
