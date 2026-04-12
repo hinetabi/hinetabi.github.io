@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Part 2: Missing Values in banking EDA — why absence encodes information, MCAR vs MAR vs MNAR, and how to decide between dropping, imputing, or flagging.">
+  <title>P2: Missing Values — EDA for Banking Loans | hinetabi.github.io</title>
+  <link rel="canonical" href="https://hinetabi.github.io/blog/eda-banking/p2-missing-values.html">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3LNV66EG8G"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3LNV66EG8G');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafaf8;--bg-secondary:#f1efea;--bg-card:#ffffff;--text-primary:#1a1a18;--text-secondary:#6b6b67;--border:rgba(0,0,0,0.1);--border-hover:rgba(0,0,0,0.2);--green:#1D9E75;--green-bg:#E1F5EE;--green-text:#0F6E56;--amber:#D97706;--amber-bg:#FEF3C7;--amber-text:#92400E;--red:#EF4444;--red-bg:#FEE2E2;--red-text:#991B1B;--blue:#3B82F6;--blue-bg:#EFF6FF;--blue-text:#1D4ED8;--purple:#7C3AED;--purple-bg:#EDE9FE;--purple-text:#5B21B6;--radius-md:8px;--radius-lg:14px;--radius-pill:999px;--transition:0.25s ease}
+    body.dark{--bg:#111110;--bg-secondary:#1c1c1a;--bg-card:#1c1c1a;--text-primary:#f0ede6;--text-secondary:#888780;--border:rgba(255,255,255,0.09);--border-hover:rgba(255,255,255,0.18);--green-bg:rgba(29,158,117,0.15);--green-text:#6ee9c0;--amber-bg:rgba(217,119,6,0.15);--amber-text:#fcd34d;--red-bg:rgba(239,68,68,0.15);--red-text:#fca5a5;--blue-bg:rgba(59,130,246,0.15);--blue-text:#93c5fd;--purple-bg:rgba(124,58,237,0.15);--purple-text:#c4b5fd}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);transition:background var(--transition),color var(--transition);min-height:100vh}
+    .site{max-width:720px;margin:0 auto;padding:0 1.5rem 5rem}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:1.4rem 0;border-bottom:0.5px solid var(--border);margin-bottom:2.5rem}
+    .nav-left{display:flex;align-items:center;gap:1rem}
+    .nav-logo{font-size:15px;font-weight:500;color:var(--text-primary);font-family:'DM Mono',monospace;text-decoration:none}
+    .toggle-btn{font-size:13px;font-family:'DM Sans',sans-serif;padding:5px 13px;border:0.5px solid var(--border-hover);border-radius:var(--radius-pill);background:var(--bg-secondary);color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background var(--transition),border-color var(--transition)}
+    .toggle-btn:hover{border-color:var(--green)}
+    .back-link{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition)}
+    .back-link:hover{color:var(--text-primary)}
+    .series-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:2.5rem}
+    .series-step{padding:7px 0;border-radius:var(--radius-md);text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:500;border:0.5px solid var(--border);color:var(--text-secondary);text-decoration:none;transition:all var(--transition);line-height:1.3}
+    .series-step:hover{border-color:var(--green);color:var(--green)}
+    .series-step.active{background:var(--green);color:#fff;border-color:var(--green)}
+    .post-header{margin-bottom:2.5rem}
+    .series-label{font-size:11px;color:var(--text-secondary);font-family:'DM Mono',monospace;margin-bottom:.4rem;letter-spacing:.05em;text-transform:uppercase;display:block}
+    .post-title{font-size:28px;font-weight:500;color:var(--text-primary);line-height:1.25;letter-spacing:-.5px;margin-bottom:.75rem}
+    .post-meta{font-size:13px;color:var(--text-secondary);margin-bottom:1rem}
+    .post-tag{font-size:12px;font-weight:500;padding:4px 11px;border-radius:var(--radius-pill);display:inline-block;margin-right:6px}
+    .tag-green{background:var(--green-bg);color:var(--green-text)}.tag-blue{background:var(--blue-bg);color:var(--blue-text)}.tag-amber{background:var(--amber-bg);color:var(--amber-text)}
+    .post-content{line-height:1.8}
+    .post-content p{font-size:15px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .post-content h2{font-size:19px;font-weight:500;color:var(--text-primary);margin-top:3rem;margin-bottom:.85rem;letter-spacing:-.3px}
+    .post-content h2 .num{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);font-weight:500;display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.06em}
+    .post-content h3{font-size:16px;font-weight:500;color:var(--text-primary);margin-top:1.75rem;margin-bottom:.5rem}
+    .post-content strong{color:var(--text-primary);font-weight:500}
+    .post-content code{font-family:'DM Mono',monospace;font-size:13px;background:var(--bg-secondary);padding:2px 6px;border-radius:4px;color:var(--text-primary)}
+    hr{border:none;border-top:0.5px solid var(--border);margin:2.5rem 0}
+    .callout{border-left:3px solid var(--green);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:1rem 1.25rem;margin-bottom:1.5rem;background:var(--green-bg)}
+    .callout p{color:var(--green-text)!important;margin-bottom:0!important;font-size:14px}
+    .callout.amber{background:var(--amber-bg);border-left-color:var(--amber)}.callout.amber p{color:var(--amber-text)!important}
+    .callout.red{background:var(--red-bg);border-left-color:var(--red)}.callout.red p{color:var(--red-text)!important}
+    .callout.blue{background:var(--blue-bg);border-left-color:var(--blue)}.callout.blue p{color:var(--blue-text)!important}
+    .chart-wrap{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:1.75rem 0}
+    .chart-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:.2rem;font-family:'DM Mono',monospace}
+    .chart-sub{font-size:12px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px;margin:1rem 0}
+    .data-table th{text-align:left;padding:.6rem .85rem;background:var(--bg-secondary);color:var(--text-secondary);font-weight:500;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+    .data-table td{padding:.65rem .85rem;border-top:0.5px solid var(--border);color:var(--text-secondary);font-size:13px;vertical-align:top}
+    .data-table tr:hover td{background:var(--bg-secondary)}
+    .badge{display:inline-block;padding:2px 9px;border-radius:var(--radius-pill);font-size:11px;font-weight:500}
+    .badge-green{background:var(--green-bg);color:var(--green-text)}.badge-amber{background:var(--amber-bg);color:var(--amber-text)}.badge-red{background:var(--red-bg);color:var(--red-text)}.badge-blue{background:var(--blue-bg);color:var(--blue-text)}
+    .type-card{border:0.5px solid var(--border);border-radius:var(--radius-md);padding:1.1rem 1.25rem;margin-bottom:.75rem;background:var(--bg-secondary)}
+    .type-card .tc-label{font-family:'DM Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem}
+    .type-card .tc-def{font-size:14px;color:var(--text-secondary);margin-bottom:.5rem}
+    .type-card .tc-ex{font-size:13px;color:var(--text-secondary);font-style:italic}
+    .toc-sidebar{position:fixed;top:50%;transform:translateY(-50%);left:calc(50% - 542px);width:162px;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:0;border:none;margin:0}
+    @media(max-width:1240px){.toc-sidebar{display:none!important}}
+    .toc-heading{font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:1rem;opacity:.5}
+    .toc-item{display:flex;align-items:stretch;gap:10px;margin-bottom:3px;text-decoration:none;width:100%}
+    .toc-bar{flex-shrink:0;width:2px;background:var(--border);border-radius:1px;transition:background var(--transition)}
+    .toc-item.active .toc-bar,.toc-item:hover .toc-bar{background:var(--green)}
+    .toc-body{padding:4px 0;min-width:0}
+    .toc-num{font-size:10px;font-family:'DM Mono',monospace;color:var(--text-secondary);opacity:.45;display:block;transition:opacity var(--transition),color var(--transition)}
+    .toc-item.active .toc-num{opacity:1;color:var(--green-text)}
+    .toc-name{font-size:12px;color:var(--text-secondary);line-height:1.35;display:block;transition:color var(--transition)}
+    .toc-item.active .toc-name,.toc-item:hover .toc-name{color:var(--text-primary)}
+    .toc-item.active .toc-name{font-weight:500}
+    .toc-divider{width:100%;height:.5px;background:var(--border);margin:5px 0 8px}
+    .post-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:2rem;border-top:.5px solid var(--border);gap:1rem}
+    .post-nav a{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition);display:flex;align-items:center;gap:.4rem}
+    .post-nav a:hover{color:var(--green)}
+    @media(max-width:600px){.post-title{font-size:22px}}
+  </style>
+</head>
+<body>
+<div class="site">
+  <nav>
+    <div class="nav-left">
+      <a class="nav-logo" href="../../index.html">hinetabi.github.io</a>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()"><span id="toggleIcon">🌙</span><span id="toggleLabel">Dark</span></button>
+    </div>
+    <a class="back-link" href="../../index.html">← Home</a>
+  </nav>
+
+  <div class="series-nav">
+    <a href="p1-why-explore.html" class="series-step">P1<br>Why &amp; Init</a>
+    <a href="p2-missing-values.html" class="series-step active">P2<br>Missing</a>
+    <a href="p3-univariate.html" class="series-step">P3<br>Univariate</a>
+    <a href="p4-bivariate.html" class="series-step">P4<br>Bivariate</a>
+    <a href="p5-multivariate.html" class="series-step">P5<br>Multivariate</a>
+    <a href="p6-outliers.html" class="series-step">P6<br>Outliers</a>
+    <a href="p7-target.html" class="series-step">P7<br>Target</a>
+    <a href="p8-insights.html" class="series-step">P8<br>Insights</a>
+  </div>
+
+  <nav class="toc-sidebar" aria-label="Contents">
+    <div class="toc-heading">Contents</div>
+    <a class="toc-item" href="#what"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">01</span><span class="toc-name">What &amp; Why</span></div></a>
+    <a class="toc-item" href="#types"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">02</span><span class="toc-name">3 Types of Missingness</span></div></a>
+    <a class="toc-item" href="#rates"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">03</span><span class="toc-name">Missing Rate Chart</span></div></a>
+    <a class="toc-item" href="#strategies"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">04</span><span class="toc-name">4 Strategies</span></div></a>
+    <a class="toc-item" href="#decision"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">05</span><span class="toc-name">Decision Guide</span></div></a>
+  </nav>
+
+  <div class="post-header">
+    <span class="series-label">EDA for Banking Loans · Part 2 of 8</span>
+    <h1 class="post-title">Missing Values — When Absence Is the Signal</h1>
+    <p class="post-meta">Le Thanh Binh · Data Scientist, Cake by VPBank · April 2026</p>
+    <div><span class="post-tag tag-green">EDA</span><span class="post-tag tag-blue">Credit Risk</span><span class="post-tag tag-amber">Data Quality</span></div>
+  </div>
+
+  <div class="post-content">
+
+    <p>Most EDA guides treat missing values as a nuisance to be cleaned up — fill with the mean, move on. In banking, that approach can be more dangerous than leaving the values missing. The reason a field is empty is often as informative as any value it could contain.</p>
+
+    <h2 id="what"><span class="num">Section 01</span>What Are Missing Values &amp; Why Do They Matter?</h2>
+
+    <h3>What is it?</h3>
+    <p>Missing values are fields that exist in the schema but have no recorded value for a given row. They appear as <code>NaN</code>, <code>None</code>, empty strings, or — more insidiously — as disguised sentinels like <code>-999</code>, <code>0</code>, or <code>9999</code> that a system writes when it has no real value to report.</p>
+
+    <h3>Why does it matter in banking?</h3>
+    <p>Consider three examples from our loan dataset, all technically "missing" but each requiring a completely different response:</p>
+
+    <p><strong>Missing <code>credit_score</code>:</strong> The bureau returned no score. This customer has no credit history — a thin-file borrower. Filling with the population mean score treats them as average-risk, when their actual risk profile is meaningfully different. The missing value is a segment label, not a gap to fill.</p>
+
+    <p><strong>Missing <code>collateral_type</code>:</strong> The customer offered no collateral. This is not unknown — it is a definitive "None." If the field is imputed with the most common collateral type, you are inventing secured lending where none existed, corrupting one of the strongest default predictors in the dataset.</p>
+
+    <p><strong>Missing <code>annual_income</code>:</strong> Could be a data entry failure, a self-employed customer with irregular income who cannot document a fixed amount, or a deliberate omission. The same missing value has three completely different implications requiring different actions. Business context is required before any decision.</p>
+
+    <div class="callout red">
+      <p><strong>Why "fill with mean" is dangerous in banking:</strong> SBV Circular 11 and Basel model validation requirements demand that missing data treatment be documented and justified. "We filled with the mean" is not acceptable if that decision introduces bias against a protected group — for example, if thin-file customers (disproportionately younger or lower-income) are systematically assigned average scores that overstate their creditworthiness, leading to over-lending at rates that cause harm.</p>
+    </div>
+
+    <h2 id="types"><span class="num">Section 02</span>Three Types of Missingness</h2>
+    <p>Before deciding what to do with missing data, you must understand <em>why</em> it is missing. The three types are fundamentally different and require different treatments.</p>
+
+    <div class="type-card">
+      <div class="tc-label" style="color:var(--green-text)">MCAR — Missing Completely At Random</div>
+      <div class="tc-def">The probability of a value being missing has no relationship to any other variable — not to the missing value itself, not to any other feature.</div>
+      <div class="tc-ex">Example: A system outage on one day caused <code>interest_rate</code> to not be recorded for loans disbursed on that day. The affected loans are not systematically different from non-affected ones. Simple mean imputation is acceptable here — but MCAR is rare in banking data.</div>
+    </div>
+
+    <div class="type-card">
+      <div class="tc-label" style="color:var(--amber-text)">MAR — Missing At Random (Conditional)</div>
+      <div class="tc-def">The probability of a value being missing is related to other observed variables, but not to the missing value itself. Given those other variables, the missingness is random.</div>
+      <div class="tc-ex">Example: Self-employed customers are more likely to have missing <code>annual_income</code> (because income is irregular and harder to document) — but among self-employed customers, the income values that are recorded are representative of what is missing. Imputing using employment-type-specific medians is appropriate here.</div>
+    </div>
+
+    <div class="type-card">
+      <div class="tc-label" style="color:var(--red-text)">MNAR — Missing Not At Random</div>
+      <div class="tc-def">The probability of a value being missing is directly related to the value that is missing. The absence encodes information that cannot be recovered by imputation.</div>
+      <div class="tc-ex">Example: High-risk customers are less likely to have a <code>credit_score</code> (because they have never borrowed before, or because previous lenders did not report to the bureau). The missing score itself correlates with higher default risk. You cannot impute this — you must flag it as its own segment: <code>has_credit_history = False</code>.</div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Missingness Type Diagram — Loan Dataset Examples</div>
+      <div class="chart-sub">Each type requires a fundamentally different analytical response</div>
+      <svg viewBox="0 0 620 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;font-family:'DM Sans',sans-serif">
+        <rect x="8" y="15" width="192" height="140" rx="8" fill="rgba(29,158,117,0.07)" stroke="rgba(29,158,117,0.4)" stroke-width="1.2"/>
+        <text x="104" y="35" text-anchor="middle" fill="#0F6E56" font-size="11" font-family="DM Mono" font-weight="600">MCAR</text>
+        <text x="104" y="52" text-anchor="middle" fill="#6b6b67" font-size="11">Random system failure</text>
+        <text x="104" y="68" text-anchor="middle" fill="#6b6b67" font-size="11">e.g. interest_rate missing</text>
+        <text x="104" y="84" text-anchor="middle" fill="#6b6b67" font-size="11">on outage day</text>
+        <rect x="20" y="96" width="172" height="22" rx="5" fill="rgba(29,158,117,0.15)"/>
+        <text x="106" y="112" text-anchor="middle" fill="#0F6E56" font-size="11">✓ Safe to impute with mean</text>
+        <text x="104" y="142" text-anchor="middle" fill="#6b6b67" font-size="10" font-style="italic">Rare in banking</text>
+
+        <rect x="214" y="15" width="192" height="140" rx="8" fill="rgba(217,119,6,0.07)" stroke="rgba(217,119,6,0.4)" stroke-width="1.2"/>
+        <text x="310" y="35" text-anchor="middle" fill="#92400E" font-size="11" font-family="DM Mono" font-weight="600">MAR</text>
+        <text x="310" y="52" text-anchor="middle" fill="#6b6b67" font-size="11">Related to other features</text>
+        <text x="310" y="68" text-anchor="middle" fill="#6b6b67" font-size="11">e.g. income missing for</text>
+        <text x="310" y="84" text-anchor="middle" fill="#6b6b67" font-size="11">self-employed customers</text>
+        <rect x="226" y="96" width="172" height="22" rx="5" fill="rgba(217,119,6,0.15)"/>
+        <text x="312" y="112" text-anchor="middle" fill="#92400E" font-size="11">Impute by segment</text>
+        <text x="310" y="142" text-anchor="middle" fill="#6b6b67" font-size="10" font-style="italic">Common — investigate first</text>
+
+        <rect x="420" y="15" width="192" height="140" rx="8" fill="rgba(239,68,68,0.07)" stroke="rgba(239,68,68,0.4)" stroke-width="1.2"/>
+        <text x="516" y="35" text-anchor="middle" fill="#991B1B" font-size="11" font-family="DM Mono" font-weight="600">MNAR</text>
+        <text x="516" y="52" text-anchor="middle" fill="#6b6b67" font-size="11">Absence IS the signal</text>
+        <text x="516" y="68" text-anchor="middle" fill="#6b6b67" font-size="11">e.g. credit_score missing</text>
+        <text x="516" y="84" text-anchor="middle" fill="#6b6b67" font-size="11">= thin-file customer</text>
+        <rect x="432" y="96" width="172" height="22" rx="5" fill="rgba(239,68,68,0.15)"/>
+        <text x="518" y="112" text-anchor="middle" fill="#991B1B" font-size="11">⚠ Flag — do NOT impute</text>
+        <text x="516" y="142" text-anchor="middle" fill="#6b6b67" font-size="10" font-style="italic">Most common in banking</text>
+      </svg>
+    </div>
+
+    <h2 id="rates"><span class="num">Section 03</span>Missing Rates in Our Loan Dataset</h2>
+    <p>Visualizing missing rates across all features at once reveals two things: how much data is absent, and whether the missingness pattern has a structure. Features that are missing together — for example, <code>credit_score</code> and <code>num_late_payments</code> both missing for the same customers — suggest a shared upstream cause (no bureau record exists for these customers at all).</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Missing Value Rates — All Features</div>
+      <div class="chart-sub">Green &lt; 5% (clean) · Amber 5–30% (investigate) · Red &gt; 30% (critical decision needed)</div>
+      <svg viewBox="0 0 580 310" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;font-family:'DM Sans',sans-serif">
+        <line x1="172" y1="10" x2="172" y2="290" stroke="rgba(0,0,0,0.12)" stroke-width="1"/>
+        <line x1="214" y1="10" x2="214" y2="290" stroke="rgba(0,0,0,0.05)" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="256" y1="10" x2="256" y2="290" stroke="rgba(0,0,0,0.05)" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="340" y1="10" x2="340" y2="290" stroke="rgba(239,68,68,0.25)" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="172" y="300" text-anchor="middle" fill="#6b6b67" font-size="10" font-family="DM Mono">0%</text>
+        <text x="214" y="300" text-anchor="middle" fill="#6b6b67" font-size="10" font-family="DM Mono">10%</text>
+        <text x="256" y="300" text-anchor="middle" fill="#6b6b67" font-size="10" font-family="DM Mono">20%</text>
+        <text x="340" y="300" text-anchor="middle" fill="#991B1B" font-size="10" font-family="DM Mono">40%</text>
+
+        <!-- Feature rows (20px apart) -->
+        <text x="167" y="28" text-anchor="end" fill="#6b6b67" font-size="12">loan_id</text>
+        <rect x="173" y="18" width="1" height="14" rx="2" fill="rgba(29,158,117,0.6)"/>
+        <text x="176" y="28" fill="#0F6E56" font-size="11" font-family="DM Mono">0%</text>
+
+        <text x="167" y="50" text-anchor="end" fill="#6b6b67" font-size="12">loan_amount</text>
+        <rect x="173" y="40" width="1" height="14" rx="2" fill="rgba(29,158,117,0.6)"/>
+        <text x="176" y="50" fill="#0F6E56" font-size="11" font-family="DM Mono">0%</text>
+
+        <text x="167" y="72" text-anchor="end" fill="#6b6b67" font-size="12">loan_purpose</text>
+        <rect x="173" y="62" width="1" height="14" rx="2" fill="rgba(29,158,117,0.6)"/>
+        <text x="176" y="72" fill="#0F6E56" font-size="11" font-family="DM Mono">0%</text>
+
+        <text x="167" y="94" text-anchor="end" fill="#6b6b67" font-size="12">customer_age</text>
+        <rect x="173" y="84" width="1" height="14" rx="2" fill="rgba(29,158,117,0.6)"/>
+        <text x="176" y="94" fill="#0F6E56" font-size="11" font-family="DM Mono">0%</text>
+
+        <text x="167" y="116" text-anchor="end" fill="#6b6b67" font-size="12">interest_rate</text>
+        <rect x="173" y="106" width="8" height="14" rx="2" fill="rgba(29,158,117,0.7)"/>
+        <text x="184" y="116" fill="#0F6E56" font-size="11" font-family="DM Mono">2%</text>
+
+        <text x="167" y="138" text-anchor="end" fill="#6b6b67" font-size="12">employment_type</text>
+        <rect x="173" y="128" width="13" height="14" rx="2" fill="rgba(29,158,117,0.7)"/>
+        <text x="189" y="138" fill="#0F6E56" font-size="11" font-family="DM Mono">3%</text>
+
+        <text x="167" y="160" text-anchor="end" fill="#6b6b67" font-size="12">loan_grade</text>
+        <rect x="173" y="150" width="21" height="14" rx="2" fill="rgba(217,119,6,0.6)"/>
+        <text x="197" y="160" fill="#92400E" font-size="11" font-family="DM Mono">5%</text>
+
+        <text x="167" y="182" text-anchor="end" fill="#6b6b67" font-size="12">annual_income</text>
+        <rect x="173" y="172" width="33" height="14" rx="2" fill="rgba(217,119,6,0.65)"/>
+        <text x="209" y="182" fill="#92400E" font-size="11" font-family="DM Mono">8% — impute by employment segment</text>
+
+        <text x="167" y="204" text-anchor="end" fill="#6b6b67" font-size="12">num_late_pmts</text>
+        <rect x="173" y="194" width="50" height="14" rx="2" fill="rgba(217,119,6,0.65)"/>
+        <text x="226" y="204" fill="#92400E" font-size="11" font-family="DM Mono">12% — co-missing with credit_score</text>
+
+        <text x="167" y="226" text-anchor="end" fill="#6b6b67" font-size="12">debt_to_income</text>
+        <rect x="173" y="216" width="63" height="14" rx="2" fill="rgba(217,119,6,0.65)"/>
+        <text x="239" y="226" fill="#92400E" font-size="11" font-family="DM Mono">15%</text>
+
+        <text x="167" y="248" text-anchor="end" fill="#6b6b67" font-size="12">collateral_type</text>
+        <rect x="173" y="238" width="168" height="14" rx="2" fill="rgba(239,68,68,0.65)"/>
+        <text x="344" y="248" fill="#991B1B" font-size="11" font-family="DM Mono">40% ← "None" = no collateral, not missing</text>
+
+        <text x="167" y="270" text-anchor="end" fill="#6b6b67" font-size="12">credit_score</text>
+        <rect x="173" y="260" width="189" height="14" rx="2" fill="rgba(239,68,68,0.75)"/>
+        <text x="365" y="270" fill="#991B1B" font-size="11" font-family="DM Mono">45% ← thin-file customers — flag, don't impute</text>
+      </svg>
+    </div>
+
+    <div class="callout amber">
+      <p><strong>Pattern insight:</strong> <code>credit_score</code> (45% missing) and <code>num_late_payments</code> (12% missing) are co-missing — the same customers tend to have both absent. This confirms a shared cause: no bureau record exists for these borrowers. Any imputation strategy applied to one should consider its relationship to the other.</p>
+    </div>
+
+    <h2 id="strategies"><span class="num">Section 04</span>The Four Strategies — When to Use Each</h2>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Missing Value Strategy Guide</div>
+      <div class="chart-sub">Decision depends on missingness type, missing rate, and whether absence carries signal</div>
+      <table class="data-table">
+        <thead><tr><th>Strategy</th><th>When to use</th><th>Loan dataset example</th><th>Risk if misapplied</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Drop the column</strong></td>
+            <td>Missing rate &gt;70% AND no signal in absence</td>
+            <td>A bureau field available for only 5% of customers has almost no training data — drop it and note in MDD</td>
+            <td>Losing a valuable feature that could have been flagged or segmented</td>
+          </tr>
+          <tr>
+            <td><strong>Drop the rows</strong></td>
+            <td>Missing rate &lt;2% AND rows are MCAR</td>
+            <td>A handful of loans where <code>interest_rate</code> was not recorded due to a one-day outage</td>
+            <td>Introducing selection bias if the dropped rows are systematically different</td>
+          </tr>
+          <tr>
+            <td><strong>Impute</strong></td>
+            <td>MAR, missing rate &lt;30%, imputation target is estimable</td>
+            <td>Fill missing <code>annual_income</code> with the median income for the same <code>employment_type</code> group — never with the global median</td>
+            <td>Artificially narrowing variance; masking income fraud patterns; treating thin-file customers as average</td>
+          </tr>
+          <tr>
+            <td><strong>Flag as segment</strong></td>
+            <td>MNAR — absence encodes information</td>
+            <td>Create <code>has_credit_history = False</code> for missing <code>credit_score</code>; keep "None" as a category for <code>collateral_type</code></td>
+            <td>None — this is the most honest treatment for MNAR data</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="decision"><span class="num">Section 05</span>Decision Flowchart</h2>
+
+    <div class="chart-wrap">
+      <div class="chart-title">How to Decide What to Do With Missing Data</div>
+      <div class="chart-sub">Follow from top to bottom for each missing feature</div>
+      <svg viewBox="0 0 580 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;font-family:'DM Sans',sans-serif">
+        <!-- Start -->
+        <rect x="190" y="10" width="200" height="36" rx="18" fill="rgba(29,158,117,0.15)" stroke="rgba(29,158,117,0.5)" stroke-width="1.2"/>
+        <text x="290" y="33" text-anchor="middle" fill="#0F6E56" font-size="12" font-weight="500">Feature has missing values</text>
+        <line x1="290" y1="46" x2="290" y2="68" stroke="#c0bfbb" stroke-width="1.5"/>
+        <polygon points="286,65 294,65 290,71" fill="#c0bfbb"/>
+
+        <!-- Q1: Does absence have meaning? -->
+        <rect x="140" y="72" width="300" height="36" rx="6" fill="var(--bg-secondary)" stroke="var(--border)" stroke-width="1"/>
+        <text x="290" y="95" text-anchor="middle" fill="var(--text-primary)" font-size="12">Does <tspan font-style="italic">absence itself</tspan> carry meaning?</text>
+        <!-- Yes → right -->
+        <line x1="440" y1="90" x2="520" y2="90" stroke="#c0bfbb" stroke-width="1.5"/>
+        <text x="480" y="84" text-anchor="middle" fill="#0F6E56" font-size="11">Yes</text>
+        <rect x="520" y="72" width="52" height="36" rx="6" fill="rgba(29,158,117,0.12)" stroke="rgba(29,158,117,0.4)" stroke-width="1"/>
+        <text x="546" y="94" text-anchor="middle" fill="#0F6E56" font-size="11" font-weight="500">Flag it</text>
+        <!-- No → down -->
+        <line x1="290" y1="108" x2="290" y2="130" stroke="#c0bfbb" stroke-width="1.5"/>
+        <text x="297" y="123" fill="#991B1B" font-size="11">No</text>
+        <polygon points="286,127 294,127 290,133" fill="#c0bfbb"/>
+
+        <!-- Q2: Missing rate? -->
+        <rect x="140" y="134" width="300" height="36" rx="6" fill="var(--bg-secondary)" stroke="var(--border)" stroke-width="1"/>
+        <text x="290" y="157" text-anchor="middle" fill="var(--text-primary)" font-size="12">Missing rate &gt; 70%?</text>
+        <!-- Yes → right drop column -->
+        <line x1="440" y1="152" x2="520" y2="152" stroke="#c0bfbb" stroke-width="1.5"/>
+        <text x="480" y="146" text-anchor="middle" fill="#0F6E56" font-size="11">Yes</text>
+        <rect x="520" y="134" width="52" height="36" rx="6" fill="rgba(239,68,68,0.12)" stroke="rgba(239,68,68,0.4)" stroke-width="1"/>
+        <text x="546" y="149" text-anchor="middle" fill="#991B1B" font-size="11" font-weight="500">Drop</text>
+        <text x="546" y="162" text-anchor="middle" fill="#991B1B" font-size="10">column</text>
+        <!-- No → down -->
+        <line x1="290" y1="170" x2="290" y2="192" stroke="#c0bfbb" stroke-width="1.5"/>
+        <text x="297" y="185" fill="#991B1B" font-size="11">No</text>
+        <polygon points="286,189 294,189 290,195" fill="#c0bfbb"/>
+
+        <!-- Q3: Is it MCAR + tiny rate? -->
+        <rect x="110" y="196" width="360" height="36" rx="6" fill="var(--bg-secondary)" stroke="var(--border)" stroke-width="1"/>
+        <text x="290" y="219" text-anchor="middle" fill="var(--text-primary)" font-size="12">MCAR and missing rate &lt; 2%?</text>
+        <!-- Yes → right drop rows -->
+        <line x1="470" y1="214" x2="520" y2="214" stroke="#c0bfbb" stroke-width="1.5"/>
+        <text x="495" y="208" text-anchor="middle" fill="#0F6E56" font-size="11">Yes</text>
+        <rect x="520" y="196" width="52" height="36" rx="6" fill="rgba(239,68,68,0.12)" stroke="rgba(239,68,68,0.4)" stroke-width="1"/>
+        <text x="546" y="211" text-anchor="middle" fill="#991B1B" font-size="11" font-weight="500">Drop</text>
+        <text x="546" y="224" text-anchor="middle" fill="#991B1B" font-size="10">rows</text>
+        <!-- No → down -->
+        <line x1="290" y1="232" x2="290" y2="254" stroke="#c0bfbb" stroke-width="1.5"/>
+        <text x="297" y="247" fill="#991B1B" font-size="11">No</text>
+        <polygon points="286,251 294,251 290,257" fill="#c0bfbb"/>
+
+        <!-- Q4: Is pattern MAR? -->
+        <rect x="110" y="258" width="360" height="36" rx="6" fill="var(--bg-secondary)" stroke="var(--border)" stroke-width="1"/>
+        <text x="290" y="281" text-anchor="middle" fill="var(--text-primary)" font-size="12">Is pattern MAR? (related to other features)</text>
+        <!-- Yes → right impute -->
+        <line x1="470" y1="276" x2="520" y2="276" stroke="#c0bfbb" stroke-width="1.5"/>
+        <text x="495" y="270" text-anchor="middle" fill="#0F6E56" font-size="11">Yes</text>
+        <rect x="520" y="258" width="52" height="36" rx="6" fill="rgba(217,119,6,0.12)" stroke="rgba(217,119,6,0.4)" stroke-width="1"/>
+        <text x="546" y="276" text-anchor="middle" fill="#92400E" font-size="11" font-weight="500">Impute</text>
+        <text x="546" y="288" text-anchor="middle" fill="#92400E" font-size="10">by group</text>
+        <!-- No → down: MNAR -->
+        <line x1="290" y1="294" x2="290" y2="316" stroke="#c0bfbb" stroke-width="1.5"/>
+        <text x="297" y="309" fill="#991B1B" font-size="11">No/unsure</text>
+        <polygon points="286,313 294,313 290,319" fill="#c0bfbb"/>
+
+        <!-- MNAR outcome -->
+        <rect x="107" y="319" width="380" height="50" rx="8" fill="rgba(239,68,68,0.08)" stroke="rgba(239,68,68,0.4)" stroke-width="1.2"/>
+        <text x="300" y="341" text-anchor="middle" fill="#991B1B" font-size="12" font-weight="500">Treat as MNAR</text>
+        <text x="300" y="358" text-anchor="middle" fill="#6b6b67" font-size="11">Flag absence · Investigate with domain expert · Document in MDD</text>
+      </svg>
+    </div>
+
+    <div class="callout">
+      <p><strong>The documentation requirement:</strong> Every missing value decision must be recorded in the Model Development Document with a rationale. For each affected feature: state the missing rate, the missingness type (MCAR/MAR/MNAR), the decision made, and the business justification. This is not optional in a regulated environment — it is what model validators and auditors review first.</p>
+    </div>
+
+    <hr>
+    <p>In <strong>Part 3</strong>, we begin the actual distributional analysis — examining each feature one variable at a time. You will see how the missing value decisions from this part directly shape what you can and cannot conclude from the distributions.</p>
+
+  </div>
+
+  <div class="post-nav">
+    <a href="p1-why-explore.html">← Part 1: Why EDA &amp; Init</a>
+    <a href="p3-univariate.html">Part 3: Univariate Analysis →</a>
+  </div>
+</div>
+
+<script>
+  (function(){const s=localStorage.getItem('theme');if(s==='dark'){document.body.classList.add('dark');document.getElementById('toggleIcon').textContent='☀️';document.getElementById('toggleLabel').textContent='Light';}})();
+  function toggleDark(){const d=document.body.classList.toggle('dark');document.getElementById('toggleIcon').textContent=d?'☀️':'🌙';document.getElementById('toggleLabel').textContent=d?'Light':'Dark';localStorage.setItem('theme',d?'dark':'light');}
+  (function(){const ids=['what','types','rates','strategies','decision'];const items=document.querySelectorAll('.toc-item');function upd(){let c=0;ids.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<160)c=i;});items.forEach((it,i)=>it.classList.toggle('active',i===c));}window.addEventListener('scroll',upd,{passive:true});upd();})();
+</script>
+</body>
+</html>

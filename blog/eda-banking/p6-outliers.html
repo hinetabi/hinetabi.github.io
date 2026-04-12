@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Part 6: Outlier Detection in banking EDA — IQR, Z-score, boxplot methods, and how to decide what to do with extreme values in loan data.">
+  <title>P6: Outlier Detection — EDA for Banking Loans | hinetabi.github.io</title>
+  <link rel="canonical" href="https://hinetabi.github.io/blog/eda-banking/p6-outliers.html">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3LNV66EG8G"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3LNV66EG8G');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafaf8;--bg-secondary:#f1efea;--bg-card:#ffffff;--text-primary:#1a1a18;--text-secondary:#6b6b67;--border:rgba(0,0,0,0.1);--border-hover:rgba(0,0,0,0.2);--green:#1D9E75;--green-bg:#E1F5EE;--green-text:#0F6E56;--amber:#D97706;--amber-bg:#FEF3C7;--amber-text:#92400E;--red:#EF4444;--red-bg:#FEE2E2;--red-text:#991B1B;--blue:#3B82F6;--blue-bg:#EFF6FF;--blue-text:#1D4ED8;--purple:#7C3AED;--purple-bg:#EDE9FE;--purple-text:#5B21B6;--radius-md:8px;--radius-lg:14px;--radius-pill:999px;--transition:0.25s ease}
+    body.dark{--bg:#111110;--bg-secondary:#1c1c1a;--bg-card:#1c1c1a;--text-primary:#f0ede6;--text-secondary:#888780;--border:rgba(255,255,255,0.09);--border-hover:rgba(255,255,255,0.18);--green-bg:rgba(29,158,117,0.15);--green-text:#6ee9c0;--amber-bg:rgba(217,119,6,0.15);--amber-text:#fcd34d;--red-bg:rgba(239,68,68,0.15);--red-text:#fca5a5;--blue-bg:rgba(59,130,246,0.15);--blue-text:#93c5fd;--purple-bg:rgba(124,58,237,0.15);--purple-text:#c4b5fd}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);transition:background var(--transition),color var(--transition);min-height:100vh}
+    .site{max-width:720px;margin:0 auto;padding:0 1.5rem 5rem}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:1.4rem 0;border-bottom:0.5px solid var(--border);margin-bottom:2.5rem}
+    .nav-left{display:flex;align-items:center;gap:1rem}
+    .nav-logo{font-size:15px;font-weight:500;color:var(--text-primary);font-family:'DM Mono',monospace;text-decoration:none}
+    .toggle-btn{font-size:13px;font-family:'DM Sans',sans-serif;padding:5px 13px;border:0.5px solid var(--border-hover);border-radius:var(--radius-pill);background:var(--bg-secondary);color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background var(--transition),border-color var(--transition)}
+    .toggle-btn:hover{border-color:var(--green)}
+    .back-link{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition)}
+    .back-link:hover{color:var(--text-primary)}
+    .series-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:2.5rem}
+    .series-step{padding:7px 0;border-radius:var(--radius-md);text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:500;border:0.5px solid var(--border);color:var(--text-secondary);text-decoration:none;transition:all var(--transition);line-height:1.3}
+    .series-step:hover{border-color:var(--green);color:var(--green)}
+    .series-step.active{background:var(--green);color:#fff;border-color:var(--green)}
+    .post-header{margin-bottom:2.5rem}
+    .series-label{font-size:11px;color:var(--text-secondary);font-family:'DM Mono',monospace;margin-bottom:.4rem;letter-spacing:.05em;text-transform:uppercase;display:block}
+    .post-title{font-size:28px;font-weight:500;color:var(--text-primary);line-height:1.25;letter-spacing:-.5px;margin-bottom:.75rem}
+    .post-meta{font-size:13px;color:var(--text-secondary);margin-bottom:1rem}
+    .post-tag{font-size:12px;font-weight:500;padding:4px 11px;border-radius:var(--radius-pill);display:inline-block;margin-right:6px}
+    .tag-green{background:var(--green-bg);color:var(--green-text)}.tag-blue{background:var(--blue-bg);color:var(--blue-text)}.tag-amber{background:var(--amber-bg);color:var(--amber-text)}.tag-red{background:var(--red-bg);color:var(--red-text)}
+    .post-content{line-height:1.8}
+    .post-content p{font-size:15px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .post-content h2{font-size:19px;font-weight:500;color:var(--text-primary);margin-top:3rem;margin-bottom:.85rem;letter-spacing:-.3px}
+    .post-content h2 .num{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);font-weight:500;display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.06em}
+    .post-content h3{font-size:16px;font-weight:500;color:var(--text-primary);margin-top:1.75rem;margin-bottom:.5rem}
+    .post-content strong{color:var(--text-primary);font-weight:500}
+    .post-content code{font-family:'DM Mono',monospace;font-size:13px;background:var(--bg-secondary);padding:2px 6px;border-radius:4px;color:var(--text-primary)}
+    hr{border:none;border-top:0.5px solid var(--border);margin:2.5rem 0}
+    .callout{border-left:3px solid var(--green);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:1rem 1.25rem;margin-bottom:1.5rem;background:var(--green-bg)}
+    .callout p{color:var(--green-text)!important;margin-bottom:0!important;font-size:14px}
+    .callout.amber{background:var(--amber-bg);border-left-color:var(--amber)}.callout.amber p{color:var(--amber-text)!important}
+    .callout.red{background:var(--red-bg);border-left-color:var(--red)}.callout.red p{color:var(--red-text)!important}
+    .callout.blue{background:var(--blue-bg);border-left-color:var(--blue)}.callout.blue p{color:var(--blue-text)!important}
+    .callout.purple{background:var(--purple-bg);border-left-color:var(--purple)}.callout.purple p{color:var(--purple-text)!important}
+    .chart-wrap{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:1.75rem 0}
+    .chart-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:.2rem;font-family:'DM Mono',monospace}
+    .chart-sub{font-size:12px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px;margin:1rem 0}
+    .data-table th{text-align:left;padding:.6rem .85rem;background:var(--bg-secondary);color:var(--text-secondary);font-weight:500;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+    .data-table td{padding:.65rem .85rem;border-top:0.5px solid var(--border);color:var(--text-secondary);font-size:13px;vertical-align:top}
+    .data-table tr:hover td{background:var(--bg-secondary)}
+    .toc-sidebar{position:fixed;top:50%;transform:translateY(-50%);left:calc(50% - 542px);width:162px;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:0;border:none;margin:0}
+    @media(max-width:1240px){.toc-sidebar{display:none!important}}
+    .toc-heading{font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:1rem;opacity:.5}
+    .toc-item{display:flex;align-items:stretch;gap:10px;margin-bottom:3px;text-decoration:none;width:100%}
+    .toc-bar{flex-shrink:0;width:2px;background:var(--border);border-radius:1px;transition:background var(--transition)}
+    .toc-item.active .toc-bar,.toc-item:hover .toc-bar{background:var(--green)}
+    .toc-body{padding:4px 0;min-width:0}
+    .toc-num{font-size:10px;font-family:'DM Mono',monospace;color:var(--text-secondary);opacity:.45;display:block}
+    .toc-item.active .toc-num{opacity:1;color:var(--green-text)}
+    .toc-name{font-size:12px;color:var(--text-secondary);line-height:1.35;display:block;transition:color var(--transition)}
+    .toc-item.active .toc-name,.toc-item:hover .toc-name{color:var(--text-primary)}
+    .toc-item.active .toc-name{font-weight:500}
+    .toc-divider{width:100%;height:.5px;background:var(--border);margin:5px 0 8px}
+    .post-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:2rem;border-top:.5px solid var(--border);gap:1rem}
+    .post-nav a{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition);display:flex;align-items:center;gap:.4rem}
+    .post-nav a:hover{color:var(--green)}
+    @media(max-width:600px){.post-title{font-size:22px}}
+  </style>
+</head>
+<body>
+<div class="site">
+  <nav>
+    <div class="nav-left">
+      <a class="nav-logo" href="../../index.html">hinetabi.github.io</a>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()"><span id="toggleIcon">🌙</span><span id="toggleLabel">Dark</span></button>
+    </div>
+    <a class="back-link" href="../../index.html">← Home</a>
+  </nav>
+
+  <!-- TOC Sidebar -->
+  <aside class="toc-sidebar" id="tocSidebar">
+    <div class="toc-heading">On this page</div>
+    <a class="toc-item" href="#what-are-outliers" data-section="what-are-outliers">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">01</span><span class="toc-name">What Are Outliers?</span></div>
+    </a>
+    <a class="toc-item" href="#types-of-outliers" data-section="types-of-outliers">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">02</span><span class="toc-name">Three Types in Banking</span></div>
+    </a>
+    <a class="toc-item" href="#detection-methods" data-section="detection-methods">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">03</span><span class="toc-name">Detection Methods</span></div>
+    </a>
+    <a class="toc-item" href="#loan-amount-boxplot" data-section="loan-amount-boxplot">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">04</span><span class="toc-name">Loan Amount Boxplot</span></div>
+    </a>
+    <a class="toc-item" href="#decision-framework" data-section="decision-framework">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">05</span><span class="toc-name">Decision Framework</span></div>
+    </a>
+    <a class="toc-item" href="#banking-insight" data-section="banking-insight">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">06</span><span class="toc-name">The Banking Paradox</span></div>
+    </a>
+  </aside>
+
+  <!-- Series Nav -->
+  <div class="series-nav">
+    <a class="series-step" href="p1-why-explore.html">P1<br>Why EDA</a>
+    <a class="series-step" href="p2-missing-values.html">P2<br>Missing</a>
+    <a class="series-step" href="p3-univariate.html">P3<br>Univariate</a>
+    <a class="series-step" href="p4-bivariate.html">P4<br>Bivariate</a>
+    <a class="series-step" href="p5-multivariate.html">P5<br>Multivariate</a>
+    <a class="series-step active" href="p6-outliers.html">P6<br>Outliers</a>
+    <a class="series-step" href="p7-target.html">P7<br>Target Var</a>
+    <a class="series-step" href="p8-insights.html">P8<br>Insights</a>
+  </div>
+
+  <!-- Post Header -->
+  <header class="post-header">
+    <span class="series-label">EDA for Banking Loans · Part 6 of 8</span>
+    <h1 class="post-title">Outlier Detection —<br>When Extremes Tell the Truth</h1>
+    <div class="post-meta">Le Thanh Binh · Data Scientist, Cake by VPBank · April 2026</div>
+    <span class="post-tag tag-red">Outliers</span>
+    <span class="post-tag tag-amber">Data Quality</span>
+    <span class="post-tag tag-green">Risk Signals</span>
+  </header>
+
+  <div class="post-content">
+
+    <p>A borrower with an annual income of 5 billion VND in a dataset where everyone else earns under 200 million. A loan amount of 0 VND. A DTI ratio of 4.7 when most values cluster between 0.1 and 0.9. Are these errors? Are they real? Should you remove them?</p>
+
+    <p>Outlier handling is where many data scientists make one of two opposite mistakes: they either remove too aggressively, throwing away the most informative records in the dataset, or they do nothing, letting extreme values distort every model they train. This part shows you how to think about outliers in banking — what they <em>mean</em> before you decide what to <em>do</em> with them.</p>
+
+    <hr>
+
+    <h2 id="what-are-outliers"><span class="num">01 — Definition</span>What Are Outliers, Really?</h2>
+
+    <p>An outlier is an observation that is <strong>significantly different from the majority of the data</strong>. The key word is "significantly" — which is where judgment comes in. Statistical tests give you candidates; domain knowledge tells you whether they're problems.</p>
+
+    <p>In a loan dataset, outliers appear in every numeric feature: loan amounts at the extremes, income figures that dwarf all others, debt-to-income ratios above 1.0 (technically impossible but present in real data due to measurement timing), or late payment counts far above the norm.</p>
+
+    <div class="callout blue">
+      <p><strong>Why this matters for banking models:</strong> Most ML algorithms (linear regression, logistic regression, gradient boosting) are sensitive to extreme values. An outlier doesn't just affect the prediction for that one record — it shifts the weights learned from all other records. A single income value of 50 billion VND can move a regression coefficient dramatically.</p>
+    </div>
+
+    <h2 id="types-of-outliers"><span class="num">02 — Classification</span>Three Types of Outliers in Banking Data</h2>
+
+    <p>Before deciding how to handle an outlier, classify it. Each type has a different correct response.</p>
+
+    <!-- 3-Type Cards SVG -->
+    <div class="chart-wrap">
+      <div class="chart-title">Outlier Classification Framework</div>
+      <div class="chart-sub">Three distinct types requiring different responses</div>
+      <svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .oc-card{fill:var(--bg-secondary,#f1efea);rx:8}
+            .oc-label{font-family:'DM Mono',monospace;font-size:10px;fill:var(--text-secondary,#6b6b67);text-transform:uppercase;letter-spacing:.05em}
+            .oc-title{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;fill:var(--text-primary,#1a1a18)}
+            .oc-body{font-family:'DM Sans',sans-serif;font-size:11px;fill:var(--text-secondary,#6b6b67)}
+            .oc-ex{font-family:'DM Mono',monospace;font-size:10px}
+          </style>
+        </defs>
+        <!-- Card 1: Erroneous -->
+        <rect x="10" y="10" width="198" height="175" rx="8" fill="#FEE2E2" stroke="#EF4444" stroke-width="0.5"/>
+        <text x="24" y="36" class="oc-label" fill="#991B1B">Type 1</text>
+        <text x="24" y="56" class="oc-title" fill="#991B1B">Erroneous</text>
+        <text x="24" y="78" class="oc-body" fill="#7f1d1d">Data entry mistakes,</text>
+        <text x="24" y="94" class="oc-body" fill="#7f1d1d">system bugs, unit</text>
+        <text x="24" y="110" class="oc-body" fill="#7f1d1d">conversion errors.</text>
+        <text x="24" y="134" class="oc-ex" fill="#EF4444">income = 0 VND</text>
+        <text x="24" y="150" class="oc-ex" fill="#EF4444">loan_amount = –500</text>
+        <text x="24" y="167" class="oc-ex" fill="#EF4444">age = 3 years old</text>
+
+        <!-- Card 2: Legitimate -->
+        <rect x="231" y="10" width="198" height="175" rx="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="0.5"/>
+        <text x="245" y="36" class="oc-label" fill="#0F6E56">Type 2</text>
+        <text x="245" y="56" class="oc-title" fill="#0F6E56">Legitimate</text>
+        <text x="245" y="78" class="oc-body" fill="#064e3b">Real edge-case customers</text>
+        <text x="245" y="94" class="oc-body" fill="#064e3b">that genuinely exist.</text>
+        <text x="245" y="110" class="oc-body" fill="#064e3b">Often highest-risk or</text>
+        <text x="245" y="126" class="oc-body" fill="#064e3b">most-profitable segment.</text>
+        <text x="245" y="150" class="oc-ex" fill="#1D9E75">income = 5B VND (CEO)</text>
+        <text x="245" y="167" class="oc-ex" fill="#1D9E75">late_payments = 18</text>
+
+        <!-- Card 3: Ambiguous -->
+        <rect x="452" y="10" width="198" height="175" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="0.5"/>
+        <text x="466" y="36" class="oc-label" fill="#92400E">Type 3</text>
+        <text x="466" y="56" class="oc-title" fill="#92400E">Ambiguous</text>
+        <text x="466" y="78" class="oc-body" fill="#78350f">Can't tell without more</text>
+        <text x="466" y="94" class="oc-body" fill="#78350f">investigation. Common</text>
+        <text x="466" y="110" class="oc-body" fill="#78350f">in scraped or merged</text>
+        <text x="466" y="126" class="oc-body" fill="#78350f">datasets.</text>
+        <text x="466" y="150" class="oc-ex" fill="#D97706">dti = 1.2</text>
+        <text x="466" y="167" class="oc-ex" fill="#D97706">loan_term = 360 months</text>
+      </svg>
+    </div>
+
+    <p>The distinction matters enormously. An erroneous outlier should be corrected or removed — it's noise. A legitimate outlier should almost never be removed — it represents a real borrower type your model needs to handle. An ambiguous outlier requires investigation: cross-reference another column, check the source system, or contact the data owner.</p>
+
+    <h2 id="detection-methods"><span class="num">03 — Methods</span>Three Detection Approaches</h2>
+
+    <p>There is no single correct method. Each technique has different assumptions and catches different kinds of extremes. Good practice uses at least two.</p>
+
+    <h3>IQR Rule (Interquartile Range)</h3>
+    <p>The most common approach in banking. Compute Q1 (25th percentile) and Q3 (75th percentile). The IQR is Q3 – Q1. Any value below <code>Q1 – 1.5 × IQR</code> or above <code>Q3 + 1.5 × IQR</code> is flagged. This is robust because it ignores the extreme values themselves when defining the boundaries.</p>
+
+    <div class="callout">
+      <p><strong>IQR on loan_amount:</strong> If Q1 = 50M VND and Q3 = 300M VND, then IQR = 250M. Lower fence = 50M – 375M = –325M (no lower outliers). Upper fence = 300M + 375M = 675M VND. Any loan above 675M is an IQR outlier — worth examining, though not necessarily erroneous.</p>
+    </div>
+
+    <h3>Z-Score (Standard Deviations from Mean)</h3>
+    <p>Compute the mean (μ) and standard deviation (σ) of a feature. A Z-score of <code>(x – μ) / σ</code> measures how many standard deviations a value is from the mean. Values with |Z| > 3 are typically flagged. <strong>Limitation:</strong> Z-scores are themselves distorted by the outliers you're trying to detect. Use with caution on skewed distributions — and most banking variables (income, loan_amount) are heavily right-skewed.</p>
+
+    <h3>Visual Inspection — Boxplots</h3>
+    <p>Before any calculation, plot the data. Boxplots directly display the IQR fence and show individual outlier dots. They tell you not just <em>that</em> outliers exist, but how many there are, whether they're one-sided (right-skew) or symmetric, and how extreme they are relative to the bulk of the distribution.</p>
+
+    <!-- Detection Method Comparison SVG -->
+    <div class="chart-wrap">
+      <div class="chart-title">Detection Method Comparison</div>
+      <div class="chart-sub">When to use each approach on banking features</div>
+      <svg viewBox="0 0 660 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .dm-h{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;fill:var(--text-secondary,#6b6b67)}
+            .dm-cell{font-family:'DM Sans',sans-serif;font-size:12px;fill:var(--text-secondary,#6b6b67)}
+            .dm-meth{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;fill:var(--text-primary,#1a1a18)}
+            .dm-row-bg{fill:var(--bg-secondary,#f1efea)}
+            .dm-good{fill:#1D9E75;font-family:'DM Mono',monospace;font-size:11px}
+            .dm-warn{fill:#D97706;font-family:'DM Mono',monospace;font-size:11px}
+          </style>
+        </defs>
+        <!-- Header -->
+        <rect x="0" y="0" width="660" height="26" rx="6" fill="var(--bg-secondary,#f1efea)"/>
+        <text x="14" y="17" class="dm-h">Method</text>
+        <text x="140" y="17" class="dm-h">Best For</text>
+        <text x="340" y="17" class="dm-h">Avoid When</text>
+        <text x="530" y="17" class="dm-h">Robust?</text>
+        <!-- Row 1 -->
+        <text x="14" y="50" class="dm-meth">IQR Rule</text>
+        <text x="140" y="50" class="dm-cell">Skewed distributions</text>
+        <text x="340" y="50" class="dm-cell">Bimodal distributions</text>
+        <text x="530" y="50" class="dm-good">✓ Yes</text>
+        <!-- Row 2 -->
+        <rect x="0" y="60" width="660" height="30" rx="0" fill="var(--bg-secondary,#f1efea)" opacity="0.5"/>
+        <text x="14" y="80" class="dm-meth">Z-Score</text>
+        <text x="140" y="80" class="dm-cell">Symmetric distributions</text>
+        <text x="340" y="80" class="dm-cell">Skewed data (income)</text>
+        <text x="530" y="80" class="dm-warn">✗ No</text>
+        <!-- Row 3 -->
+        <text x="14" y="110" class="dm-meth">Boxplot</text>
+        <text x="140" y="110" class="dm-cell">Any feature, quick scan</text>
+        <text x="340" y="110" class="dm-cell">Large number of features</text>
+        <text x="530" y="110" class="dm-good">✓ Yes</text>
+        <!-- Row 4 -->
+        <rect x="0" y="120" width="660" height="30" rx="0" fill="var(--bg-secondary,#f1efea)" opacity="0.5"/>
+        <text x="14" y="140" class="dm-meth">Domain Rules</text>
+        <text x="140" y="140" class="dm-cell">Known business bounds</text>
+        <text x="340" y="140" class="dm-cell">Novel feature types</text>
+        <text x="530" y="140" class="dm-good">✓ Best</text>
+        <!-- dividers -->
+        <line x1="0" y1="27" x2="660" y2="27" stroke="var(--border,rgba(0,0,0,0.1))" stroke-width="0.5"/>
+        <line x1="0" y1="57" x2="660" y2="57" stroke="var(--border,rgba(0,0,0,0.1))" stroke-width="0.5"/>
+        <line x1="0" y1="87" x2="660" y2="87" stroke="var(--border,rgba(0,0,0,0.1))" stroke-width="0.5"/>
+        <line x1="0" y1="117" x2="660" y2="117" stroke="var(--border,rgba(0,0,0,0.1))" stroke-width="0.5"/>
+        <line x1="0" y1="147" x2="660" y2="147" stroke="var(--border,rgba(0,0,0,0.1))" stroke-width="0.5"/>
+      </svg>
+    </div>
+
+    <h2 id="loan-amount-boxplot"><span class="num">04 — Visualization</span>Reading the Loan Amount Boxplot</h2>
+
+    <p>Let's walk through what a boxplot tells us about <code>loan_amount</code> in our banking dataset. The chart below represents a realistic distribution: the bulk of loans cluster between 50M–350M VND, with a long right tail of large loans.</p>
+
+    <!-- Loan Amount Boxplot SVG -->
+    <div class="chart-wrap">
+      <div class="chart-title">loan_amount — Boxplot with Outlier Flags</div>
+      <div class="chart-sub">IQR method; values in millions VND (M)</div>
+      <svg viewBox="0 0 660 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .bp-label{font-family:'DM Mono',monospace;font-size:10px;fill:var(--text-secondary,#6b6b67)}
+            .bp-val{font-family:'DM Mono',monospace;font-size:9px;fill:var(--text-secondary,#6b6b67)}
+            .bp-annot{font-family:'DM Sans',sans-serif;font-size:11px;fill:var(--text-secondary,#6b6b67)}
+            .bp-annot-b{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;fill:var(--text-primary,#1a1a18)}
+          </style>
+        </defs>
+        <!-- Axes -->
+        <line x1="80" y1="30" x2="80" y2="200" stroke="var(--border,rgba(0,0,0,0.1))" stroke-width="0.5"/>
+        <line x1="80" y1="200" x2="640" y2="200" stroke="var(--border,rgba(0,0,0,0.1))" stroke-width="0.5"/>
+
+        <!-- Scale: 0 to 900M, mapped 80→640 = 560px for 900M → 0.622px/M -->
+        <!-- Whisker left at 50M: 80 + 50*0.622 = 111 -->
+        <!-- Q1 at 80M: 80 + 80*0.622 = 130 -->
+        <!-- Median at 180M: 80 + 180*0.622 = 192 -->
+        <!-- Q3 at 320M: 80 + 320*0.622 = 280 -->
+        <!-- IQR = 240, upper fence = 320+360=680M: 80 + 680*0.622 = 503 -->
+        <!-- Outliers at 720, 780, 850 -->
+
+        <!-- Grid lines -->
+        <line x1="80" y1="140" x2="640" y2="140" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5" stroke-dasharray="4,4"/>
+        <line x1="192" y1="140" x2="192" y2="200" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5" stroke-dasharray="4,4"/>
+        <line x1="280" y1="140" x2="280" y2="200" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5" stroke-dasharray="4,4"/>
+        <line x1="503" y1="140" x2="503" y2="200" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5" stroke-dasharray="4,4"/>
+
+        <!-- Lower whisker -->
+        <line x1="111" y1="165" x2="130" y2="165" stroke="var(--text-primary,#1a1a18)" stroke-width="1.5"/>
+        <line x1="111" y1="155" x2="111" y2="175" stroke="var(--text-primary,#1a1a18)" stroke-width="1.5"/>
+
+        <!-- IQR Box -->
+        <rect x="130" y="140" width="150" height="50" rx="3" fill="var(--blue-bg,#EFF6FF)" stroke="var(--blue,#3B82F6)" stroke-width="1.5"/>
+
+        <!-- Median line -->
+        <line x1="192" y1="140" x2="192" y2="190" stroke="var(--green,#1D9E75)" stroke-width="2.5"/>
+
+        <!-- Upper whisker to fence -->
+        <line x1="280" y1="165" x2="503" y2="165" stroke="var(--text-primary,#1a1a18)" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <line x1="503" y1="155" x2="503" y2="175" stroke="var(--text-primary,#1a1a18)" stroke-width="1.5"/>
+
+        <!-- Outlier dots -->
+        <circle cx="528" cy="165" r="5" fill="none" stroke="#EF4444" stroke-width="1.5"/>
+        <circle cx="560" cy="165" r="5" fill="none" stroke="#EF4444" stroke-width="1.5"/>
+        <circle cx="598" cy="165" r="5" fill="none" stroke="#EF4444" stroke-width="1.5"/>
+        <circle cx="628" cy="165" r="5" fill="none" stroke="#EF4444" stroke-width="1.5"/>
+
+        <!-- X-axis labels -->
+        <text x="111" y="215" class="bp-val" text-anchor="middle">50M</text>
+        <text x="130" y="215" class="bp-val" text-anchor="middle">80M</text>
+        <text x="192" y="215" class="bp-val" text-anchor="middle">180M</text>
+        <text x="280" y="215" class="bp-val" text-anchor="middle">320M</text>
+        <text x="503" y="215" class="bp-val" text-anchor="middle">680M</text>
+        <text x="565" y="215" class="bp-val" text-anchor="middle">720–850M</text>
+
+        <!-- Y axis label -->
+        <text x="77" y="165" class="bp-val" text-anchor="end">loan_amount</text>
+
+        <!-- Annotation callouts -->
+        <!-- Whisker min -->
+        <line x1="111" y1="148" x2="111" y2="120" stroke="var(--text-secondary,#6b6b67)" stroke-width="0.5" stroke-dasharray="3,2"/>
+        <text x="111" y="115" class="bp-annot" text-anchor="middle">Min whisker</text>
+
+        <!-- Q1 -->
+        <line x1="130" y1="138" x2="130" y2="108" stroke="var(--text-secondary,#6b6b67)" stroke-width="0.5" stroke-dasharray="3,2"/>
+        <text x="130" y="103" class="bp-annot" text-anchor="middle">Q1</text>
+
+        <!-- Median -->
+        <line x1="192" y1="138" x2="192" y2="70" stroke="var(--green,#1D9E75)" stroke-width="0.5" stroke-dasharray="3,2"/>
+        <text x="192" y="60" class="bp-annot-b" text-anchor="middle" fill="#1D9E75">Median</text>
+
+        <!-- Q3 -->
+        <line x1="280" y1="138" x2="280" y2="108" stroke="var(--text-secondary,#6b6b67)" stroke-width="0.5" stroke-dasharray="3,2"/>
+        <text x="280" y="103" class="bp-annot" text-anchor="middle">Q3</text>
+
+        <!-- IQR fence -->
+        <line x1="503" y1="148" x2="503" y2="120" stroke="var(--amber,#D97706)" stroke-width="0.5" stroke-dasharray="3,2"/>
+        <text x="503" y="115" class="bp-annot" text-anchor="middle" fill="#D97706">IQR Fence</text>
+
+        <!-- Outlier label -->
+        <text x="570" y="148" class="bp-annot" fill="#EF4444">4 outliers</text>
+        <text x="570" y="162" class="bp-annot" fill="#EF4444">(0.4% of data)</text>
+
+        <!-- IQR brace -->
+        <line x1="130" y1="232" x2="280" y2="232" stroke="var(--blue,#3B82F6)" stroke-width="1"/>
+        <line x1="130" y1="228" x2="130" y2="236" stroke="var(--blue,#3B82F6)" stroke-width="1"/>
+        <line x1="280" y1="228" x2="280" y2="236" stroke="var(--blue,#3B82F6)" stroke-width="1"/>
+        <text x="205" y="248" class="bp-annot" text-anchor="middle" fill="#3B82F6">IQR = 240M</text>
+        <text x="205" y="262" class="bp-annot" text-anchor="middle" fill="#3B82F6">Fence = Q3 + 1.5×IQR = 680M</text>
+      </svg>
+    </div>
+
+    <p>Reading this boxplot: the median loan is 180M VND — that's the typical customer. The middle 50% of loans (the box) fall between 80M–320M VND. Beyond the upper fence of 680M, we have 4 loans (0.4% of data) that are outliers by the IQR rule. These are not necessarily wrong — they may be high-value corporate or real-estate loans that genuinely exist in the portfolio.</p>
+
+    <h2 id="decision-framework"><span class="num">05 — Decision</span>What to Do With Outliers</h2>
+
+    <p>After identifying and classifying outliers, you have four options. Which one is right depends on the outlier type and your modeling objective.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Outlier Treatment Decision Table</div>
+      <div class="chart-sub">Matched to outlier type and business context</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Treatment</th><th>When to Use</th><th>Example in Banking</th><th>Risk</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Remove</strong></td>
+            <td>Clearly erroneous; data entry mistake with no way to recover correct value</td>
+            <td><code>income = 0</code> or <code>age = 2</code> — impossible values</td>
+            <td>Lose real data if misclassified</td>
+          </tr>
+          <tr>
+            <td><strong>Cap (Winsorize)</strong></td>
+            <td>Legitimate but extreme; real customers you want to include, but value is too influential</td>
+            <td>Cap <code>loan_amount</code> at 99th percentile (650M) — large loans still included but capped</td>
+            <td>Distorts prediction for extreme-but-real cases</td>
+          </tr>
+          <tr>
+            <td><strong>Transform</strong></td>
+            <td>Right-skewed distribution; log transform compresses the tail without removing data</td>
+            <td><code>log(annual_income)</code> — brings 5B VND CEO income closer to 500M median</td>
+            <td>Coefficients harder to interpret in raw units</td>
+          </tr>
+          <tr>
+            <td><strong>Keep as-is</strong></td>
+            <td>Outlier is informative; model needs to learn its behavior</td>
+            <td><code>num_late_payments = 18</code> — this person is very high risk; removing them would create a blind spot</td>
+            <td>Instability in linear models; tree models handle it fine</td>
+          </tr>
+          <tr>
+            <td><strong>Flag &amp; Segment</strong></td>
+            <td>Outlier represents a fundamentally different customer type needing separate treatment</td>
+            <td>Create <code>is_large_loan = True</code> indicator; build separate model or apply separate policy rule</td>
+            <td>Increases model complexity; needs more data per segment</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout amber">
+      <p><strong>The winsorization threshold question:</strong> Should you cap at the 95th, 99th, or 99.9th percentile? There is no universal answer. In consumer credit, 99th is common. In SME or corporate lending where variability is higher, 99.5th may be more appropriate. Always document your choice in your Model Development Document (MDD) so auditors and validators can review the justification.</p>
+    </div>
+
+    <h2 id="banking-insight"><span class="num">06 — The Paradox</span>Outliers in Banking Are Often the Point</h2>
+
+    <p>Here is the uncomfortable truth about outlier handling in credit risk: <strong>the "outliers" are often exactly the borrowers you need to understand most.</strong></p>
+
+    <p>Consider <code>num_late_payments</code>. A borrower with 18 late payments is a massive outlier — most borrowers have 0 or 1. But this borrower is also, almost certainly, a defaulter. If you remove them as an outlier, you're removing your highest-risk cases from the training data. Your model will then be systematically blind to severe credit deterioration patterns.</p>
+
+    <!-- The Paradox Visual -->
+    <div class="chart-wrap">
+      <div class="chart-title">late_payments vs. is_default — Why Outliers Must Stay</div>
+      <div class="chart-sub">Removing outliers on the left removes the highest-default-rate segment</div>
+      <svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .par-lab{font-family:'DM Mono',monospace;font-size:10px;fill:var(--text-secondary,#6b6b67)}
+            .par-val{font-family:'DM Sans',sans-serif;font-size:12px;fill:var(--text-secondary,#6b6b67)}
+            .par-pct{font-family:'DM Mono',monospace;font-size:11px;font-weight:600}
+          </style>
+        </defs>
+        <!-- Background zones -->
+        <rect x="70" y="15" width="300" height="165" rx="6" fill="var(--green-bg,#E1F5EE)" opacity="0.5"/>
+        <rect x="380" y="15" width="270" height="165" rx="6" fill="var(--red-bg,#FEE2E2)" opacity="0.5"/>
+
+        <!-- Zone labels -->
+        <text x="220" y="35" class="par-lab" text-anchor="middle" fill="#0F6E56">Normal range (kept)</text>
+        <text x="515" y="35" class="par-lab" text-anchor="middle" fill="#991B1B">Outlier zone (risky to remove)</text>
+
+        <!-- X axis -->
+        <line x1="70" y1="165" x2="640" y2="165" stroke="var(--border,rgba(0,0,0,0.15))" stroke-width="0.5"/>
+
+        <!-- Bars: default rate by num_late_payments group -->
+        <!-- 0: 4%, 1: 8%, 2-3: 15%, 4-5: 24%, 6-9: 38%, 10+: 62% -->
+        <!-- Bar height = rate * 120 (so 100% = 120px), base at y=165 -->
+        <rect x="90" y="117" width="45" height="48" rx="3" fill="var(--green,#1D9E75)"/>
+        <text x="112" y="112" class="par-pct" text-anchor="middle" fill="#1D9E75">4%</text>
+        <text x="112" y="183" class="par-lab" text-anchor="middle">0</text>
+
+        <rect x="155" y="69" width="45" height="96" rx="3" fill="var(--green,#1D9E75)" opacity="0.8"/>
+        <text x="177" y="64" class="par-pct" text-anchor="middle" fill="#1D9E75">8%</text>
+        <text x="177" y="183" class="par-lab" text-anchor="middle">1</text>
+
+        <rect x="220" y="75" width="45" height="90" rx="3" fill="var(--amber,#D97706)" opacity="0.7"/>
+        <text x="242" y="70" class="par-pct" text-anchor="middle" fill="#D97706">15%</text>
+        <text x="242" y="183" class="par-lab" text-anchor="middle">2–3</text>
+
+        <rect x="285" y="76" width="45" height="89" rx="3" fill="var(--amber,#D97706)"/>
+        <text x="307" y="71" class="par-pct" text-anchor="middle" fill="#D97706">24%</text>
+        <text x="307" y="183" class="par-lab" text-anchor="middle">4–5</text>
+
+        <rect x="395" y="119" width="45" height="46" rx="3" fill="var(--red,#EF4444)" opacity="0.7"/>
+        <text x="417" y="114" class="par-pct" text-anchor="middle" fill="#EF4444">38%</text>
+        <text x="417" y="183" class="par-lab" text-anchor="middle">6–9</text>
+
+        <rect x="460" y="91" width="45" height="74" rx="3" fill="var(--red,#EF4444)"/>
+        <text x="482" y="86" class="par-pct" text-anchor="middle" fill="#EF4444">62%</text>
+        <text x="482" y="183" class="par-lab" text-anchor="middle">10–14</text>
+
+        <rect x="530" y="60" width="45" height="105" rx="3" fill="#991B1B"/>
+        <text x="552" y="55" class="par-pct" text-anchor="middle" fill="#991B1B">88%</text>
+        <text x="552" y="183" class="par-lab" text-anchor="middle">15+</text>
+
+        <!-- Y-axis label -->
+        <text x="62" y="165" class="par-lab" text-anchor="end">0%</text>
+        <text x="62" y="117" class="par-lab" text-anchor="end">40%</text>
+        <text x="62" y="65" class="par-lab" text-anchor="end">80%</text>
+        <text x="350" y="12" class="par-lab" text-anchor="middle">Default Rate (%)</text>
+        <text x="350" y="197" class="par-lab" text-anchor="middle">num_late_payments (groups)</text>
+
+        <!-- Dashed fence line -->
+        <line x1="375" y1="15" x2="375" y2="175" stroke="#EF4444" stroke-width="1" stroke-dasharray="5,3"/>
+      </svg>
+    </div>
+
+    <p>Borrowers with 15+ late payments default at 88%. These are unambiguously the most important observations for a credit risk model to learn from. The IQR fence might flag them as outliers — but removing them would be catastrophic for model quality and, ultimately, for the bank's ability to price risk correctly.</p>
+
+    <div class="callout">
+      <p><strong>The right approach for late_payments:</strong> Keep all values as-is for model training. Consider log-transforming for linear models to reduce leverage. Create a binary flag <code>is_repeat_defaulter</code> if counts exceed a business threshold. Never remove — these records are signal, not noise.</p>
+    </div>
+
+    <div class="callout red">
+      <p><strong>Regulatory note:</strong> Under SBV Circular 11 and Basel model validation standards, your outlier treatment methodology must be documented and justified. "We removed outliers" is not acceptable documentation. The MDD must specify: which features, which thresholds, which method, and why — and must demonstrate that removal did not systematically exclude a protected or minority borrower group.</p>
+    </div>
+
+    <p>Outlier detection is ultimately a question of domain knowledge applied to data. No algorithm can tell you whether a 5-billion-VND income is real or erroneous — only the business context can. EDA is the bridge between the raw numbers and that judgment.</p>
+
+    <hr>
+    <!-- Post Nav -->
+    <div class="post-nav">
+      <a href="p5-multivariate.html">← P5: Multivariate Analysis</a>
+      <a href="p7-target.html">P7: Target Variable →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const saved = localStorage.getItem('theme');
+    if(saved === 'dark') { document.body.classList.add('dark'); document.getElementById('toggleIcon').textContent='☀️'; document.getElementById('toggleLabel').textContent='Light'; }
+  })();
+  function toggleDark(){
+    const isDark = document.body.classList.toggle('dark');
+    document.getElementById('toggleIcon').textContent = isDark ? '☀️' : '🌙';
+    document.getElementById('toggleLabel').textContent = isDark ? 'Light' : 'Dark';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }
+  const sections = document.querySelectorAll('[id]');
+  const tocItems = document.querySelectorAll('.toc-item');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (s.getBoundingClientRect().top < 160) current = s.id; });
+    tocItems.forEach(t => {
+      t.classList.toggle('active', t.dataset.section === current);
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>

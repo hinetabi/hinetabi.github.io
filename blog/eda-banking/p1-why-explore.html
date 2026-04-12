@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Part 1 of EDA Banking series: Why EDA matters in banking and how to do initial data exploration for loan default models.">
+  <title>P1: Why EDA & Initial Exploration — EDA for Banking Loans | hinetabi.github.io</title>
+  <link rel="canonical" href="https://hinetabi.github.io/blog/eda-banking/p1-why-explore.html">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3LNV66EG8G"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3LNV66EG8G');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafaf8;--bg-secondary:#f1efea;--bg-card:#ffffff;--text-primary:#1a1a18;--text-secondary:#6b6b67;--border:rgba(0,0,0,0.1);--border-hover:rgba(0,0,0,0.2);--green:#1D9E75;--green-bg:#E1F5EE;--green-text:#0F6E56;--amber:#D97706;--amber-bg:#FEF3C7;--amber-text:#92400E;--red:#EF4444;--red-bg:#FEE2E2;--red-text:#991B1B;--blue:#3B82F6;--blue-bg:#EFF6FF;--blue-text:#1D4ED8;--purple:#7C3AED;--purple-bg:#EDE9FE;--purple-text:#5B21B6;--radius-md:8px;--radius-lg:14px;--radius-pill:999px;--transition:0.25s ease}
+    body.dark{--bg:#111110;--bg-secondary:#1c1c1a;--bg-card:#1c1c1a;--text-primary:#f0ede6;--text-secondary:#888780;--border:rgba(255,255,255,0.09);--border-hover:rgba(255,255,255,0.18);--green-bg:rgba(29,158,117,0.15);--green-text:#6ee9c0;--amber-bg:rgba(217,119,6,0.15);--amber-text:#fcd34d;--red-bg:rgba(239,68,68,0.15);--red-text:#fca5a5;--blue-bg:rgba(59,130,246,0.15);--blue-text:#93c5fd;--purple-bg:rgba(124,58,237,0.15);--purple-text:#c4b5fd}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);transition:background var(--transition),color var(--transition);min-height:100vh}
+    .site{max-width:720px;margin:0 auto;padding:0 1.5rem 5rem}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:1.4rem 0;border-bottom:0.5px solid var(--border);margin-bottom:2.5rem}
+    .nav-left{display:flex;align-items:center;gap:1rem}
+    .nav-logo{font-size:15px;font-weight:500;color:var(--text-primary);font-family:'DM Mono',monospace;text-decoration:none}
+    .toggle-btn{font-size:13px;font-family:'DM Sans',sans-serif;padding:5px 13px;border:0.5px solid var(--border-hover);border-radius:var(--radius-pill);background:var(--bg-secondary);color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background var(--transition),border-color var(--transition)}
+    .toggle-btn:hover{border-color:var(--green)}
+    .back-link{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition)}
+    .back-link:hover{color:var(--text-primary)}
+    .series-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:2.5rem}
+    @media(max-width:520px){.series-nav{grid-template-columns:repeat(4,1fr)}}
+    .series-step{padding:7px 0;border-radius:var(--radius-md);text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:500;border:0.5px solid var(--border);color:var(--text-secondary);text-decoration:none;transition:all var(--transition);line-height:1.3}
+    .series-step:hover{border-color:var(--green);color:var(--green)}
+    .series-step.active{background:var(--green);color:#fff;border-color:var(--green)}
+    .post-header{margin-bottom:2.5rem}
+    .series-label{font-size:11px;color:var(--text-secondary);font-family:'DM Mono',monospace;margin-bottom:0.4rem;letter-spacing:.05em;text-transform:uppercase;display:block}
+    .post-title{font-size:28px;font-weight:500;color:var(--text-primary);line-height:1.25;letter-spacing:-.5px;margin-bottom:.75rem}
+    .post-meta{font-size:13px;color:var(--text-secondary);margin-bottom:1rem}
+    .post-tag{font-size:12px;font-weight:500;padding:4px 11px;border-radius:var(--radius-pill);display:inline-block;margin-right:6px}
+    .tag-green{background:var(--green-bg);color:var(--green-text)}
+    .tag-blue{background:var(--blue-bg);color:var(--blue-text)}
+    .tag-amber{background:var(--amber-bg);color:var(--amber-text)}
+    .post-content{line-height:1.8}
+    .post-content p{font-size:15px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .post-content h2{font-size:19px;font-weight:500;color:var(--text-primary);margin-top:3rem;margin-bottom:.85rem;letter-spacing:-.3px}
+    .post-content h2 .num{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);font-weight:500;display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.06em}
+    .post-content h3{font-size:16px;font-weight:500;color:var(--text-primary);margin-top:1.75rem;margin-bottom:.5rem}
+    .post-content strong{color:var(--text-primary);font-weight:500}
+    .post-content code{font-family:'DM Mono',monospace;font-size:13px;background:var(--bg-secondary);padding:2px 6px;border-radius:4px;color:var(--text-primary)}
+    hr{border:none;border-top:0.5px solid var(--border);margin:2.5rem 0}
+    .callout{border-left:3px solid var(--green);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:1rem 1.25rem;margin-bottom:1.5rem;background:var(--green-bg)}
+    .callout p{color:var(--green-text)!important;margin-bottom:0!important;font-size:14px}
+    .callout.amber{background:var(--amber-bg);border-left-color:var(--amber)}.callout.amber p{color:var(--amber-text)!important}
+    .callout.red{background:var(--red-bg);border-left-color:var(--red)}.callout.red p{color:var(--red-text)!important}
+    .callout.blue{background:var(--blue-bg);border-left-color:var(--blue)}.callout.blue p{color:var(--blue-text)!important}
+    .callout.purple{background:var(--purple-bg);border-left-color:var(--purple)}.callout.purple p{color:var(--purple-text)!important}
+    .chart-wrap{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:1.75rem 0}
+    .chart-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:.2rem;font-family:'DM Mono',monospace}
+    .chart-sub{font-size:12px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px;margin:1rem 0}
+    .data-table th{text-align:left;padding:.6rem .85rem;background:var(--bg-secondary);color:var(--text-secondary);font-weight:500;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+    .data-table td{padding:.65rem .85rem;border-top:0.5px solid var(--border);color:var(--text-secondary);font-size:13px;vertical-align:top}
+    .data-table tr:hover td{background:var(--bg-secondary)}
+    .badge{display:inline-block;padding:2px 9px;border-radius:var(--radius-pill);font-size:11px;font-weight:500}
+    .badge-green{background:var(--green-bg);color:var(--green-text)}
+    .badge-amber{background:var(--amber-bg);color:var(--amber-text)}
+    .badge-red{background:var(--red-bg);color:var(--red-text)}
+    .badge-blue{background:var(--blue-bg);color:var(--blue-text)}
+    .badge-purple{background:var(--purple-bg);color:var(--purple-text)}
+    .q-block{border:0.5px solid var(--border);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-bottom:.75rem;background:var(--bg-secondary);display:flex;gap:1rem;align-items:flex-start}
+    .q-num{font-family:'DM Mono',monospace;font-size:12px;color:var(--green);font-weight:500;flex-shrink:0;padding-top:1px}
+    .q-text{font-size:14px;color:var(--text-secondary);line-height:1.6}
+    .q-text strong{color:var(--text-primary)}
+    .toc-sidebar{position:fixed;top:50%;transform:translateY(-50%);left:calc(50% - 542px);width:162px;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:0;border:none;margin:0}
+    @media(max-width:1240px){.toc-sidebar{display:none!important}}
+    .toc-heading{font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:1rem;opacity:.5}
+    .toc-item{display:flex;align-items:stretch;gap:10px;margin-bottom:3px;text-decoration:none;width:100%}
+    .toc-bar{flex-shrink:0;width:2px;background:var(--border);border-radius:1px;transition:background var(--transition)}
+    .toc-item.active .toc-bar,.toc-item:hover .toc-bar{background:var(--green)}
+    .toc-body{padding:4px 0;min-width:0}
+    .toc-num{font-size:10px;font-family:'DM Mono',monospace;color:var(--text-secondary);opacity:.45;display:block;transition:opacity var(--transition),color var(--transition)}
+    .toc-item.active .toc-num{opacity:1;color:var(--green-text)}
+    .toc-name{font-size:12px;color:var(--text-secondary);line-height:1.35;display:block;transition:color var(--transition)}
+    .toc-item.active .toc-name,.toc-item:hover .toc-name{color:var(--text-primary)}
+    .toc-item.active .toc-name{font-weight:500}
+    .toc-divider{width:100%;height:.5px;background:var(--border);margin:5px 0 8px}
+    .post-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:2rem;border-top:.5px solid var(--border);gap:1rem}
+    .post-nav a{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition);display:flex;align-items:center;gap:.4rem}
+    .post-nav a:hover{color:var(--green)}
+    @media(max-width:600px){.post-title{font-size:22px}}
+  </style>
+</head>
+<body>
+<div class="site">
+  <nav>
+    <div class="nav-left">
+      <a class="nav-logo" href="../../index.html">hinetabi.github.io</a>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()"><span id="toggleIcon">🌙</span><span id="toggleLabel">Dark</span></button>
+    </div>
+    <a class="back-link" href="../../index.html">← Home</a>
+  </nav>
+
+  <div class="series-nav">
+    <a href="p1-why-explore.html" class="series-step active">P1<br>Why &amp; Init</a>
+    <a href="p2-missing-values.html" class="series-step">P2<br>Missing</a>
+    <a href="p3-univariate.html" class="series-step">P3<br>Univariate</a>
+    <a href="p4-bivariate.html" class="series-step">P4<br>Bivariate</a>
+    <a href="p5-multivariate.html" class="series-step">P5<br>Multivariate</a>
+    <a href="p6-outliers.html" class="series-step">P6<br>Outliers</a>
+    <a href="p7-target.html" class="series-step">P7<br>Target</a>
+    <a href="p8-insights.html" class="series-step">P8<br>Insights</a>
+  </div>
+
+  <nav class="toc-sidebar" aria-label="Contents">
+    <div class="toc-heading">Contents</div>
+    <a class="toc-item" href="#why"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">01</span><span class="toc-name">Why EDA in Banking</span></div></a>
+    <a class="toc-item" href="#questions"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">02</span><span class="toc-name">7 Questions EDA Answers</span></div></a>
+    <a class="toc-item" href="#dataset"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">03</span><span class="toc-name">The Loan Dataset</span></div></a>
+    <a class="toc-item" href="#explore"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">04</span><span class="toc-name">Initial Exploration</span></div></a>
+    <a class="toc-item" href="#traps"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">05</span><span class="toc-name">Common Traps</span></div></a>
+  </nav>
+
+  <div class="post-header">
+    <span class="series-label">EDA for Banking Loans · Part 1 of 8</span>
+    <h1 class="post-title">Why EDA Matters &amp; Initial Data Exploration</h1>
+    <p class="post-meta">Le Thanh Binh · Data Scientist, Cake by VPBank · April 2026</p>
+    <div><span class="post-tag tag-green">EDA</span><span class="post-tag tag-blue">Credit Risk</span><span class="post-tag tag-amber">Banking</span></div>
+  </div>
+
+  <div class="post-content">
+
+    <div class="callout purple">
+      <p><em>"If you torture the data long enough, it will confess to anything."</em> — Ronald Coase. EDA is the discipline of not torturing the data — of understanding it honestly before making any demands of it.</p>
+    </div>
+
+    <p>Most data science courses teach EDA as a sequence of plot types: histogram, boxplot, heatmap, done. But in banking, where a scoring model directly determines who gets credit and at what price, that mechanical approach is not enough. EDA in banking is an act of <strong>due diligence</strong> — you are taking responsibility for the data quality, the feature logic, and the analytical assumptions before they are baked into a production system.</p>
+
+    <p>This series walks through every EDA stage using a realistic loan default dataset. Each part focuses on <strong>what the technique is</strong> and <strong>why it matters specifically in banking</strong> — not on code syntax.</p>
+
+    <!-- WHY -->
+    <h2 id="why"><span class="num">Section 01</span>Why EDA Is Non-Negotiable in Banking</h2>
+
+    <h3>What is EDA?</h3>
+    <p>Exploratory Data Analysis is the process of systematically investigating a dataset to understand its structure, quality, distributions, and relationships — <em>before</em> building any model. It is the difference between knowing your data and assuming you know your data.</p>
+
+    <h3>Why is it especially critical in banking?</h3>
+    <p>In most domains, a model that performs slightly worse than expected is an inconvenience. In banking, it is a financial and regulatory event. The stakes create three non-negotiable reasons to do thorough EDA:</p>
+
+    <p><strong>1. Data arrives broken.</strong> Loan data is assembled from multiple upstream systems — an origination platform, a core banking system, a credit bureau feed, an internal CRM — each with its own schemas, encodings, and quality levels. Joins between these systems routinely produce duplicated rows, mismatched types, and columns that look numeric but contain encoded sentinels like <code>-999</code> or <code>0</code> representing "not available." EDA is the only way to catch these before they corrupt model training.</p>
+
+    <p><strong>2. Wrong assumptions cost money.</strong> A model trained without EDA may discover that <code>annual_income</code> is right-skewed but use it as-is — causing tree depth to blow up on income outliers and degrading performance on the bulk of the population. Or it may treat a missing <code>credit_score</code> as zero, systematically mis-scoring thin-file customers who are actually a distinct risk segment.</p>
+
+    <p><strong>3. Regulators require it.</strong> The State Bank of Vietnam (SBV), the Basel Committee, and internal model risk management frameworks all require that model development documents (MDDs) contain evidence of data quality validation, feature distribution analysis, and missing data treatment decisions. EDA is not just good practice — it produces the artifacts that let you deploy the model legally.</p>
+
+    <div class="callout red">
+      <p><strong>The silent failure problem:</strong> Data quality failures in banking are silent. A dtype mismatch does not throw an error — it silently converts a new category to NaN. A duplicate loan record does not announce itself — it inflates the weight of one customer in training. A <code>-999</code> sentinel in an income column looks like a real (negative) value to every statistical function you run on it. These failures compound downstream into WoE tables, into feature importances, into production scores.</p>
+    </div>
+
+    <!-- 7 QUESTIONS -->
+    <h2 id="questions"><span class="num">Section 02</span>The 7 Questions EDA Answers</h2>
+
+    <p>Before running a single line of analysis, write down what you expect the data to tell you. Then use EDA to test each expectation. Here are the seven questions a thorough EDA must answer for a loan default dataset:</p>
+
+    <div class="q-block"><span class="q-num">Q1</span><div class="q-text"><strong>What exactly do I have?</strong> — How many loan records, how many features, what are the data types, do they match the data dictionary? Did the join produce unexpected columns or duplicate rows?</div></div>
+    <div class="q-block"><span class="q-num">Q2</span><div class="q-text"><strong>What is missing, and why?</strong> — Which features have null values? Is the missingness random or systematic? Does absence encode information (e.g., no collateral offered, no credit history)?</div></div>
+    <div class="q-block"><span class="q-num">Q3</span><div class="q-text"><strong>How is each feature distributed?</strong> — Is <code>annual_income</code> right-skewed? Is <code>credit_score</code> bimodal? Are there impossible values like negative ages or interest rates above 200%?</div></div>
+    <div class="q-block"><span class="q-num">Q4</span><div class="q-text"><strong>How do features relate to each other?</strong> — Is <code>credit_score</code> correlated with <code>num_late_payments</code> as expected? Are any two features so correlated they are effectively duplicates?</div></div>
+    <div class="q-block"><span class="q-num">Q5</span><div class="q-text"><strong>What combination of features predicts default?</strong> — Does default rate increase when <em>both</em> loan grade is low and no collateral is present? Do interaction effects reveal policy rules the business hasn't articulated yet?</div></div>
+    <div class="q-block"><span class="q-num">Q6</span><div class="q-text"><strong>What are the outliers, and are they real?</strong> — Does a <code>loan_amount</code> of 5 billion VND represent a high-net-worth customer or a data entry error? Does <code>num_late_payments = 50</code> represent a deeply delinquent borrower or a system bug?</div></div>
+    <div class="q-block"><span class="q-num">Q7</span><div class="q-text"><strong>Is the target variable well-defined and trustworthy?</strong> — What exactly is "default"? Is there class imbalance? Does default rate vary suspiciously by time period (suggesting data vintage issues)?</div></div>
+
+    <!-- DATASET -->
+    <h2 id="dataset"><span class="num">Section 03</span>The Loan Dataset</h2>
+    <p>Throughout this series, we work with a representative consumer loan dataset. Each row is one loan account. This schema mirrors what you would find in a typical digital lending platform in Vietnam.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Loan Dataset — Feature Schema</div>
+      <div class="chart-sub">15 features · Mixed types · ~100,000 records · Target: is_default</div>
+      <table class="data-table">
+        <thead><tr><th>Feature</th><th>Type</th><th>Description &amp; Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>loan_id</code></td><td><span class="badge badge-blue">ID</span></td><td>Unique identifier — always drop before modeling; never a feature</td></tr>
+          <tr><td><code>customer_age</code></td><td><span class="badge badge-green">Numerical</span></td><td>Age in years · Check for impossible values (&lt;18, &gt;90)</td></tr>
+          <tr><td><code>annual_income</code></td><td><span class="badge badge-green">Numerical</span></td><td>Annual income (VND) · Expect heavy right skew</td></tr>
+          <tr><td><code>loan_amount</code></td><td><span class="badge badge-green">Numerical</span></td><td>Amount disbursed · Should be positive; negatives = data error</td></tr>
+          <tr><td><code>loan_term</code></td><td><span class="badge badge-green">Numerical</span></td><td>Duration in months: 12, 24, 36, 60 · Discrete, not continuous</td></tr>
+          <tr><td><code>interest_rate</code></td><td><span class="badge badge-green">Numerical</span></td><td>Annual rate (%) · Correlated with grade — sanity check this</td></tr>
+          <tr><td><code>debt_to_income</code></td><td><span class="badge badge-green">Numerical</span></td><td>Monthly debt ÷ gross income · Values &gt;1 are suspicious</td></tr>
+          <tr><td><code>credit_score</code></td><td><span class="badge badge-green">Numerical</span></td><td>Bureau score 300–850 · Missing = thin-file customer, not zero</td></tr>
+          <tr><td><code>num_late_payments</code></td><td><span class="badge badge-green">Numerical</span></td><td>Past-due events in last 24 months · Strong default predictor</td></tr>
+          <tr><td><code>employment_type</code></td><td><span class="badge badge-amber">Categorical</span></td><td>Salaried / Self-employed / Freelance · Check for new categories</td></tr>
+          <tr><td><code>loan_purpose</code></td><td><span class="badge badge-amber">Categorical</span></td><td>Home / Car / Business / Personal / Education</td></tr>
+          <tr><td><code>collateral_type</code></td><td><span class="badge badge-amber">Categorical</span></td><td>None / Property / Vehicle / Securities · "None" is data, not missing</td></tr>
+          <tr><td><code>loan_grade</code></td><td><span class="badge badge-purple">Ordinal</span></td><td>A → G · Order encodes risk — treat as ordered category, not text</td></tr>
+          <tr><td><code>region</code></td><td><span class="badge badge-amber">Categorical</span></td><td>Province/city · Watch for rare categories and test-branch names</td></tr>
+          <tr><td><code>is_default</code></td><td><span class="badge badge-red">Target</span></td><td>1 = defaulted · Definition must be pinned before any EDA begins</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DATA PIPELINE CHART -->
+    <div class="chart-wrap">
+      <div class="chart-title">Where Loan Data Comes From</div>
+      <div class="chart-sub">Multiple upstream systems → multiple quality issues → one joined dataset that must be validated</div>
+      <svg viewBox="0 0 620 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;font-family:'DM Sans',sans-serif">
+        <!-- System boxes -->
+        <rect x="8" y="20" width="120" height="50" rx="7" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="1.2"/>
+        <text x="68" y="40" text-anchor="middle" fill="#1D4ED8" font-size="10" font-family="DM Mono" font-weight="600">ORIGINATION</text>
+        <text x="68" y="55" text-anchor="middle" fill="#6b6b67" font-size="11">Loan application</text>
+        <text x="68" y="68" text-anchor="middle" fill="#6b6b67" font-size="11">Customer profile</text>
+
+        <rect x="150" y="20" width="120" height="50" rx="7" fill="rgba(217,119,6,0.1)" stroke="rgba(217,119,6,0.5)" stroke-width="1.2"/>
+        <text x="210" y="40" text-anchor="middle" fill="#92400E" font-size="10" font-family="DM Mono" font-weight="600">CORE BANKING</text>
+        <text x="210" y="55" text-anchor="middle" fill="#6b6b67" font-size="11">Payment history</text>
+        <text x="210" y="68" text-anchor="middle" fill="#6b6b67" font-size="11">Account status</text>
+
+        <rect x="292" y="20" width="120" height="50" rx="7" fill="rgba(124,58,237,0.1)" stroke="rgba(124,58,237,0.5)" stroke-width="1.2"/>
+        <text x="352" y="40" text-anchor="middle" fill="#5B21B6" font-size="10" font-family="DM Mono" font-weight="600">CREDIT BUREAU</text>
+        <text x="352" y="55" text-anchor="middle" fill="#6b6b67" font-size="11">Credit score</text>
+        <text x="352" y="68" text-anchor="middle" fill="#6b6b67" font-size="11">External debts</text>
+
+        <rect x="434" y="20" width="120" height="50" rx="7" fill="rgba(29,158,117,0.1)" stroke="rgba(29,158,117,0.5)" stroke-width="1.2"/>
+        <text x="494" y="40" text-anchor="middle" fill="#0F6E56" font-size="10" font-family="DM Mono" font-weight="600">CRM / OTHER</text>
+        <text x="494" y="55" text-anchor="middle" fill="#6b6b67" font-size="11">Customer segment</text>
+        <text x="494" y="68" text-anchor="middle" fill="#6b6b67" font-size="11">Channel &amp; branch</text>
+
+        <!-- Arrows down to joined dataset -->
+        <line x1="68" y1="70" x2="68" y2="90" stroke="#c0bfbb" stroke-width="1.5"/>
+        <line x1="210" y1="70" x2="210" y2="90" stroke="#c0bfbb" stroke-width="1.5"/>
+        <line x1="352" y1="70" x2="352" y2="90" stroke="#c0bfbb" stroke-width="1.5"/>
+        <line x1="494" y1="70" x2="494" y2="90" stroke="#c0bfbb" stroke-width="1.5"/>
+        <line x1="68" y1="90" x2="494" y2="90" stroke="#c0bfbb" stroke-width="1.5"/>
+        <line x1="281" y1="90" x2="281" y2="105" stroke="#c0bfbb" stroke-width="1.5"/>
+        <polygon points="277,102 285,102 281,108" fill="#c0bfbb"/>
+
+        <!-- Joined dataset box -->
+        <rect x="160" y="108" width="242" height="28" rx="7" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.5)" stroke-width="1.2"/>
+        <text x="281" y="127" text-anchor="middle" fill="#991B1B" font-size="12" font-weight="500">Joined Loan Dataset ← EDA starts here</text>
+      </svg>
+    </div>
+
+    <!-- INITIAL EXPLORATION -->
+    <h2 id="explore"><span class="num">Section 04</span>Initial Data Exploration</h2>
+
+    <h3>What is it?</h3>
+    <p>The first physical contact with the dataset — verifying that what was received matches what was described, identifying the shape, checking that data types are correctly interpreted, and confirming there are no immediately obvious structural problems.</p>
+
+    <h3>Why do we need it?</h3>
+    <p>You cannot analyze data you do not understand. Initial exploration answers the most basic questions: how many rows, how many columns, what does a typical row look like, are there duplicate records? These seem trivial, but finding a 50,000-row dataset when you expected 200,000 — or finding the same <code>loan_id</code> appearing three times — surfaces problems that invalidate every subsequent analysis if left unchecked.</p>
+
+    <p>In banking specifically, this step also confirms that the dataset represents the correct <em>population</em> and <em>time period</em>. A dataset labeled "all consumer loans 2022–2024" that actually only contains approved loans from 2022 is a different dataset — one with selection bias baked in — and every distribution you analyze will be wrong.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Feature Type Classification</div>
+      <div class="chart-sub">Correct type assignment determines every downstream analysis decision</div>
+      <svg viewBox="0 0 620 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;font-family:'DM Sans',sans-serif">
+        <rect x="8" y="10" width="145" height="168" rx="8" fill="rgba(29,158,117,0.08)" stroke="rgba(29,158,117,0.4)" stroke-width="1"/>
+        <text x="80" y="30" text-anchor="middle" fill="#0F6E56" font-size="10" font-family="DM Mono" font-weight="600">NUMERICAL</text>
+        <text x="80" y="50" text-anchor="middle" fill="#6b6b67" font-size="12">customer_age</text>
+        <text x="80" y="68" text-anchor="middle" fill="#6b6b67" font-size="12">annual_income</text>
+        <text x="80" y="86" text-anchor="middle" fill="#6b6b67" font-size="12">loan_amount</text>
+        <text x="80" y="104" text-anchor="middle" fill="#6b6b67" font-size="12">debt_to_income</text>
+        <text x="80" y="122" text-anchor="middle" fill="#6b6b67" font-size="12">credit_score</text>
+        <text x="80" y="140" text-anchor="middle" fill="#6b6b67" font-size="12">interest_rate</text>
+        <text x="80" y="158" text-anchor="middle" fill="#6b6b67" font-size="12">num_late_pmts</text>
+        <text x="80" y="174" text-anchor="middle" fill="#0F6E56" font-size="9" font-family="DM Mono">→ histogram, boxplot</text>
+
+        <rect x="165" y="10" width="145" height="130" rx="8" fill="rgba(217,119,6,0.08)" stroke="rgba(217,119,6,0.4)" stroke-width="1"/>
+        <text x="237" y="30" text-anchor="middle" fill="#92400E" font-size="10" font-family="DM Mono" font-weight="600">CATEGORICAL</text>
+        <text x="237" y="52" text-anchor="middle" fill="#6b6b67" font-size="12">employment_type</text>
+        <text x="237" y="72" text-anchor="middle" fill="#6b6b67" font-size="12">loan_purpose</text>
+        <text x="237" y="92" text-anchor="middle" fill="#6b6b67" font-size="12">collateral_type</text>
+        <text x="237" y="112" text-anchor="middle" fill="#6b6b67" font-size="12">region</text>
+        <text x="237" y="132" text-anchor="middle" fill="#92400E" font-size="9" font-family="DM Mono">→ countplot, bar chart</text>
+
+        <rect x="322" y="10" width="145" height="92" rx="8" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.4)" stroke-width="1"/>
+        <text x="394" y="30" text-anchor="middle" fill="#5B21B6" font-size="10" font-family="DM Mono" font-weight="600">ORDINAL</text>
+        <text x="394" y="52" text-anchor="middle" fill="#6b6b67" font-size="12">loan_grade (A→G)</text>
+        <text x="394" y="72" text-anchor="middle" fill="#6b6b67" font-size="12">loan_term (12→60)</text>
+        <text x="394" y="88" text-anchor="middle" fill="#5B21B6" font-size="9" font-family="DM Mono">→ ordered bar chart</text>
+
+        <rect x="479" y="10" width="133" height="55" rx="8" fill="rgba(239,68,68,0.08)" stroke="rgba(239,68,68,0.4)" stroke-width="1"/>
+        <text x="545" y="30" text-anchor="middle" fill="#991B1B" font-size="10" font-family="DM Mono" font-weight="600">TARGET</text>
+        <text x="545" y="50" text-anchor="middle" fill="#6b6b67" font-size="12">is_default (0 / 1)</text>
+
+        <rect x="479" y="78" width="133" height="52" rx="8" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.4)" stroke-width="1"/>
+        <text x="545" y="96" text-anchor="middle" fill="#1D4ED8" font-size="10" font-family="DM Mono" font-weight="600">DROP (ID)</text>
+        <text x="545" y="116" text-anchor="middle" fill="#6b6b67" font-size="12">loan_id</text>
+      </svg>
+    </div>
+
+    <!-- COMMON TRAPS -->
+    <h2 id="traps"><span class="num">Section 05</span>Common Traps in Banking Data</h2>
+
+    <h3>What are they?</h3>
+    <p>Patterns that look correct at a glance but hide serious problems. These traps are especially common in banking because data is assembled from legacy systems with long-standing conventions that were never designed for machine learning.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Banking Data Traps — Initial Inspection Checklist</div>
+      <div class="chart-sub">Each trap has passed basic validation but will cause silent errors downstream</div>
+      <table class="data-table">
+        <thead><tr><th>Trap</th><th>What it looks like</th><th>Why it's dangerous</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ordinal as integer</strong></td><td><code>loan_grade</code> stored as 1–7</td><td>Model assumes equal spacing between grades — Grade B is not exactly halfway between A and C in risk</td><td>Cast to ordered category</td></tr>
+          <tr><td><strong>ID as feature</strong></td><td><code>loan_id</code>, <code>customer_id</code> included in training</td><td>Model memorizes IDs, producing perfect train accuracy and random test accuracy</td><td>Drop all ID columns before training</td></tr>
+          <tr><td><strong>Sentinel as value</strong></td><td><code>credit_score = -999</code> or <code>income = 0</code></td><td>Statistical functions treat as real values, pulling mean and variance entirely off</td><td>Replace with NaN, then handle as missing</td></tr>
+          <tr><td><strong>Leakage column</strong></td><td><code>days_since_default</code>, <code>collection_status</code></td><td>Feature only has a value after the loan defaults — using it causes the model to cheat</td><td>Verify each feature is available at the prediction point in time</td></tr>
+          <tr><td><strong>Nominal as numeric</strong></td><td><code>region</code> encoded as 1–63 (province codes)</td><td>Model assumes province 63 is "more" than province 1 — a meaningless numeric relationship</td><td>Cast to string category or use target encoding properly</td></tr>
+          <tr><td><strong>Informative "None"</strong></td><td><code>collateral_type = None</code></td><td>If treated as missing and imputed, the signal is destroyed — "no collateral offered" is the actual information</td><td>Keep "None" as an explicit category</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <p><strong>The loan_grade encoding trap in detail:</strong> Imagine your grading system assigns A=1, B=2, C=3, D=4, E=5, F=6, G=7. A linear model would then learn a coefficient for "grade" and apply it linearly — implying the risk difference between A and B equals the risk difference between F and G. In practice, the jump from F to G often carries far more incremental risk than the jump from A to B. The encoding destroys this non-linearity before training even begins.</p>
+    </div>
+
+    <hr>
+    <p>In <strong>Part 2</strong>, we go deeper into missing values — the most consequential data quality decision in the entire EDA process — and explain why the reason a value is missing matters as much as the fact that it is missing.</p>
+
+  </div>
+
+  <div class="post-nav">
+    <span style="color:var(--text-secondary);font-size:13px;">← Start of series</span>
+    <a href="p2-missing-values.html">Part 2: Missing Values →</a>
+  </div>
+</div>
+
+<script>
+  (function(){const s=localStorage.getItem('theme');if(s==='dark'){document.body.classList.add('dark');document.getElementById('toggleIcon').textContent='☀️';document.getElementById('toggleLabel').textContent='Light';}})();
+  function toggleDark(){const d=document.body.classList.toggle('dark');document.getElementById('toggleIcon').textContent=d?'☀️':'🌙';document.getElementById('toggleLabel').textContent=d?'Light':'Dark';localStorage.setItem('theme',d?'dark':'light');}
+  (function(){const ids=['why','questions','dataset','explore','traps'];const items=document.querySelectorAll('.toc-item');function upd(){let c=0;ids.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<160)c=i;});items.forEach((it,i)=>it.classList.toggle('active',i===c));}window.addEventListener('scroll',upd,{passive:true});upd();})();
+</script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Part 5: Multivariate Analysis in banking EDA — interaction effects, feature combinations, and how to discover credit policy rules from data.">
+  <title>P5: Multivariate Analysis — EDA for Banking Loans | hinetabi.github.io</title>
+  <link rel="canonical" href="https://hinetabi.github.io/blog/eda-banking/p5-multivariate.html">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3LNV66EG8G"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3LNV66EG8G');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafaf8;--bg-secondary:#f1efea;--bg-card:#ffffff;--text-primary:#1a1a18;--text-secondary:#6b6b67;--border:rgba(0,0,0,0.1);--border-hover:rgba(0,0,0,0.2);--green:#1D9E75;--green-bg:#E1F5EE;--green-text:#0F6E56;--amber:#D97706;--amber-bg:#FEF3C7;--amber-text:#92400E;--red:#EF4444;--red-bg:#FEE2E2;--red-text:#991B1B;--blue:#3B82F6;--blue-bg:#EFF6FF;--blue-text:#1D4ED8;--purple:#7C3AED;--purple-bg:#EDE9FE;--purple-text:#5B21B6;--radius-md:8px;--radius-lg:14px;--radius-pill:999px;--transition:0.25s ease}
+    body.dark{--bg:#111110;--bg-secondary:#1c1c1a;--bg-card:#1c1c1a;--text-primary:#f0ede6;--text-secondary:#888780;--border:rgba(255,255,255,0.09);--border-hover:rgba(255,255,255,0.18);--green-bg:rgba(29,158,117,0.15);--green-text:#6ee9c0;--amber-bg:rgba(217,119,6,0.15);--amber-text:#fcd34d;--red-bg:rgba(239,68,68,0.15);--red-text:#fca5a5;--blue-bg:rgba(59,130,246,0.15);--blue-text:#93c5fd;--purple-bg:rgba(124,58,237,0.15);--purple-text:#c4b5fd}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);transition:background var(--transition),color var(--transition);min-height:100vh}
+    .site{max-width:720px;margin:0 auto;padding:0 1.5rem 5rem}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:1.4rem 0;border-bottom:0.5px solid var(--border);margin-bottom:2.5rem}
+    .nav-left{display:flex;align-items:center;gap:1rem}
+    .nav-logo{font-size:15px;font-weight:500;color:var(--text-primary);font-family:'DM Mono',monospace;text-decoration:none}
+    .toggle-btn{font-size:13px;font-family:'DM Sans',sans-serif;padding:5px 13px;border:0.5px solid var(--border-hover);border-radius:var(--radius-pill);background:var(--bg-secondary);color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background var(--transition),border-color var(--transition)}
+    .toggle-btn:hover{border-color:var(--green)}
+    .back-link{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition)}
+    .back-link:hover{color:var(--text-primary)}
+    .series-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:2.5rem}
+    .series-step{padding:7px 0;border-radius:var(--radius-md);text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:500;border:0.5px solid var(--border);color:var(--text-secondary);text-decoration:none;transition:all var(--transition);line-height:1.3}
+    .series-step:hover{border-color:var(--green);color:var(--green)}
+    .series-step.active{background:var(--green);color:#fff;border-color:var(--green)}
+    .post-header{margin-bottom:2.5rem}
+    .series-label{font-size:11px;color:var(--text-secondary);font-family:'DM Mono',monospace;margin-bottom:.4rem;letter-spacing:.05em;text-transform:uppercase;display:block}
+    .post-title{font-size:28px;font-weight:500;color:var(--text-primary);line-height:1.25;letter-spacing:-.5px;margin-bottom:.75rem}
+    .post-meta{font-size:13px;color:var(--text-secondary);margin-bottom:1rem}
+    .post-tag{font-size:12px;font-weight:500;padding:4px 11px;border-radius:var(--radius-pill);display:inline-block;margin-right:6px}
+    .tag-green{background:var(--green-bg);color:var(--green-text)}.tag-blue{background:var(--blue-bg);color:var(--blue-text)}.tag-amber{background:var(--amber-bg);color:var(--amber-text)}
+    .post-content{line-height:1.8}
+    .post-content p{font-size:15px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .post-content h2{font-size:19px;font-weight:500;color:var(--text-primary);margin-top:3rem;margin-bottom:.85rem;letter-spacing:-.3px}
+    .post-content h2 .num{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);font-weight:500;display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.06em}
+    .post-content h3{font-size:16px;font-weight:500;color:var(--text-primary);margin-top:1.75rem;margin-bottom:.5rem}
+    .post-content strong{color:var(--text-primary);font-weight:500}
+    .post-content code{font-family:'DM Mono',monospace;font-size:13px;background:var(--bg-secondary);padding:2px 6px;border-radius:4px;color:var(--text-primary)}
+    hr{border:none;border-top:0.5px solid var(--border);margin:2.5rem 0}
+    .callout{border-left:3px solid var(--green);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:1rem 1.25rem;margin-bottom:1.5rem;background:var(--green-bg)}
+    .callout p{color:var(--green-text)!important;margin-bottom:0!important;font-size:14px}
+    .callout.amber{background:var(--amber-bg);border-left-color:var(--amber)}.callout.amber p{color:var(--amber-text)!important}
+    .callout.red{background:var(--red-bg);border-left-color:var(--red)}.callout.red p{color:var(--red-text)!important}
+    .callout.blue{background:var(--blue-bg);border-left-color:var(--blue)}.callout.blue p{color:var(--blue-text)!important}
+    .chart-wrap{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:1.75rem 0}
+    .chart-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:.2rem;font-family:'DM Mono',monospace}
+    .chart-sub{font-size:12px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px;margin:1rem 0}
+    .data-table th{text-align:left;padding:.6rem .85rem;background:var(--bg-secondary);color:var(--text-secondary);font-weight:500;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+    .data-table td{padding:.65rem .85rem;border-top:0.5px solid var(--border);color:var(--text-secondary);font-size:13px;vertical-align:top}
+    .data-table tr:hover td{background:var(--bg-secondary)}
+    .toc-sidebar{position:fixed;top:50%;transform:translateY(-50%);left:calc(50% - 542px);width:162px;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:0;border:none;margin:0}
+    @media(max-width:1240px){.toc-sidebar{display:none!important}}
+    .toc-heading{font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:1rem;opacity:.5}
+    .toc-item{display:flex;align-items:stretch;gap:10px;margin-bottom:3px;text-decoration:none;width:100%}
+    .toc-bar{flex-shrink:0;width:2px;background:var(--border);border-radius:1px;transition:background var(--transition)}
+    .toc-item.active .toc-bar,.toc-item:hover .toc-bar{background:var(--green)}
+    .toc-body{padding:4px 0;min-width:0}
+    .toc-num{font-size:10px;font-family:'DM Mono',monospace;color:var(--text-secondary);opacity:.45;display:block}
+    .toc-item.active .toc-num{opacity:1;color:var(--green-text)}
+    .toc-name{font-size:12px;color:var(--text-secondary);line-height:1.35;display:block;transition:color var(--transition)}
+    .toc-item.active .toc-name,.toc-item:hover .toc-name{color:var(--text-primary)}
+    .toc-item.active .toc-name{font-weight:500}
+    .toc-divider{width:100%;height:.5px;background:var(--border);margin:5px 0 8px}
+    .post-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:2rem;border-top:.5px solid var(--border);gap:1rem}
+    .post-nav a{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition);display:flex;align-items:center;gap:.4rem}
+    .post-nav a:hover{color:var(--green)}
+    @media(max-width:600px){.post-title{font-size:22px}}
+  </style>
+</head>
+<body>
+<div class="site">
+  <nav>
+    <div class="nav-left">
+      <a class="nav-logo" href="../../index.html">hinetabi.github.io</a>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()"><span id="toggleIcon">🌙</span><span id="toggleLabel">Dark</span></button>
+    </div>
+    <a class="back-link" href="../../index.html">← Home</a>
+  </nav>
+
+  <div class="series-nav">
+    <a href="p1-why-explore.html" class="series-step">P1<br>Why &amp; Init</a>
+    <a href="p2-missing-values.html" class="series-step">P2<br>Missing</a>
+    <a href="p3-univariate.html" class="series-step">P3<br>Univariate</a>
+    <a href="p4-bivariate.html" class="series-step">P4<br>Bivariate</a>
+    <a href="p5-multivariate.html" class="series-step active">P5<br>Multivariate</a>
+    <a href="p6-outliers.html" class="series-step">P6<br>Outliers</a>
+    <a href="p7-target.html" class="series-step">P7<br>Target</a>
+    <a href="p8-insights.html" class="series-step">P8<br>Insights</a>
+  </div>
+
+  <nav class="toc-sidebar" aria-label="Contents">
+    <div class="toc-heading">Contents</div>
+    <a class="toc-item" href="#what"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">01</span><span class="toc-name">What &amp; Why</span></div></a>
+    <a class="toc-item" href="#interaction"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">02</span><span class="toc-name">Interaction Effects</span></div></a>
+    <a class="toc-item" href="#heatmap"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">03</span><span class="toc-name">Grade × Collateral</span></div></a>
+    <a class="toc-item" href="#facets"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">04</span><span class="toc-name">Faceted Analysis</span></div></a>
+    <a class="toc-item" href="#policy"><div class="toc-bar"></div><div class="toc-body"><span class="toc-num">05</span><span class="toc-name">Credit Policy Rules</span></div></a>
+  </nav>
+
+  <div class="post-header">
+    <span class="series-label">EDA for Banking Loans · Part 5 of 8</span>
+    <h1 class="post-title">Multivariate Analysis — Where Credit Policy Lives</h1>
+    <p class="post-meta">Le Thanh Binh · Data Scientist, Cake by VPBank · April 2026</p>
+    <div><span class="post-tag tag-green">EDA</span><span class="post-tag tag-blue">Interactions</span><span class="post-tag tag-amber">Credit Policy</span></div>
+  </div>
+
+  <div class="post-content">
+
+    <h2 id="what"><span class="num">Section 01</span>What Is It &amp; Why Do We Need It?</h2>
+
+    <h3>What is multivariate analysis?</h3>
+    <p>Multivariate analysis examines <strong>three or more variables simultaneously</strong> — how combinations of features interact, whether the effect of one feature depends on the value of another, and which feature combinations produce the most extreme risk profiles.</p>
+
+    <h3>Why does it matter more in banking than in other domains?</h3>
+    <p>Banking risk is inherently combinatorial. A single variable almost never tells the full story. Consider:</p>
+    <p>A Grade C loan sounds moderate risk. But a Grade C loan with no collateral, from a self-employed borrower with a DTI of 0.6, is a fundamentally different product from a Grade C loan backed by property from a salaried borrower. Bivariate analysis sees the grade. Only multivariate analysis sees the combination.</p>
+    <p>This is not just an academic observation. The most important credit policy rules in any lending institution are multivariate: "No loans above 500M VND to Grade D or below with no collateral." "Freelance borrowers require at least Grade B." These rules did not come from intuition — they came from exactly this kind of analysis applied to historical default data.</p>
+
+    <div class="callout blue">
+      <p><strong>Why bivariate alone is not enough:</strong> <code>employment_type = Freelance</code> has a 12.4% average default rate. <code>loan_grade = D</code> has a 14.2% default rate. But Freelance + Grade D + no collateral has a 32% default rate — much higher than either factor alone would predict by simple addition. This <em>superadditive interaction</em> is invisible until you look at all three together.</p>
+    </div>
+
+    <h2 id="interaction"><span class="num">Section 02</span>What Is an Interaction Effect?</h2>
+
+    <p>An interaction effect occurs when the impact of one feature on default risk changes depending on the value of another feature. Formally: the effect of A on default is not constant — it depends on B.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Interaction Effect — DTI Impact Depends on Collateral</div>
+      <div class="chart-sub">DTI's effect on default is weaker when collateral exists — collateral modifies the risk of high DTI</div>
+      <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;font-family:'DM Sans',sans-serif">
+        <!-- No Collateral line (steep) -->
+        <text x="40" y="18" fill="#991B1B" font-size="12" font-weight="500">No Collateral</text>
+        <line x1="40" y1="165" x2="510" y2="165" stroke="rgba(0,0,0,0.12)" stroke-width="1"/>
+        <line x1="40" y1="125" x2="510" y2="125" stroke="rgba(0,0,0,0.05)" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="40" y1="85" x2="510" y2="85" stroke="rgba(0,0,0,0.05)" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="40" y1="45" x2="510" y2="45" stroke="rgba(0,0,0,0.05)" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="35" y="168" text-anchor="end" fill="#6b6b67" font-size="10" font-family="DM Mono">0%</text>
+        <text x="35" y="128" text-anchor="end" fill="#6b6b67" font-size="10" font-family="DM Mono">10%</text>
+        <text x="35" y="88" text-anchor="end" fill="#6b6b67" font-size="10" font-family="DM Mono">20%</text>
+        <text x="35" y="48" text-anchor="end" fill="#6b6b67" font-size="10" font-family="DM Mono">30%</text>
+        <!-- No collateral: steep ascent -->
+        <polyline points="60,158 160,142 260,120 360,88 460,48" stroke="rgba(239,68,68,0.85)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="60" cy="158" r="4" fill="rgba(239,68,68,0.85)"/>
+        <circle cx="160" cy="142" r="4" fill="rgba(239,68,68,0.85)"/>
+        <circle cx="260" cy="120" r="4" fill="rgba(239,68,68,0.85)"/>
+        <circle cx="360" cy="88" r="4" fill="rgba(239,68,68,0.85)"/>
+        <circle cx="460" cy="48" r="4" fill="rgba(239,68,68,0.85)"/>
+        <!-- With collateral: shallow ascent -->
+        <polyline points="60,162 160,158 260,152 360,143 460,132" stroke="rgba(29,158,117,0.85)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="60" cy="162" r="4" fill="rgba(29,158,117,0.85)"/>
+        <circle cx="160" cy="158" r="4" fill="rgba(29,158,117,0.85)"/>
+        <circle cx="260" cy="152" r="4" fill="rgba(29,158,117,0.85)"/>
+        <circle cx="360" cy="143" r="4" fill="rgba(29,158,117,0.85)"/>
+        <circle cx="460" cy="132" r="4" fill="rgba(29,158,117,0.85)"/>
+        <!-- Legend -->
+        <line x1="300" y1="18" x2="320" y2="18" stroke="rgba(239,68,68,0.85)" stroke-width="2.5"/>
+        <text x="325" y="22" fill="#991B1B" font-size="11">No collateral</text>
+        <line x1="300" y1="36" x2="320" y2="36" stroke="rgba(29,158,117,0.85)" stroke-width="2.5"/>
+        <text x="325" y="40" fill="#0F6E56" font-size="11">With collateral</text>
+        <!-- X labels -->
+        <text x="60" y="182" text-anchor="middle" fill="#6b6b67" font-size="10">DTI 0.1</text>
+        <text x="160" y="182" text-anchor="middle" fill="#6b6b67" font-size="10">DTI 0.2</text>
+        <text x="260" y="182" text-anchor="middle" fill="#6b6b67" font-size="10">DTI 0.3</text>
+        <text x="360" y="182" text-anchor="middle" fill="#6b6b67" font-size="10">DTI 0.5</text>
+        <text x="460" y="182" text-anchor="middle" fill="#6b6b67" font-size="10">DTI 0.7</text>
+      </svg>
+    </div>
+
+    <p>The two lines diverge significantly as DTI increases. For borrowers with collateral (green line), even a high DTI of 0.7 results in only about an 8% default rate — the collateral provides security. For borrowers without collateral (red line), the same DTI pushes default rate above 30%. DTI and collateral are not independent; they interact. A model that ignores this interaction will systematically underestimate risk for high-DTI, uncollateralized borrowers.</p>
+
+    <h2 id="heatmap"><span class="num">Section 03</span>Loan Grade × Collateral Type — Risk Grid</h2>
+
+    <h3>What is it?</h3>
+    <p>A two-dimensional heatmap where rows are loan grades and columns are collateral types, with each cell showing the default rate for that exact combination. This is the most direct way to visualize a two-way interaction between categorical features.</p>
+
+    <h3>Why does it reveal what bivariate analysis misses?</h3>
+    <p>Bivariate analysis tells you Grade C has 7.8% default and "no collateral" has 15.8% default. Multivariate tells you Grade C with no collateral has 10.2% default — which is similar to Grade D with property collateral (9.8%). This equivalence is invisible from the two individual charts but immediately visible in the grid below.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Default Rate Grid: Loan Grade × Collateral Type</div>
+      <div class="chart-sub">Each cell = observed default rate for that combination · Deeper red = higher risk</div>
+      <svg viewBox="0 0 580 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;font-family:'DM Sans',sans-serif">
+        <!-- Column headers -->
+        <text x="197" y="20" text-anchor="middle" fill="#6b6b67" font-size="11">No Collateral</text>
+        <text x="295" y="20" text-anchor="middle" fill="#6b6b67" font-size="11">Property</text>
+        <text x="393" y="20" text-anchor="middle" fill="#6b6b67" font-size="11">Vehicle</text>
+        <text x="491" y="20" text-anchor="middle" fill="#6b6b67" font-size="11">Securities</text>
+
+        <!-- Grade A row -->
+        <text x="90" y="54" text-anchor="end" fill="#0F6E56" font-size="12" font-weight="500">Grade A</text>
+        <rect x="150" y="36" width="94" height="30" rx="4" fill="rgba(29,158,117,0.08)"/><text x="197" y="56" text-anchor="middle" fill="#0F6E56" font-size="11" font-family="DM Mono">1.8%</text>
+        <rect x="248" y="36" width="94" height="30" rx="4" fill="rgba(29,158,117,0.2)"/><text x="295" y="56" text-anchor="middle" fill="#0F6E56" font-size="11" font-family="DM Mono">0.6%</text>
+        <rect x="346" y="36" width="94" height="30" rx="4" fill="rgba(29,158,117,0.14)"/><text x="393" y="56" text-anchor="middle" fill="#0F6E56" font-size="11" font-family="DM Mono">0.9%</text>
+        <rect x="444" y="36" width="94" height="30" rx="4" fill="rgba(29,158,117,0.22)"/><text x="491" y="56" text-anchor="middle" fill="#0F6E56" font-size="11" font-family="DM Mono">0.4%</text>
+
+        <!-- Grade B row -->
+        <text x="90" y="102" text-anchor="end" fill="#6b6b67" font-size="12" font-weight="500">Grade B</text>
+        <rect x="150" y="82" width="94" height="30" rx="4" fill="rgba(239,68,68,0.12)"/><text x="197" y="102" text-anchor="middle" fill="#6b6b67" font-size="11" font-family="DM Mono">4.8%</text>
+        <rect x="248" y="82" width="94" height="30" rx="4" fill="rgba(29,158,117,0.12)"/><text x="295" y="102" text-anchor="middle" fill="#0F6E56" font-size="11" font-family="DM Mono">1.9%</text>
+        <rect x="346" y="82" width="94" height="30" rx="4" fill="rgba(239,68,68,0.1)"/><text x="393" y="102" text-anchor="middle" fill="#6b6b67" font-size="11" font-family="DM Mono">2.8%</text>
+        <rect x="444" y="82" width="94" height="30" rx="4" fill="rgba(29,158,117,0.14)"/><text x="491" y="102" text-anchor="middle" fill="#0F6E56" font-size="11" font-family="DM Mono">1.4%</text>
+
+        <!-- Grade C row -->
+        <text x="90" y="150" text-anchor="end" fill="#6b6b67" font-size="12" font-weight="500">Grade C</text>
+        <rect x="150" y="128" width="94" height="30" rx="4" fill="rgba(239,68,68,0.28)"/><text x="197" y="150" text-anchor="middle" fill="#991B1B" font-size="11" font-family="DM Mono" font-weight="500">10.2%</text>
+        <rect x="248" y="128" width="94" height="30" rx="4" fill="rgba(239,68,68,0.12)"/><text x="295" y="150" text-anchor="middle" fill="#6b6b67" font-size="11" font-family="DM Mono">4.5%</text>
+        <rect x="346" y="128" width="94" height="30" rx="4" fill="rgba(239,68,68,0.2)"/><text x="393" y="150" text-anchor="middle" fill="#991B1B" font-size="11" font-family="DM Mono">7.1%</text>
+        <rect x="444" y="128" width="94" height="30" rx="4" fill="rgba(239,68,68,0.1)"/><text x="491" y="150" text-anchor="middle" fill="#6b6b67" font-size="11" font-family="DM Mono">3.2%</text>
+
+        <!-- Grade D row -->
+        <text x="90" y="198" text-anchor="end" fill="#6b6b67" font-size="12" font-weight="500">Grade D</text>
+        <rect x="150" y="176" width="94" height="30" rx="4" fill="rgba(239,68,68,0.55)"/><text x="197" y="198" text-anchor="middle" fill="#991B1B" font-size="11" font-family="DM Mono" font-weight="500">21.4%</text>
+        <rect x="248" y="176" width="94" height="30" rx="4" fill="rgba(239,68,68,0.22)"/><text x="295" y="198" text-anchor="middle" fill="#991B1B" font-size="11" font-family="DM Mono">9.8% ≈C-None</text>
+        <rect x="346" y="176" width="94" height="30" rx="4" fill="rgba(239,68,68,0.32)"/><text x="393" y="198" text-anchor="middle" fill="#991B1B" font-size="11" font-family="DM Mono">14.3%</text>
+        <rect x="444" y="176" width="94" height="30" rx="4" fill="rgba(239,68,68,0.17)"/><text x="491" y="198" text-anchor="middle" fill="#991B1B" font-size="11" font-family="DM Mono">7.2%</text>
+
+        <!-- Grade E+ row -->
+        <text x="90" y="246" text-anchor="end" fill="#991B1B" font-size="12" font-weight="500">Grade E–G</text>
+        <rect x="150" y="224" width="94" height="30" rx="4" fill="rgba(239,68,68,0.88)"/><text x="197" y="246" text-anchor="middle" fill="#fff" font-size="11" font-family="DM Mono" font-weight="500">38.1%</text>
+        <rect x="248" y="224" width="94" height="30" rx="4" fill="rgba(239,68,68,0.45)"/><text x="295" y="246" text-anchor="middle" fill="#991B1B" font-size="11" font-family="DM Mono" font-weight="500">19.5%</text>
+        <rect x="346" y="224" width="94" height="30" rx="4" fill="rgba(239,68,68,0.65)"/><text x="393" y="246" text-anchor="middle" fill="#fff" font-size="11" font-family="DM Mono" font-weight="500">28.7%</text>
+        <rect x="444" y="224" width="94" height="30" rx="4" fill="rgba(239,68,68,0.32)"/><text x="491" y="246" text-anchor="middle" fill="#991B1B" font-size="11" font-family="DM Mono">14.2%</text>
+      </svg>
+    </div>
+
+    <div class="callout">
+      <p><strong>The Grade C ≈ Grade D insight:</strong> Grade C (No Collateral) = 10.2% default rate is nearly identical to Grade D (Property) = 9.8%. This means the bank's grade system and collateral requirement are not independent risk factors — they substitute for each other at the margin. A Grade C unsecured loan should be priced like a Grade D secured loan. This is an EDA finding that directly feeds into pricing and underwriting policy.</p>
+    </div>
+
+    <h2 id="facets"><span class="num">Section 04</span>Faceted Analysis — Age Distribution by Segment</h2>
+
+    <h3>What is it?</h3>
+    <p>A faceted chart creates a grid of small sub-charts — each showing the same distribution for a different subset of the data. It is the multivariate equivalent of a histogram: instead of one distribution for the whole population, you see how the distribution shifts across combinations of segments.</p>
+
+    <h3>Why does it matter?</h3>
+    <p>Facets reveal whether a pattern you see in the whole population is consistent across segments, or driven by one specific sub-group. If the age distribution of defaulters looks similar across all loan purposes, age is a genuine cross-cutting risk factor. If the pattern only holds for Business loans but not for Personal loans, the relationship is segment-specific — and a model that pools the populations together will miss this nuance.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Age Distribution — Defaulters vs Non-defaulters by Loan Purpose</div>
+      <div class="chart-sub">Facets show whether the age-default relationship is consistent across loan purposes</div>
+      <svg viewBox="0 0 580 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;font-family:'DM Sans',sans-serif">
+        <!-- Legend -->
+        <rect x="380" y="5" width="12" height="10" rx="2" fill="rgba(239,68,68,0.7)"/>
+        <text x="396" y="15" fill="#6b6b67" font-size="11">Defaulted</text>
+        <rect x="460" y="5" width="12" height="10" rx="2" fill="rgba(29,158,117,0.5)"/>
+        <text x="476" y="15" fill="#6b6b67" font-size="11">Not defaulted</text>
+
+        <!-- Personal Loans facet -->
+        <text x="80" y="30" text-anchor="middle" fill="#6b6b67" font-size="11" font-weight="500">Personal Loans</text>
+        <line x1="10" y1="115" x2="150" y2="115" stroke="rgba(0,0,0,0.12)" stroke-width="1"/>
+        <!-- age bars: 18-25, 25-35, 35-45, 45-55, 55+ -->
+        <rect x="15" y="95" width="22" height="20" rx="2" fill="rgba(239,68,68,0.7)"/>
+        <rect x="15" y="75" width="22" height="40" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="42" y="65" width="22" height="50" rx="2" fill="rgba(239,68,68,0.65)"/>
+        <rect x="42" y="45" width="22" height="70" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="69" y="70" width="22" height="45" rx="2" fill="rgba(239,68,68,0.6)"/>
+        <rect x="69" y="52" width="22" height="63" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="96" y="83" width="22" height="32" rx="2" fill="rgba(239,68,68,0.55)"/>
+        <rect x="96" y="60" width="22" height="55" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="123" y="92" width="22" height="23" rx="2" fill="rgba(239,68,68,0.45)"/>
+        <rect x="123" y="70" width="22" height="45" rx="2" fill="rgba(29,158,117,0.4)"/>
+        <text x="26" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">18–25</text>
+        <text x="53" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">25–35</text>
+        <text x="80" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">35–45</text>
+        <text x="107" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">45–55</text>
+        <text x="134" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">55+</text>
+
+        <!-- Business Loans facet -->
+        <text x="290" y="30" text-anchor="middle" fill="#6b6b67" font-size="11" font-weight="500">Business Loans</text>
+        <line x1="220" y1="115" x2="360" y2="115" stroke="rgba(0,0,0,0.12)" stroke-width="1"/>
+        <!-- Younger age = higher default in business loans -->
+        <rect x="225" y="55" width="22" height="60" rx="2" fill="rgba(239,68,68,0.85)"/>
+        <rect x="225" y="40" width="22" height="35" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="252" y="68" width="22" height="47" rx="2" fill="rgba(239,68,68,0.72)"/>
+        <rect x="252" y="45" width="22" height="60" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="279" y="85" width="22" height="30" rx="2" fill="rgba(239,68,68,0.55)"/>
+        <rect x="279" y="55" width="22" height="60" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="306" y="95" width="22" height="20" rx="2" fill="rgba(239,68,68,0.4)"/>
+        <rect x="306" y="55" width="22" height="60" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="333" y="100" width="22" height="15" rx="2" fill="rgba(239,68,68,0.3)"/>
+        <rect x="333" y="60" width="22" height="55" rx="2" fill="rgba(29,158,117,0.4)"/>
+        <text x="236" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">18–25</text>
+        <text x="263" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">25–35</text>
+        <text x="290" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">35–45</text>
+        <text x="317" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">45–55</text>
+        <text x="344" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">55+</text>
+        <!-- Annotation -->
+        <text x="290" y="148" text-anchor="middle" fill="#991B1B" font-size="10" font-style="italic">Younger borrowers drive business default</text>
+
+        <!-- Home Loans facet -->
+        <text x="500" y="30" text-anchor="middle" fill="#6b6b67" font-size="11" font-weight="500">Home Loans</text>
+        <line x1="430" y1="115" x2="570" y2="115" stroke="rgba(0,0,0,0.12)" stroke-width="1"/>
+        <!-- Very flat — low default across all ages -->
+        <rect x="435" y="103" width="22" height="12" rx="2" fill="rgba(239,68,68,0.45)"/>
+        <rect x="435" y="70" width="22" height="45" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="462" y="100" width="22" height="15" rx="2" fill="rgba(239,68,68,0.4)"/>
+        <rect x="462" y="60" width="22" height="55" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="489" y="101" width="22" height="14" rx="2" fill="rgba(239,68,68,0.38)"/>
+        <rect x="489" y="55" width="22" height="60" rx="2" fill="rgba(29,158,117,0.45)"/>
+        <rect x="516" y="102" width="22" height="13" rx="2" fill="rgba(239,68,68,0.35)"/>
+        <rect x="516" y="57" width="22" height="58" rx="2" fill="rgba(29,158,117,0.4)"/>
+        <rect x="543" y="104" width="22" height="11" rx="2" fill="rgba(239,68,68,0.3)"/>
+        <rect x="543" y="62" width="22" height="53" rx="2" fill="rgba(29,158,117,0.38)"/>
+        <text x="446" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">18–25</text>
+        <text x="473" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">25–35</text>
+        <text x="500" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">35–45</text>
+        <text x="527" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">45–55</text>
+        <text x="554" y="127" text-anchor="middle" fill="#6b6b67" font-size="8">55+</text>
+        <text x="500" y="148" text-anchor="middle" fill="#0F6E56" font-size="10" font-style="italic">Age barely affects home loan default</text>
+
+        <text x="290" y="190" text-anchor="middle" fill="#6b6b67" font-size="12">Age → Default relationship is different for each loan purpose. A single age coefficient across all purposes would be misleading.</text>
+      </svg>
+    </div>
+
+    <h2 id="policy"><span class="num">Section 05</span>From EDA to Credit Policy Rules</h2>
+
+    <h3>What is it?</h3>
+    <p>Credit policy rules are hard cutoffs that the bank applies before a model score — "no loans to Grade F+ customers regardless of score," or "Freelance borrowers require collateral." These rules exist because in certain combinations, risk is so high that a model score offers no additional discrimination.</p>
+
+    <h3>Why does multivariate EDA generate them?</h3>
+    <p>A bivariate default rate of 14.2% for Grade D is concerning but manageable with higher pricing. A multivariate finding that Grade D + Freelance + no collateral produces a 32% default rate is not a pricing problem — it is a policy problem. No interest rate can be set high enough to make that combination viable in a regulated consumer lending context without becoming predatory.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Policy Rules Derived from Multivariate EDA</div>
+      <div class="chart-sub">Each rule corresponds to a specific combination where default rate exceeds the viable threshold</div>
+      <table class="data-table">
+        <thead><tr><th>Combination Found in EDA</th><th>Observed Default Rate</th><th>Policy Decision</th></tr></thead>
+        <tbody>
+          <tr><td>Grade E–G + No Collateral</td><td><strong>38.1%</strong></td><td>Automatic decline regardless of score</td></tr>
+          <tr><td>Grade D + Freelance + No Collateral</td><td><strong>~32%</strong></td><td>Decline or require 2× security deposit</td></tr>
+          <tr><td>Grade C + No Collateral + DTI &gt; 0.5</td><td><strong>~18%</strong></td><td>Require manual underwriter review</td></tr>
+          <tr><td>Grade A/B + Property Collateral</td><td><strong>&lt;2%</strong></td><td>Eligible for fast-track automated approval</td></tr>
+          <tr><td>Business Loan + Age &lt; 25</td><td><strong>~25%</strong></td><td>Cap loan amount at 50M VND; require co-signor</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout amber">
+      <p><strong>The data scientist's responsibility:</strong> When multivariate EDA reveals that a certain combination produces very high default rates, documenting and surfacing that finding is essential. The decision about whether to create a hard policy rule — vs. letting the model score handle it — belongs to the risk and business teams. But the data scientist must make the finding visible and quantifiable. An EDA report that only shows marginal distributions will miss these combinations entirely.</p>
+    </div>
+
+    <hr>
+    <p>In <strong>Part 6</strong>, we move to outlier detection — examining which data points fall far outside the normal range, and, critically, deciding whether each one is a data error or a genuine high-risk signal worth keeping.</p>
+
+  </div>
+
+  <div class="post-nav">
+    <a href="p4-bivariate.html">← Part 4: Bivariate</a>
+    <a href="p6-outliers.html">Part 6: Outliers →</a>
+  </div>
+</div>
+
+<script>
+  (function(){const s=localStorage.getItem('theme');if(s==='dark'){document.body.classList.add('dark');document.getElementById('toggleIcon').textContent='☀️';document.getElementById('toggleLabel').textContent='Light';}})();
+  function toggleDark(){const d=document.body.classList.toggle('dark');document.getElementById('toggleIcon').textContent=d?'☀️':'🌙';document.getElementById('toggleLabel').textContent=d?'Light':'Dark';localStorage.setItem('theme',d?'dark':'light');}
+  (function(){const ids=['what','interaction','heatmap','facets','policy'];const items=document.querySelectorAll('.toc-item');function upd(){let c=0;ids.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<160)c=i;});items.forEach((it,i)=>it.classList.toggle('active',i===c));}window.addEventListener('scroll',upd,{passive:true});upd();})();
+</script>
+</body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Part 7: Target variable deep dive in banking EDA — class imbalance, default rate segmentation, vintage analysis, and how to define is_default correctly.">
+  <title>P7: Target Variable — EDA for Banking Loans | hinetabi.github.io</title>
+  <link rel="canonical" href="https://hinetabi.github.io/blog/eda-banking/p7-target.html">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3LNV66EG8G"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3LNV66EG8G');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafaf8;--bg-secondary:#f1efea;--bg-card:#ffffff;--text-primary:#1a1a18;--text-secondary:#6b6b67;--border:rgba(0,0,0,0.1);--border-hover:rgba(0,0,0,0.2);--green:#1D9E75;--green-bg:#E1F5EE;--green-text:#0F6E56;--amber:#D97706;--amber-bg:#FEF3C7;--amber-text:#92400E;--red:#EF4444;--red-bg:#FEE2E2;--red-text:#991B1B;--blue:#3B82F6;--blue-bg:#EFF6FF;--blue-text:#1D4ED8;--purple:#7C3AED;--purple-bg:#EDE9FE;--purple-text:#5B21B6;--radius-md:8px;--radius-lg:14px;--radius-pill:999px;--transition:0.25s ease}
+    body.dark{--bg:#111110;--bg-secondary:#1c1c1a;--bg-card:#1c1c1a;--text-primary:#f0ede6;--text-secondary:#888780;--border:rgba(255,255,255,0.09);--border-hover:rgba(255,255,255,0.18);--green-bg:rgba(29,158,117,0.15);--green-text:#6ee9c0;--amber-bg:rgba(217,119,6,0.15);--amber-text:#fcd34d;--red-bg:rgba(239,68,68,0.15);--red-text:#fca5a5;--blue-bg:rgba(59,130,246,0.15);--blue-text:#93c5fd;--purple-bg:rgba(124,58,237,0.15);--purple-text:#c4b5fd}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);transition:background var(--transition),color var(--transition);min-height:100vh}
+    .site{max-width:720px;margin:0 auto;padding:0 1.5rem 5rem}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:1.4rem 0;border-bottom:0.5px solid var(--border);margin-bottom:2.5rem}
+    .nav-left{display:flex;align-items:center;gap:1rem}
+    .nav-logo{font-size:15px;font-weight:500;color:var(--text-primary);font-family:'DM Mono',monospace;text-decoration:none}
+    .toggle-btn{font-size:13px;font-family:'DM Sans',sans-serif;padding:5px 13px;border:0.5px solid var(--border-hover);border-radius:var(--radius-pill);background:var(--bg-secondary);color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background var(--transition),border-color var(--transition)}
+    .toggle-btn:hover{border-color:var(--green)}
+    .back-link{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition)}
+    .back-link:hover{color:var(--text-primary)}
+    .series-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:2.5rem}
+    .series-step{padding:7px 0;border-radius:var(--radius-md);text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:500;border:0.5px solid var(--border);color:var(--text-secondary);text-decoration:none;transition:all var(--transition);line-height:1.3}
+    .series-step:hover{border-color:var(--green);color:var(--green)}
+    .series-step.active{background:var(--green);color:#fff;border-color:var(--green)}
+    .post-header{margin-bottom:2.5rem}
+    .series-label{font-size:11px;color:var(--text-secondary);font-family:'DM Mono',monospace;margin-bottom:.4rem;letter-spacing:.05em;text-transform:uppercase;display:block}
+    .post-title{font-size:28px;font-weight:500;color:var(--text-primary);line-height:1.25;letter-spacing:-.5px;margin-bottom:.75rem}
+    .post-meta{font-size:13px;color:var(--text-secondary);margin-bottom:1rem}
+    .post-tag{font-size:12px;font-weight:500;padding:4px 11px;border-radius:var(--radius-pill);display:inline-block;margin-right:6px}
+    .tag-green{background:var(--green-bg);color:var(--green-text)}.tag-blue{background:var(--blue-bg);color:var(--blue-text)}.tag-amber{background:var(--amber-bg);color:var(--amber-text)}.tag-red{background:var(--red-bg);color:var(--red-text)}.tag-purple{background:var(--purple-bg);color:var(--purple-text)}
+    .post-content{line-height:1.8}
+    .post-content p{font-size:15px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .post-content h2{font-size:19px;font-weight:500;color:var(--text-primary);margin-top:3rem;margin-bottom:.85rem;letter-spacing:-.3px}
+    .post-content h2 .num{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);font-weight:500;display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.06em}
+    .post-content h3{font-size:16px;font-weight:500;color:var(--text-primary);margin-top:1.75rem;margin-bottom:.5rem}
+    .post-content strong{color:var(--text-primary);font-weight:500}
+    .post-content code{font-family:'DM Mono',monospace;font-size:13px;background:var(--bg-secondary);padding:2px 6px;border-radius:4px;color:var(--text-primary)}
+    hr{border:none;border-top:0.5px solid var(--border);margin:2.5rem 0}
+    .callout{border-left:3px solid var(--green);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:1rem 1.25rem;margin-bottom:1.5rem;background:var(--green-bg)}
+    .callout p{color:var(--green-text)!important;margin-bottom:0!important;font-size:14px}
+    .callout.amber{background:var(--amber-bg);border-left-color:var(--amber)}.callout.amber p{color:var(--amber-text)!important}
+    .callout.red{background:var(--red-bg);border-left-color:var(--red)}.callout.red p{color:var(--red-text)!important}
+    .callout.blue{background:var(--blue-bg);border-left-color:var(--blue)}.callout.blue p{color:var(--blue-text)!important}
+    .callout.purple{background:var(--purple-bg);border-left-color:var(--purple)}.callout.purple p{color:var(--purple-text)!important}
+    .chart-wrap{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:1.75rem 0}
+    .chart-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:.2rem;font-family:'DM Mono',monospace}
+    .chart-sub{font-size:12px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px;margin:1rem 0}
+    .data-table th{text-align:left;padding:.6rem .85rem;background:var(--bg-secondary);color:var(--text-secondary);font-weight:500;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+    .data-table td{padding:.65rem .85rem;border-top:0.5px solid var(--border);color:var(--text-secondary);font-size:13px;vertical-align:top}
+    .data-table tr:hover td{background:var(--bg-secondary)}
+    .toc-sidebar{position:fixed;top:50%;transform:translateY(-50%);left:calc(50% - 542px);width:162px;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:0;border:none;margin:0}
+    @media(max-width:1240px){.toc-sidebar{display:none!important}}
+    .toc-heading{font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:1rem;opacity:.5}
+    .toc-item{display:flex;align-items:stretch;gap:10px;margin-bottom:3px;text-decoration:none;width:100%}
+    .toc-bar{flex-shrink:0;width:2px;background:var(--border);border-radius:1px;transition:background var(--transition)}
+    .toc-item.active .toc-bar,.toc-item:hover .toc-bar{background:var(--green)}
+    .toc-body{padding:4px 0;min-width:0}
+    .toc-num{font-size:10px;font-family:'DM Mono',monospace;color:var(--text-secondary);opacity:.45;display:block}
+    .toc-item.active .toc-num{opacity:1;color:var(--green-text)}
+    .toc-name{font-size:12px;color:var(--text-secondary);line-height:1.35;display:block;transition:color var(--transition)}
+    .toc-item.active .toc-name,.toc-item:hover .toc-name{color:var(--text-primary)}
+    .toc-item.active .toc-name{font-weight:500}
+    .toc-divider{width:100%;height:.5px;background:var(--border);margin:5px 0 8px}
+    .post-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:2rem;border-top:.5px solid var(--border);gap:1rem}
+    .post-nav a{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition);display:flex;align-items:center;gap:.4rem}
+    .post-nav a:hover{color:var(--green)}
+    @media(max-width:600px){.post-title{font-size:22px}}
+  </style>
+</head>
+<body>
+<div class="site">
+  <nav>
+    <div class="nav-left">
+      <a class="nav-logo" href="../../index.html">hinetabi.github.io</a>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()"><span id="toggleIcon">🌙</span><span id="toggleLabel">Dark</span></button>
+    </div>
+    <a class="back-link" href="../../index.html">← Home</a>
+  </nav>
+
+  <!-- TOC Sidebar -->
+  <aside class="toc-sidebar" id="tocSidebar">
+    <div class="toc-heading">On this page</div>
+    <a class="toc-item" href="#target-definition" data-section="target-definition">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">01</span><span class="toc-name">Defining the Target</span></div>
+    </a>
+    <a class="toc-item" href="#class-imbalance" data-section="class-imbalance">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">02</span><span class="toc-name">Class Imbalance</span></div>
+    </a>
+    <a class="toc-item" href="#default-by-segment" data-section="default-by-segment">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">03</span><span class="toc-name">Default by Segment</span></div>
+    </a>
+    <a class="toc-item" href="#vintage-analysis" data-section="vintage-analysis">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">04</span><span class="toc-name">Vintage Analysis</span></div>
+    </a>
+    <a class="toc-item" href="#metric-selection" data-section="metric-selection">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">05</span><span class="toc-name">Metric Selection</span></div>
+    </a>
+    <a class="toc-item" href="#target-checklist" data-section="target-checklist">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">06</span><span class="toc-name">Target Checklist</span></div>
+    </a>
+  </aside>
+
+  <!-- Series Nav -->
+  <div class="series-nav">
+    <a class="series-step" href="p1-why-explore.html">P1<br>Why EDA</a>
+    <a class="series-step" href="p2-missing-values.html">P2<br>Missing</a>
+    <a class="series-step" href="p3-univariate.html">P3<br>Univariate</a>
+    <a class="series-step" href="p4-bivariate.html">P4<br>Bivariate</a>
+    <a class="series-step" href="p5-multivariate.html">P5<br>Multivariate</a>
+    <a class="series-step" href="p6-outliers.html">P6<br>Outliers</a>
+    <a class="series-step active" href="p7-target.html">P7<br>Target Var</a>
+    <a class="series-step" href="p8-insights.html">P8<br>Insights</a>
+  </div>
+
+  <!-- Post Header -->
+  <header class="post-header">
+    <span class="series-label">EDA for Banking Loans · Part 7 of 8</span>
+    <h1 class="post-title">Target Variable Deep Dive —<br>Understanding What You're Predicting</h1>
+    <div class="post-meta">Le Thanh Binh · Data Scientist, Cake by VPBank · April 2026</div>
+    <span class="post-tag tag-red">Class Imbalance</span>
+    <span class="post-tag tag-purple">Target Definition</span>
+    <span class="post-tag tag-amber">Vintage Analysis</span>
+  </header>
+
+  <div class="post-content">
+
+    <p>Before building any model, you must deeply understand the thing you're predicting. In credit risk, this is <code>is_default</code> — a binary label that appears simple but hides a minefield of definitional choices, temporal traps, and measurement ambiguities. How you define, explore, and validate this variable often matters more than the algorithm you choose.</p>
+
+    <p>Most EDA guides spend five minutes on the target variable: count the classes, check the ratio, move on. This part argues that you should spend proportionally <em>more</em> time on the target than on any other single feature — because every downstream model quality metric flows from it.</p>
+
+    <hr>
+
+    <h2 id="target-definition"><span class="num">01 — Definition</span>What Does "Default" Actually Mean?</h2>
+
+    <p>In regulatory terms, the Basel Committee defines default as a borrower being 90+ days past due (DPD) on any material obligation. But in practice, different banks use different cutoffs, and the EDA analyst must verify which definition was applied before trusting any label.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Common is_default Definitions in Vietnamese Consumer Banking</div>
+      <div class="chart-sub">Each definition captures a different risk horizon and population</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Definition</th><th>Trigger</th><th>% of Loans Affected</th><th>Use Case</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Basel Standard</strong></td>
+            <td>90+ DPD on any payment</td>
+            <td>~8–12%</td>
+            <td>Regulatory capital, IFRS 9</td>
+          </tr>
+          <tr>
+            <td><strong>Early Default</strong></td>
+            <td>30+ DPD within first 12 months</td>
+            <td>~5–8%</td>
+            <td>Acquisition model monitoring</td>
+          </tr>
+          <tr>
+            <td><strong>Write-off</strong></td>
+            <td>Loan written off the books</td>
+            <td>~2–4%</td>
+            <td>Loss given default (LGD) modeling</td>
+          </tr>
+          <tr>
+            <td><strong>Restructured</strong></td>
+            <td>Any repayment restructuring event</td>
+            <td>~15–20%</td>
+            <td>Early warning systems</td>
+          </tr>
+          <tr>
+            <td><strong>SBV Group 3–5</strong></td>
+            <td>SBV Circular 11, debt group ≥ 3</td>
+            <td>~10–15%</td>
+            <td>Regulatory reporting, Vietnam-specific</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout amber">
+      <p><strong>The observation window trap:</strong> A loan issued in Q4 2023 may not have had enough time to default by Q2 2024. If you include these "immature" loans in your training data, they'll appear as non-defaults even though some would have defaulted given more time. This right-censoring problem is why target variable EDA must always include a temporal component.</p>
+    </div>
+
+    <h2 id="class-imbalance"><span class="num">02 — Imbalance</span>Class Distribution and Why It Changes Everything</h2>
+
+    <p>In most consumer loan portfolios, defaults are the minority class — typically 5–20%. This is not a coincidence: banks only survive by approving mostly good loans. But this structural imbalance creates serious problems for naive model training.</p>
+
+    <!-- Class Imbalance Donut SVG -->
+    <div class="chart-wrap">
+      <div class="chart-title">is_default — Class Distribution</div>
+      <div class="chart-sub">Illustrative: 88% non-default vs 12% default in loan portfolio</div>
+      <svg viewBox="0 0 660 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .ci-lab{font-family:'DM Sans',sans-serif;font-size:12px;fill:var(--text-secondary,#6b6b67)}
+            .ci-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:600;fill:var(--text-primary,#1a1a18)}
+            .ci-sub{font-family:'DM Mono',monospace;font-size:11px;fill:var(--text-secondary,#6b6b67)}
+          </style>
+        </defs>
+
+        <!-- Donut: 360 * 0.88 = 316.8 degrees for 0, 43.2 for 1 -->
+        <!-- Center at 165, 110 radius 80 -->
+        <!-- Non-default arc: start 0° (top), sweep 316.8° -->
+        <!-- cos(0) = 0, sin(0) = -1 → start 165,30 -->
+        <!-- 316.8° = 316.8*π/180 = 5.528 rad; end angle = 316.8° = -43.2° from start, or +316.8° -->
+        <!-- x = 165 + 80*sin(316.8*π/180) = 165 + 80*(-0.682) = 165-54.6 = 110.4 -->
+        <!-- y = 110 - 80*cos(316.8*π/180) = 110 - 80*(0.731) = 110-58.5 = 51.5 -->
+
+        <!-- Non-default (green) large arc -->
+        <path d="M165,30 A80,80 0 1,1 110,52 Z" fill="var(--green,#1D9E75)" opacity="0.85"/>
+        <!-- Default (red) small arc -->
+        <path d="M110,52 A80,80 0 0,1 165,30 Z" fill="var(--red,#EF4444)" opacity="0.85"/>
+
+        <!-- Inner white circle (donut hole) -->
+        <circle cx="165" cy="110" r="52" fill="var(--bg-card,#ffffff)"/>
+
+        <!-- Center text -->
+        <text x="165" y="105" class="ci-val" text-anchor="middle">88%</text>
+        <text x="165" y="122" class="ci-sub" text-anchor="middle">Non-default</text>
+
+        <!-- Legend -->
+        <rect x="290" y="70" width="12" height="12" rx="3" fill="var(--green,#1D9E75)"/>
+        <text x="308" y="81" class="ci-lab">Non-default (is_default=0)</text>
+        <text x="308" y="98" font-family="'DM Mono',monospace" font-size="14" font-weight="600" fill="var(--green,#1D9E75)">88,000 loans</text>
+        <text x="308" y="113" class="ci-lab" fill="var(--green-text,#0F6E56)">88.0% of dataset</text>
+
+        <rect x="290" y="132" width="12" height="12" rx="3" fill="var(--red,#EF4444)"/>
+        <text x="308" y="143" class="ci-lab">Default (is_default=1)</text>
+        <text x="308" y="160" font-family="'DM Mono',monospace" font-size="14" font-weight="600" fill="var(--red,#EF4444)">12,000 loans</text>
+        <text x="308" y="175" class="ci-lab" fill="var(--red-text,#991B1B)">12.0% of dataset</text>
+
+        <!-- Imbalance ratio -->
+        <rect x="290" y="188" width="340" height="24" rx="6" fill="var(--amber-bg,#FEF3C7)"/>
+        <text x="460" y="205" font-family="'DM Mono',monospace" font-size="11" text-anchor="middle" fill="var(--amber-text,#92400E)">Imbalance ratio: 7.3 : 1 (Non-default : Default)</text>
+      </svg>
+    </div>
+
+    <p>A 7:1 imbalance means a model that predicts "never default" for every borrower achieves 88% accuracy — while being completely useless. Accuracy is the wrong metric. This is why EDA on the target variable must surface the imbalance explicitly, before anyone proposes using accuracy as a model evaluation criterion.</p>
+
+    <div class="callout red">
+      <p><strong>The accuracy illusion:</strong> Presenting a credit risk model with 88% accuracy to a bank stakeholder who doesn't understand imbalance is dangerous. They may approve a model that approves every application — causing massive losses. Always report precision, recall, F1, and AUC-ROC for imbalanced classification problems. Never use accuracy alone.</p>
+    </div>
+
+    <h2 id="default-by-segment"><span class="num">03 — Segmentation</span>Default Rate Across Key Segments</h2>
+
+    <p>The overall 12% default rate is an aggregate that hides enormous variation by segment. EDA should compute and visualize the default rate across each major feature to understand where risk concentrates.</p>
+
+    <!-- Default Rate by Segment Horizontal Bars -->
+    <div class="chart-wrap">
+      <div class="chart-title">Default Rate by Segment — Selected Features</div>
+      <div class="chart-sub">The overall rate of 12% masks extreme variation across groups</div>
+      <svg viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .seg-lab{font-family:'DM Sans',sans-serif;font-size:12px;fill:var(--text-secondary,#6b6b67);text-anchor:end}
+            .seg-pct{font-family:'DM Mono',monospace;font-size:11px;font-weight:600}
+            .seg-head{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;fill:var(--text-secondary,#6b6b67)}
+          </style>
+        </defs>
+
+        <!-- Reference line at 12% (overall) -->
+        <!-- x-axis: 175 to 620, 445px for 0–50% range. 12% = 445*0.24 = 106.8 → x=281.8 -->
+        <line x1="282" y1="10" x2="282" y2="310" stroke="var(--amber,#D97706)" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+        <text x="282" y="8" class="seg-head" text-anchor="middle" fill="var(--amber,#D97706)">avg 12%</text>
+
+        <!-- X-axis labels -->
+        <text x="175" y="308" class="seg-head" text-anchor="middle">0%</text>
+        <text x="282" y="308" class="seg-head" text-anchor="middle">12%</text>
+        <text x="397" y="308" class="seg-head" text-anchor="middle">25%</text>
+        <text x="531" y="308" class="seg-head" text-anchor="middle">40%</text>
+        <line x1="175" y1="295" x2="620" y2="295" stroke="var(--border,rgba(0,0,0,0.1))" stroke-width="0.5"/>
+
+        <!-- Section: Loan Grade -->
+        <text x="165" y="28" class="seg-head" text-anchor="end">LOAN GRADE</text>
+
+        <!-- Grade A: 1.2% → 445*0.024=10.7px -->
+        <text x="165" y="48" class="seg-lab">Grade A</text>
+        <rect x="175" y="37" width="11" height="14" rx="3" fill="var(--green,#1D9E75)"/>
+        <text x="191" y="48" class="seg-pct" fill="var(--green,#1D9E75)">1.2%</text>
+
+        <!-- Grade B: 4.8% → 445*0.096=42.7px -->
+        <text x="165" y="68" class="seg-lab">Grade B</text>
+        <rect x="175" y="57" width="43" height="14" rx="3" fill="var(--green,#1D9E75)" opacity="0.7"/>
+        <text x="223" y="68" class="seg-pct" fill="var(--green,#1D9E75)">4.8%</text>
+
+        <!-- Grade C: 9.1% → 445*0.182=81px -->
+        <text x="165" y="88" class="seg-lab">Grade C</text>
+        <rect x="175" y="77" width="81" height="14" rx="3" fill="var(--amber,#D97706)" opacity="0.7"/>
+        <text x="261" y="88" class="seg-pct" fill="var(--amber,#D97706)">9.1%</text>
+
+        <!-- Grade D: 18.5% → 445*0.37=164.7px -->
+        <text x="165" y="108" class="seg-lab">Grade D</text>
+        <rect x="175" y="97" width="165" height="14" rx="3" fill="var(--amber,#D97706)"/>
+        <text x="345" y="108" class="seg-pct" fill="var(--amber,#D97706)">18.5%</text>
+
+        <!-- Grade E: 28.3% → 445*0.566=251.7px -->
+        <text x="165" y="128" class="seg-lab">Grade E</text>
+        <rect x="175" y="117" width="252" height="14" rx="3" fill="var(--red,#EF4444)" opacity="0.7"/>
+        <text x="432" y="128" class="seg-pct" fill="var(--red,#EF4444)">28.3%</text>
+
+        <!-- Grade G: 42.8% → 445*0.856=380.7px -->
+        <text x="165" y="148" class="seg-lab">Grade G</text>
+        <rect x="175" y="137" width="381" height="14" rx="3" fill="var(--red,#EF4444)"/>
+        <text x="561" y="148" class="seg-pct" fill="var(--red,#EF4444)">42.8%</text>
+
+        <!-- Divider -->
+        <line x1="100" y1="162" x2="620" y2="162" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5"/>
+
+        <!-- Section: Employment Type -->
+        <text x="165" y="182" class="seg-head" text-anchor="end">EMPLOYMENT</text>
+
+        <!-- Salaried: 7.4% → 33px -->
+        <text x="165" y="202" class="seg-lab">Salaried</text>
+        <rect x="175" y="191" width="33" height="14" rx="3" fill="var(--green,#1D9E75)"/>
+        <text x="213" y="202" class="seg-pct" fill="var(--green,#1D9E75)">7.4%</text>
+
+        <!-- Self-employed: 14.2% → 63px -->
+        <text x="165" y="222" class="seg-lab">Self-employed</text>
+        <rect x="175" y="211" width="63" height="14" rx="3" fill="var(--amber,#D97706)"/>
+        <text x="243" y="222" class="seg-pct" fill="var(--amber,#D97706)">14.2%</text>
+
+        <!-- Freelance: 22.6% → 100px -->
+        <text x="165" y="242" class="seg-lab">Freelance</text>
+        <rect x="175" y="231" width="101" height="14" rx="3" fill="var(--red,#EF4444)" opacity="0.8"/>
+        <text x="281" y="242" class="seg-pct" fill="var(--red,#EF4444)">22.6%</text>
+
+        <!-- Divider -->
+        <line x1="100" y1="256" x2="620" y2="256" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5"/>
+
+        <!-- Section: Collateral -->
+        <text x="165" y="275" class="seg-head" text-anchor="end">COLLATERAL</text>
+
+        <!-- With property: 6.8% → 30px -->
+        <text x="165" y="291" class="seg-lab">With property</text>
+        <rect x="175" y="280" width="30" height="14" rx="3" fill="var(--green,#1D9E75)"/>
+        <text x="210" y="291" class="seg-pct" fill="var(--green,#1D9E75)">6.8%</text>
+      </svg>
+    </div>
+
+    <p>This segmentation view reveals that the headline 12% default rate is dragged up by Grade G (42.8%) and freelance borrowers (22.6%). Grade A salaried borrowers with property collateral likely default at under 3%. Building a single model to serve both populations may be the wrong architecture entirely — the EDA is pointing toward a segmented credit policy.</p>
+
+    <h2 id="vintage-analysis"><span class="num">04 — Time</span>Vintage Analysis — Default as a Time-Evolving Curve</h2>
+
+    <p>A "vintage" is a cohort of loans originated in the same time period (month or quarter). Vintage analysis tracks how the cumulative default rate of each cohort evolves over the loan's life. This is critical for understanding whether your target label is meaningful.</p>
+
+    <!-- Vintage Curve SVG -->
+    <div class="chart-wrap">
+      <div class="chart-title">Vintage Curves — Cumulative Default Rate by Months on Book</div>
+      <div class="chart-sub">Different origination cohorts reaching different maturity levels</div>
+      <svg viewBox="0 0 660 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .vc-lab{font-family:'DM Mono',monospace;font-size:10px;fill:var(--text-secondary,#6b6b67)}
+            .vc-axis{stroke:var(--border,rgba(0,0,0,0.1));stroke-width:0.5}
+          </style>
+        </defs>
+
+        <!-- Axes -->
+        <line x1="60" y1="20" x2="60" y2="195" class="vc-axis"/>
+        <line x1="60" y1="195" x2="630" y2="195" class="vc-axis"/>
+
+        <!-- Y-axis labels (0 to 20%) -->
+        <text x="50" y="195" class="vc-lab" text-anchor="end">0%</text>
+        <text x="50" y="148" class="vc-lab" text-anchor="end">5%</text>
+        <text x="50" y="101" class="vc-lab" text-anchor="end">10%</text>
+        <text x="50" y="54" class="vc-lab" text-anchor="end">15%</text>
+        <line x1="60" y1="148" x2="630" y2="148" class="vc-axis" stroke-dasharray="3,3" opacity="0.5"/>
+        <line x1="60" y1="101" x2="630" y2="101" class="vc-axis" stroke-dasharray="3,3" opacity="0.5"/>
+        <line x1="60" y1="54" x2="630" y2="54" class="vc-axis" stroke-dasharray="3,3" opacity="0.5"/>
+
+        <!-- X-axis: 0 to 24 months, 570px / 24 = 23.75px per month -->
+        <text x="60" y="210" class="vc-lab" text-anchor="middle">0</text>
+        <text x="179" y="210" class="vc-lab" text-anchor="middle">5</text>
+        <text x="298" y="210" class="vc-lab" text-anchor="middle">10</text>
+        <text x="417" y="210" class="vc-lab" text-anchor="middle">15</text>
+        <text x="536" y="210" class="vc-lab" text-anchor="middle">20</text>
+        <text x="630" y="210" class="vc-lab" text-anchor="middle">24 mo</text>
+
+        <!-- Vintage Q1 2022 (mature, 24mo, defaults ~14%) -->
+        <!-- Y: 195 - (rate/20)*175. 14%→ 195-122.5=72.5 -->
+        <polyline points="60,195 84,190 107,183 131,175 155,166 179,157 202,148 226,139 250,131 274,124 298,118 321,112 345,107 369,103 393,99 417,96 440,93 464,90 488,88 512,86 536,85 560,84 583,83 607,82 630,82"
+          fill="none" stroke="var(--blue,#3B82F6)" stroke-width="2" opacity="0.9"/>
+        <text x="634" y="86" class="vc-lab" fill="var(--blue,#3B82F6)">Q1'22</text>
+        <text x="634" y="97" class="vc-lab" fill="var(--blue,#3B82F6)">14%</text>
+
+        <!-- Vintage Q3 2022 (18mo data, ~11%) -->
+        <polyline points="60,195 84,191 107,185 131,178 155,170 179,161 202,153 226,144 250,136 274,129 298,123 321,118 345,113 369,109 393,106 417,103 440,101 464,99 488,97"
+          fill="none" stroke="var(--green,#1D9E75)" stroke-width="2" opacity="0.9"/>
+        <text x="492" y="100" class="vc-lab" fill="var(--green,#1D9E75)">Q3'22</text>
+        <text x="492" y="111" class="vc-lab" fill="var(--green,#1D9E75)">11%</text>
+        <!-- Terminal dot -->
+        <circle cx="488" cy="97" r="3" fill="var(--green,#1D9E75)"/>
+
+        <!-- Vintage Q1 2023 (12mo data, ~7%) -->
+        <polyline points="60,195 84,192 107,187 131,181 155,174 179,166 202,159 226,152 250,146 274,141 298,136 321,132"
+          fill="none" stroke="var(--amber,#D97706)" stroke-width="2" opacity="0.9"/>
+        <text x="325" y="135" class="vc-lab" fill="var(--amber,#D97706)">Q1'23</text>
+        <text x="325" y="146" class="vc-lab" fill="var(--amber,#D97706)">7% (immature)</text>
+        <circle cx="321" cy="132" r="3" fill="var(--amber,#D97706)"/>
+
+        <!-- Vintage Q3 2023 (6mo data, ~3%) -->
+        <polyline points="60,195 84,193 107,190 131,186 155,182 179,177"
+          fill="none" stroke="var(--red,#EF4444)" stroke-width="2" opacity="0.9"/>
+        <text x="183" y="180" class="vc-lab" fill="var(--red,#EF4444)">Q3'23</text>
+        <text x="183" y="191" class="vc-lab" fill="var(--red,#EF4444)">3% (too early)</text>
+        <circle cx="179" cy="177" r="3" fill="var(--red,#EF4444)"/>
+
+        <!-- Labels -->
+        <text x="345" y="227" class="vc-lab" text-anchor="middle">Months on Book (MOB)</text>
+        <text x="22" y="110" class="vc-lab" text-anchor="middle" transform="rotate(-90 22 110)">Cumulative Default Rate</text>
+      </svg>
+    </div>
+
+    <p>This chart shows why recency is dangerous for target variable construction. The Q3 2023 vintage shows only 3% default rate at 6 months — not because it's a better vintage, but because defaults haven't happened yet. The mature Q1 2022 vintage curves to 14%. Including immature vintages in your training data as if their current 3% is their final rate will cause your model to be systematically over-optimistic.</p>
+
+    <div class="callout">
+      <p><strong>The rule of thumb:</strong> Only include loan cohorts that have reached at least 12 months on book (ideally 18 months) in your training dataset. Apply a performance window cutoff date and exclude all loans that haven't had enough observation time to manifest their default behaviour.</p>
+    </div>
+
+    <h2 id="metric-selection"><span class="num">05 — Metrics</span>Choosing the Right Evaluation Metric</h2>
+
+    <p>EDA on the target variable should directly inform which metric you optimize for. Different banking use cases prioritize different error types.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Metric Selection Guide for Credit Risk Models</div>
+      <div class="chart-sub">Driven by class imbalance level and business cost asymmetry</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Metric</th><th>What It Measures</th><th>Use When</th><th>Avoid When</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>AUC-ROC</strong></td>
+            <td>Ranking quality — ability to rank defaulters above non-defaulters</td>
+            <td>Standard scorecard development, Gini coefficient reporting</td>
+            <td>Threshold optimization or severe imbalance (>20:1)</td>
+          </tr>
+          <tr>
+            <td><strong>KS Statistic</strong></td>
+            <td>Max separation between default and non-default score distributions</td>
+            <td>Traditional scorecard validation; SBV model validation reports</td>
+            <td>When score distributions overlap heavily</td>
+          </tr>
+          <tr>
+            <td><strong>Precision-Recall AUC</strong></td>
+            <td>Precision vs. recall trade-off at every threshold</td>
+            <td>Severe imbalance (>15:1); fraud detection adjacent use cases</td>
+            <td>When ranking quality is more important than threshold performance</td>
+          </tr>
+          <tr>
+            <td><strong>F1 Score</strong></td>
+            <td>Harmonic mean of precision and recall</td>
+            <td>When you need a single-number threshold performance metric</td>
+            <td>When FP and FN have very different business costs</td>
+          </tr>
+          <tr>
+            <td><strong>Expected Loss</strong></td>
+            <td>PD × LGD × EAD — business cost of misclassification</td>
+            <td>Final model approval; comparing against champion model</td>
+            <td>Early development stages where LGD isn't modeled yet</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout blue">
+      <p><strong>Why Gini (= 2×AUC – 1) is standard in Vietnamese banking:</strong> SBV model validation teams are accustomed to Gini as the primary discriminatory power metric. A Gini above 0.40 is generally considered acceptable for consumer credit; above 0.55 is good; above 0.65 is excellent. Document the Gini in your EDA output so validators have a baseline before modeling begins.</p>
+    </div>
+
+    <h2 id="target-checklist"><span class="num">06 — Validation</span>Target Variable Validation Checklist</h2>
+
+    <p>Before any modeling begins, every credit risk analyst should be able to confirm the following about their target variable. These are not optional — they are the minimum due diligence required for a defensible model.</p>
+
+    <!-- Checklist Visual -->
+    <div class="chart-wrap">
+      <div class="chart-title">is_default EDA Checklist</div>
+      <div class="chart-sub">Complete before any feature engineering or model training</div>
+      <svg viewBox="0 0 660 310" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .cl-item{font-family:'DM Sans',sans-serif;font-size:13px;fill:var(--text-secondary,#6b6b67)}
+            .cl-cat{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;fill:var(--green,#1D9E75)}
+            .cl-check{font-family:'DM Mono',monospace;font-size:14px}
+          </style>
+        </defs>
+
+        <!-- Definition checks -->
+        <text x="14" y="22" class="cl-cat">Definition</text>
+        <text x="36" y="46" class="cl-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="46" class="cl-item">Default definition matches regulatory requirement (Basel / SBV Circular 11)</text>
+        <text x="36" y="70" class="cl-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="70" class="cl-item">DPD threshold documented (30, 60, or 90 days)</text>
+        <text x="36" y="94" class="cl-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="94" class="cl-item">Observation window and performance window clearly defined</text>
+
+        <line x1="14" y1="106" x2="646" y2="106" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5"/>
+
+        <!-- Distribution checks -->
+        <text x="14" y="124" class="cl-cat">Distribution</text>
+        <text x="36" y="148" class="cl-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="148" class="cl-item">Class distribution computed and imbalance ratio documented</text>
+        <text x="36" y="172" class="cl-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="172" class="cl-item">Default rate by vintage month — no immature cohorts in training set</text>
+        <text x="36" y="196" class="cl-check" fill="var(--amber,#D97706)">☐</text>
+        <text x="56" y="196" class="cl-item">Default rate trends over time (seasonality, economic cycle effects)</text>
+
+        <line x1="14" y1="208" x2="646" y2="208" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5"/>
+
+        <!-- Segmentation checks -->
+        <text x="14" y="226" class="cl-cat">Segmentation</text>
+        <text x="36" y="250" class="cl-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="250" class="cl-item">Default rate by loan grade — monotonicity validated</text>
+        <text x="36" y="274" class="cl-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="274" class="cl-item">Default rate by employment type, collateral, and loan purpose</text>
+        <text x="36" y="298" class="cl-check" fill="var(--amber,#D97706)">☐</text>
+        <text x="56" y="298" class="cl-item">Check for disparate impact across demographic segments (fairness audit)</text>
+      </svg>
+    </div>
+
+    <div class="callout purple">
+      <p><strong>The fairness audit item:</strong> Regulatory frameworks increasingly require that credit models do not disproportionately deny credit to protected groups. Even if demographic features aren't in your model, proxy variables (postcode, employment type) can introduce disparate impact. EDA on the target variable should include a fairness check where possible — not just model performance metrics.</p>
+    </div>
+
+    <p>Understanding the target variable completely — its definition, its distribution, its temporal structure, and its variation across segments — is the foundation on which every subsequent modeling decision rests. No amount of feature engineering can compensate for a poorly understood or incorrectly defined target.</p>
+
+    <hr>
+    <!-- Post Nav -->
+    <div class="post-nav">
+      <a href="p6-outliers.html">← P6: Outlier Detection</a>
+      <a href="p8-insights.html">P8: Key Insights →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const saved = localStorage.getItem('theme');
+    if(saved === 'dark') { document.body.classList.add('dark'); document.getElementById('toggleIcon').textContent='☀️'; document.getElementById('toggleLabel').textContent='Light'; }
+  })();
+  function toggleDark(){
+    const isDark = document.body.classList.toggle('dark');
+    document.getElementById('toggleIcon').textContent = isDark ? '☀️' : '🌙';
+    document.getElementById('toggleLabel').textContent = isDark ? 'Light' : 'Dark';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }
+  const sections = document.querySelectorAll('[id]');
+  const tocItems = document.querySelectorAll('.toc-item');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (s.getBoundingClientRect().top < 160) current = s.id; });
+    tocItems.forEach(t => {
+      t.classList.toggle('active', t.dataset.section === current);
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>

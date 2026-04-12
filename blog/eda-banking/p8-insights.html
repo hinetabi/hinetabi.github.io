@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Part 8: Key insights and reporting from banking EDA — turning analysis into action, MDD documentation, common mistakes, and the hypothesis-driven EDA mindset.">
+  <title>P8: Key Insights & Reporting — EDA for Banking Loans | hinetabi.github.io</title>
+  <link rel="canonical" href="https://hinetabi.github.io/blog/eda-banking/p8-insights.html">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3LNV66EG8G"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3LNV66EG8G');</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafaf8;--bg-secondary:#f1efea;--bg-card:#ffffff;--text-primary:#1a1a18;--text-secondary:#6b6b67;--border:rgba(0,0,0,0.1);--border-hover:rgba(0,0,0,0.2);--green:#1D9E75;--green-bg:#E1F5EE;--green-text:#0F6E56;--amber:#D97706;--amber-bg:#FEF3C7;--amber-text:#92400E;--red:#EF4444;--red-bg:#FEE2E2;--red-text:#991B1B;--blue:#3B82F6;--blue-bg:#EFF6FF;--blue-text:#1D4ED8;--purple:#7C3AED;--purple-bg:#EDE9FE;--purple-text:#5B21B6;--radius-md:8px;--radius-lg:14px;--radius-pill:999px;--transition:0.25s ease}
+    body.dark{--bg:#111110;--bg-secondary:#1c1c1a;--bg-card:#1c1c1a;--text-primary:#f0ede6;--text-secondary:#888780;--border:rgba(255,255,255,0.09);--border-hover:rgba(255,255,255,0.18);--green-bg:rgba(29,158,117,0.15);--green-text:#6ee9c0;--amber-bg:rgba(217,119,6,0.15);--amber-text:#fcd34d;--red-bg:rgba(239,68,68,0.15);--red-text:#fca5a5;--blue-bg:rgba(59,130,246,0.15);--blue-text:#93c5fd;--purple-bg:rgba(124,58,237,0.15);--purple-text:#c4b5fd}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);transition:background var(--transition),color var(--transition);min-height:100vh}
+    .site{max-width:720px;margin:0 auto;padding:0 1.5rem 5rem}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:1.4rem 0;border-bottom:0.5px solid var(--border);margin-bottom:2.5rem}
+    .nav-left{display:flex;align-items:center;gap:1rem}
+    .nav-logo{font-size:15px;font-weight:500;color:var(--text-primary);font-family:'DM Mono',monospace;text-decoration:none}
+    .toggle-btn{font-size:13px;font-family:'DM Sans',sans-serif;padding:5px 13px;border:0.5px solid var(--border-hover);border-radius:var(--radius-pill);background:var(--bg-secondary);color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background var(--transition),border-color var(--transition)}
+    .toggle-btn:hover{border-color:var(--green)}
+    .back-link{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition)}
+    .back-link:hover{color:var(--text-primary)}
+    .series-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:2.5rem}
+    .series-step{padding:7px 0;border-radius:var(--radius-md);text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:500;border:0.5px solid var(--border);color:var(--text-secondary);text-decoration:none;transition:all var(--transition);line-height:1.3}
+    .series-step:hover{border-color:var(--green);color:var(--green)}
+    .series-step.active{background:var(--green);color:#fff;border-color:var(--green)}
+    .post-header{margin-bottom:2.5rem}
+    .series-label{font-size:11px;color:var(--text-secondary);font-family:'DM Mono',monospace;margin-bottom:.4rem;letter-spacing:.05em;text-transform:uppercase;display:block}
+    .post-title{font-size:28px;font-weight:500;color:var(--text-primary);line-height:1.25;letter-spacing:-.5px;margin-bottom:.75rem}
+    .post-meta{font-size:13px;color:var(--text-secondary);margin-bottom:1rem}
+    .post-tag{font-size:12px;font-weight:500;padding:4px 11px;border-radius:var(--radius-pill);display:inline-block;margin-right:6px}
+    .tag-green{background:var(--green-bg);color:var(--green-text)}.tag-blue{background:var(--blue-bg);color:var(--blue-text)}.tag-amber{background:var(--amber-bg);color:var(--amber-text)}.tag-purple{background:var(--purple-bg);color:var(--purple-text)}
+    .post-content{line-height:1.8}
+    .post-content p{font-size:15px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .post-content h2{font-size:19px;font-weight:500;color:var(--text-primary);margin-top:3rem;margin-bottom:.85rem;letter-spacing:-.3px}
+    .post-content h2 .num{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);font-weight:500;display:block;margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.06em}
+    .post-content h3{font-size:16px;font-weight:500;color:var(--text-primary);margin-top:1.75rem;margin-bottom:.5rem}
+    .post-content strong{color:var(--text-primary);font-weight:500}
+    .post-content code{font-family:'DM Mono',monospace;font-size:13px;background:var(--bg-secondary);padding:2px 6px;border-radius:4px;color:var(--text-primary)}
+    hr{border:none;border-top:0.5px solid var(--border);margin:2.5rem 0}
+    .callout{border-left:3px solid var(--green);border-radius:0 var(--radius-md) var(--radius-md) 0;padding:1rem 1.25rem;margin-bottom:1.5rem;background:var(--green-bg)}
+    .callout p{color:var(--green-text)!important;margin-bottom:0!important;font-size:14px}
+    .callout.amber{background:var(--amber-bg);border-left-color:var(--amber)}.callout.amber p{color:var(--amber-text)!important}
+    .callout.red{background:var(--red-bg);border-left-color:var(--red)}.callout.red p{color:var(--red-text)!important}
+    .callout.blue{background:var(--blue-bg);border-left-color:var(--blue)}.callout.blue p{color:var(--blue-text)!important}
+    .callout.purple{background:var(--purple-bg);border-left-color:var(--purple)}.callout.purple p{color:var(--purple-text)!important}
+    .chart-wrap{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:1.75rem 0}
+    .chart-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:.2rem;font-family:'DM Mono',monospace}
+    .chart-sub{font-size:12px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px;margin:1rem 0}
+    .data-table th{text-align:left;padding:.6rem .85rem;background:var(--bg-secondary);color:var(--text-secondary);font-weight:500;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+    .data-table td{padding:.65rem .85rem;border-top:0.5px solid var(--border);color:var(--text-secondary);font-size:13px;vertical-align:top}
+    .data-table tr:hover td{background:var(--bg-secondary)}
+    .toc-sidebar{position:fixed;top:50%;transform:translateY(-50%);left:calc(50% - 542px);width:162px;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:0;border:none;margin:0}
+    @media(max-width:1240px){.toc-sidebar{display:none!important}}
+    .toc-heading{font-size:11px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--text-secondary);margin-bottom:1rem;opacity:.5}
+    .toc-item{display:flex;align-items:stretch;gap:10px;margin-bottom:3px;text-decoration:none;width:100%}
+    .toc-bar{flex-shrink:0;width:2px;background:var(--border);border-radius:1px;transition:background var(--transition)}
+    .toc-item.active .toc-bar,.toc-item:hover .toc-bar{background:var(--green)}
+    .toc-body{padding:4px 0;min-width:0}
+    .toc-num{font-size:10px;font-family:'DM Mono',monospace;color:var(--text-secondary);opacity:.45;display:block}
+    .toc-item.active .toc-num{opacity:1;color:var(--green-text)}
+    .toc-name{font-size:12px;color:var(--text-secondary);line-height:1.35;display:block;transition:color var(--transition)}
+    .toc-item.active .toc-name,.toc-item:hover .toc-name{color:var(--text-primary)}
+    .toc-item.active .toc-name{font-weight:500}
+    .toc-divider{width:100%;height:.5px;background:var(--border);margin:5px 0 8px}
+    .post-nav{display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:2rem;border-top:.5px solid var(--border);gap:1rem}
+    .post-nav a{font-size:13px;color:var(--text-secondary);text-decoration:none;transition:color var(--transition);display:flex;align-items:center;gap:.4rem}
+    .post-nav a:hover{color:var(--green)}
+    .series-complete{background:var(--green-bg);border:0.5px solid var(--green);border-radius:var(--radius-lg);padding:2rem;text-align:center;margin-top:2.5rem}
+    .series-complete p{color:var(--green-text)!important;font-size:15px;margin-bottom:.5rem!important}
+    .series-complete strong{color:var(--green-text);font-size:18px;display:block;margin-bottom:.5rem}
+    @media(max-width:600px){.post-title{font-size:22px}}
+  </style>
+</head>
+<body>
+<div class="site">
+  <nav>
+    <div class="nav-left">
+      <a class="nav-logo" href="../../index.html">hinetabi.github.io</a>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()"><span id="toggleIcon">🌙</span><span id="toggleLabel">Dark</span></button>
+    </div>
+    <a class="back-link" href="../../index.html">← Home</a>
+  </nav>
+
+  <!-- TOC Sidebar -->
+  <aside class="toc-sidebar" id="tocSidebar">
+    <div class="toc-heading">On this page</div>
+    <a class="toc-item" href="#eda-to-action" data-section="eda-to-action">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">01</span><span class="toc-name">EDA → Action Map</span></div>
+    </a>
+    <a class="toc-item" href="#eda-journey" data-section="eda-journey">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">02</span><span class="toc-name">The Full EDA Journey</span></div>
+    </a>
+    <a class="toc-item" href="#common-mistakes" data-section="common-mistakes">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">03</span><span class="toc-name">Common Mistakes</span></div>
+    </a>
+    <a class="toc-item" href="#mdd-checklist" data-section="mdd-checklist">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">04</span><span class="toc-name">MDD Documentation</span></div>
+    </a>
+    <a class="toc-item" href="#hypothesis-driven" data-section="hypothesis-driven">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">05</span><span class="toc-name">Hypothesis-Driven EDA</span></div>
+    </a>
+    <a class="toc-item" href="#the-mindset" data-section="the-mindset">
+      <div class="toc-bar"></div>
+      <div class="toc-body"><span class="toc-num">06</span><span class="toc-name">The Right Mindset</span></div>
+    </a>
+  </aside>
+
+  <!-- Series Nav -->
+  <div class="series-nav">
+    <a class="series-step" href="p1-why-explore.html">P1<br>Why EDA</a>
+    <a class="series-step" href="p2-missing-values.html">P2<br>Missing</a>
+    <a class="series-step" href="p3-univariate.html">P3<br>Univariate</a>
+    <a class="series-step" href="p4-bivariate.html">P4<br>Bivariate</a>
+    <a class="series-step" href="p5-multivariate.html">P5<br>Multivariate</a>
+    <a class="series-step" href="p6-outliers.html">P6<br>Outliers</a>
+    <a class="series-step" href="p7-target.html">P7<br>Target Var</a>
+    <a class="series-step active" href="p8-insights.html">P8<br>Insights</a>
+  </div>
+
+  <!-- Post Header -->
+  <header class="post-header">
+    <span class="series-label">EDA for Banking Loans · Part 8 of 8</span>
+    <h1 class="post-title">Key Insights & Reporting —<br>Turning Analysis Into Action</h1>
+    <div class="post-meta">Le Thanh Binh · Data Scientist, Cake by VPBank · April 2026</div>
+    <span class="post-tag tag-green">EDA Summary</span>
+    <span class="post-tag tag-purple">MDD</span>
+    <span class="post-tag tag-blue">Best Practices</span>
+  </header>
+
+  <div class="post-content">
+
+    <p>You've explored your data from every angle: structure, missingness, univariate distributions, bivariate relationships, multivariate interactions, outliers, and the target variable itself. Now comes the part that distinguishes a data scientist from a data analyst — translating all those observations into a coherent narrative that drives decisions.</p>
+
+    <p>EDA is not a phase that ends. It's a mindset that continues through feature engineering, model training, and even post-deployment monitoring. This final post captures the key insights from the full EDA journey and gives you the frameworks to document, communicate, and act on them.</p>
+
+    <hr>
+
+    <h2 id="eda-to-action"><span class="num">01 — Impact</span>From EDA Finding to Business Action</h2>
+
+    <p>Every significant EDA finding should map to a concrete downstream action. If an observation doesn't change something — a feature engineering decision, a modeling choice, a policy rule, a data quality fix — it wasn't worth documenting. The table below captures the key findings from Parts 1–7 and the action each one drives.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">EDA Findings → Actions Map</div>
+      <div class="chart-sub">Every insight should change something downstream</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>EDA Finding</th><th>Source</th><th>Action Required</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>credit_score missing 45%</strong> — concentrated in younger accounts</td>
+            <td>P2: Missing</td>
+            <td>Create <code>has_credit_history</code> flag; impute with segment median; never drop rows</td>
+          </tr>
+          <tr>
+            <td><strong>annual_income is right-skewed</strong> (median 78M, mean 142M VND)</td>
+            <td>P3: Univariate</td>
+            <td>Apply log transform before linear models; report medians not means in summaries</td>
+          </tr>
+          <tr>
+            <td><strong>DTI is bimodal</strong> — two peaks at 0.2 and 0.6</td>
+            <td>P3: Univariate</td>
+            <td>Create segment indicator <code>dti_segment</code>; investigate if two distinct products are mixed</td>
+          </tr>
+          <tr>
+            <td><strong>Grade A→G default monotonicity holds</strong> (1.2% → 42.8%)</td>
+            <td>P4: Bivariate</td>
+            <td>Validate grade model; use grade as a strong ordinal feature; no encoding needed (already ordinal)</td>
+          </tr>
+          <tr>
+            <td><strong>credit_score ↔ late_payments = –0.74</strong> (high multicollinearity)</td>
+            <td>P4: Bivariate</td>
+            <td>Do not use both in linear models simultaneously; select one or use PCA / VIF analysis</td>
+          </tr>
+          <tr>
+            <td><strong>Grade C (no collateral) ≈ Grade D (property)</strong> in default rate</td>
+            <td>P5: Multivariate</td>
+            <td>Add grade × collateral interaction term; review collateral-adjusted pricing policy</td>
+          </tr>
+          <tr>
+            <td><strong>Freelance default rate 22.6%</strong> vs salaried 7.4%</td>
+            <td>P7: Target</td>
+            <td>Consider separate model or tighter policy for freelance segment; flag for underwriting review</td>
+          </tr>
+          <tr>
+            <td><strong>num_late_payments outliers are highest-default cases</strong></td>
+            <td>P6: Outliers</td>
+            <td>Keep all values; create <code>is_repeat_defaulter</code> binary flag at threshold 6+</td>
+          </tr>
+          <tr>
+            <td><strong>Q3 2023 vintage immature</strong> — 3% default at 6 months on book</td>
+            <td>P7: Target</td>
+            <td>Exclude from training set; apply 12-month minimum maturity cutoff</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="eda-journey"><span class="num">02 — Overview</span>The Full EDA Journey — A Pipeline View</h2>
+
+    <p>Looking back, the 8-part EDA process follows a logical progression from the outermost structural questions inward to the most specific signal extraction. Each stage builds on the one before it.</p>
+
+    <!-- EDA Journey Pipeline SVG -->
+    <div class="chart-wrap">
+      <div class="chart-title">EDA Pipeline — From Raw Data to Model-Ready Insights</div>
+      <div class="chart-sub">Sequential stages with cumulative understanding</div>
+      <svg viewBox="0 0 660 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .pip-box{rx:8;ry:8}
+            .pip-num{font-family:'DM Mono',monospace;font-size:9px;font-weight:600;fill:#fff;text-transform:uppercase;letter-spacing:.05em}
+            .pip-title{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;fill:#fff}
+            .pip-desc{font-family:'DM Sans',sans-serif;font-size:10px;fill:rgba(255,255,255,0.8)}
+            .pip-arrow{stroke:var(--border,rgba(0,0,0,0.15));stroke-width:1.5;fill:none;marker-end:url(#arr)}
+          </style>
+          <marker id="arr" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 6 3 L 0 6 z" fill="var(--border,rgba(0,0,0,0.2))"/>
+          </marker>
+        </defs>
+
+        <!-- Row 1: P1, P2 -->
+        <rect x="10" y="10" width="140" height="72" rx="8" fill="var(--blue,#3B82F6)"/>
+        <text x="20" y="28" class="pip-num">P1 — Structure</text>
+        <text x="20" y="44" class="pip-title">Why Explore</text>
+        <text x="20" y="59" class="pip-desc">Shape, dtypes,</text>
+        <text x="20" y="72" class="pip-desc">feature taxonomy</text>
+
+        <line x1="150" y1="46" x2="175" y2="46" class="pip-arrow"/>
+
+        <rect x="175" y="10" width="140" height="72" rx="8" fill="var(--blue,#3B82F6)" opacity="0.85"/>
+        <text x="185" y="28" class="pip-num">P2 — Quality</text>
+        <text x="185" y="44" class="pip-title">Missing Values</text>
+        <text x="185" y="59" class="pip-desc">MCAR/MAR/MNAR,</text>
+        <text x="185" y="72" class="pip-desc">imputation strategy</text>
+
+        <line x1="315" y1="46" x2="340" y2="46" class="pip-arrow"/>
+
+        <rect x="340" y="10" width="140" height="72" rx="8" fill="var(--green,#1D9E75)"/>
+        <text x="350" y="28" class="pip-num">P3 — Distribution</text>
+        <text x="350" y="44" class="pip-title">Univariate</text>
+        <text x="350" y="59" class="pip-desc">Skew, outliers,</text>
+        <text x="350" y="72" class="pip-desc">modality, transforms</text>
+
+        <line x1="480" y1="46" x2="505" y2="46" class="pip-arrow"/>
+
+        <rect x="505" y="10" width="145" height="72" rx="8" fill="var(--green,#1D9E75)" opacity="0.85"/>
+        <text x="515" y="28" class="pip-num">P4 — Relationships</text>
+        <text x="515" y="44" class="pip-title">Bivariate</text>
+        <text x="515" y="59" class="pip-desc">Correlations, WoE,</text>
+        <text x="515" y="72" class="pip-desc">default rate curves</text>
+
+        <!-- Row 2 arrows down -->
+        <line x1="577" y1="82" x2="577" y2="112" class="pip-arrow"/>
+
+        <!-- Row 2: P5, P6 (right to left) -->
+        <rect x="505" y="112" width="145" height="72" rx="8" fill="var(--amber,#D97706)"/>
+        <text x="515" y="130" class="pip-num">P5 — Interactions</text>
+        <text x="515" y="146" class="pip-title">Multivariate</text>
+        <text x="515" y="161" class="pip-desc">Policy rules, faceted</text>
+        <text x="515" y="174" class="pip-desc">heatmaps, segments</text>
+
+        <line x1="505" y1="148" x2="480" y2="148" class="pip-arrow"/>
+
+        <rect x="340" y="112" width="140" height="72" rx="8" fill="var(--amber,#D97706)" opacity="0.85"/>
+        <text x="350" y="130" class="pip-num">P6 — Extremes</text>
+        <text x="350" y="146" class="pip-title">Outliers</text>
+        <text x="350" y="161" class="pip-desc">IQR, Z-score, cap</text>
+        <text x="350" y="174" class="pip-desc">vs keep decision</text>
+
+        <line x1="340" y1="148" x2="315" y2="148" class="pip-arrow"/>
+
+        <rect x="175" y="112" width="140" height="72" rx="8" fill="var(--red,#EF4444)"/>
+        <text x="185" y="130" class="pip-num">P7 — Target</text>
+        <text x="185" y="146" class="pip-title">Target Variable</text>
+        <text x="185" y="161" class="pip-desc">Class balance, vintage,</text>
+        <text x="185" y="174" class="pip-desc">definition, metrics</text>
+
+        <line x1="175" y1="148" x2="150" y2="148" class="pip-arrow"/>
+
+        <rect x="10" y="112" width="140" height="72" rx="8" fill="var(--red,#EF4444)" opacity="0.85"/>
+        <text x="20" y="130" class="pip-num">P8 — Synthesis</text>
+        <text x="20" y="146" class="pip-title">Key Insights</text>
+        <text x="20" y="161" class="pip-desc">Action map, MDD,</text>
+        <text x="20" y="174" class="pip-desc">hypotheses, report</text>
+
+        <!-- Arrow down to output -->
+        <line x1="80" y1="184" x2="80" y2="214" class="pip-arrow"/>
+
+        <!-- Output box -->
+        <rect x="10" y="214" width="640" height="72" rx="8" fill="var(--bg-secondary,#f1efea)" stroke="var(--green,#1D9E75)" stroke-width="1.5"/>
+        <text x="330" y="238" font-family="'DM Mono',monospace" font-size="11" text-transform="uppercase" fill="var(--green,#1D9E75)" text-anchor="middle" letter-spacing=".05em">OUTPUT</text>
+        <text x="330" y="258" font-family="'DM Sans',sans-serif" font-size="13" font-weight="500" fill="var(--text-primary,#1a1a18)" text-anchor="middle">Model Development Document (MDD) · Feature Engineering Plan · Credit Policy Recommendations</text>
+        <text x="330" y="276" font-family="'DM Sans',sans-serif" font-size="12" fill="var(--text-secondary,#6b6b67)" text-anchor="middle">Training dataset specification · Baseline Gini estimate · Validation framework</text>
+      </svg>
+    </div>
+
+    <h2 id="common-mistakes"><span class="num">03 — Pitfalls</span>The Most Common EDA Mistakes in Banking</h2>
+
+    <p>After running EDA across many credit datasets, certain mistakes appear again and again. Most are not about missing a chart — they're about missing a question.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Top EDA Mistakes — and What They Cost</div>
+      <div class="chart-sub">From model audits and post-deployment failures in consumer credit</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Mistake</th><th>What Goes Wrong</th><th>How to Avoid</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Treating ordinal as numeric</strong></td>
+            <td><code>loan_grade</code> encoded as 1–7 implies Grade G is "7× more risky than A," which is not the relationship. Linear models are distorted.</td>
+            <td>Use WoE encoding or target encoding for ordinal features in linear models; tree models handle ordinals natively</td>
+          </tr>
+          <tr>
+            <td><strong>Ignoring missingness patterns</strong></td>
+            <td>Imputing <code>credit_score</code> with the population median erases the thin-file signal entirely — the missing rows ARE the high-risk population</td>
+            <td>Always classify missingness as MCAR/MAR/MNAR first; create indicator flags before any imputation</td>
+          </tr>
+          <tr>
+            <td><strong>Using accuracy on imbalanced targets</strong></td>
+            <td>A model predicting all non-defaults achieves 88% accuracy. Stakeholders approve it. The bank loses money on 100% of defaults.</td>
+            <td>Always report AUC-ROC, KS statistic, and precision-recall curves. Never report accuracy alone.</td>
+          </tr>
+          <tr>
+            <td><strong>Including immature vintages</strong></td>
+            <td>Training data includes Q4 2023 loans at 3% default rate (only 6 months old). Model is systematically over-optimistic. Post-deployment KPIs miss targets.</td>
+            <td>Apply minimum 12-month maturity cutoff before defining the training population</td>
+          </tr>
+          <tr>
+            <td><strong>Treating EDA as a one-time step</strong></td>
+            <td>Data changes over time. The distribution shift in new applicants renders your EDA conclusions stale. Model performance degrades silently.</td>
+            <td>Build monitoring dashboards that re-run key EDA metrics on new incoming data monthly</td>
+          </tr>
+          <tr>
+            <td><strong>Confusing correlation with causation</strong></td>
+            <td>high correlation between loan purpose "vacation" and default doesn't mean vacations cause defaults — it's an income/segment proxy. Wrong features get prioritized.</td>
+            <td>For every correlation finding, ask: what's the actual causal mechanism? Does this make business sense?</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="mdd-checklist"><span class="num">04 — Documentation</span>What Goes in the Model Development Document</h2>
+
+    <p>In Vietnamese banking, the Model Development Document (MDD) is the primary artifact that model validators, auditors, and the SBV will review. The EDA section of the MDD is not optional and must be comprehensive. Here is what examiners expect.</p>
+
+    <!-- MDD Checklist SVG -->
+    <div class="chart-wrap">
+      <div class="chart-title">MDD EDA Section — Minimum Requirements</div>
+      <div class="chart-sub">Based on SBV Circular 11 and Basel Committee model risk guidelines</div>
+      <svg viewBox="0 0 660 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <style>
+            .mdd-cat{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;fill:var(--green,#1D9E75)}
+            .mdd-item{font-family:'DM Sans',sans-serif;font-size:12px;fill:var(--text-secondary,#6b6b67)}
+            .mdd-check{font-family:'DM Mono',monospace;font-size:13px}
+          </style>
+        </defs>
+
+        <!-- Data Profile -->
+        <text x="14" y="22" class="mdd-cat">1. Data Profile</text>
+        <text x="36" y="42" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="42" class="mdd-item">Dataset dimensions (rows × columns), observation window, data sources</text>
+        <text x="36" y="62" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="62" class="mdd-item">Feature taxonomy table (numeric / ordinal / nominal / date / target)</text>
+        <text x="36" y="82" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="82" class="mdd-item">Missing value rates per feature with MCAR/MAR/MNAR classification</text>
+
+        <line x1="14" y1="94" x2="646" y2="94" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5"/>
+
+        <!-- Distributions -->
+        <text x="14" y="112" class="mdd-cat">2. Distributions</text>
+        <text x="36" y="132" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="132" class="mdd-item">Univariate summary statistics (mean, median, std, skewness, kurtosis)</text>
+        <text x="36" y="152" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="152" class="mdd-item">Outlier detection method and treatment applied per feature</text>
+        <text x="36" y="172" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="172" class="mdd-item">Distribution plots (histograms / boxplots) for all continuous features</text>
+
+        <line x1="14" y1="184" x2="646" y2="184" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5"/>
+
+        <!-- Target -->
+        <text x="14" y="202" class="mdd-cat">3. Target Variable</text>
+        <text x="36" y="222" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="222" class="mdd-item">Default definition (DPD threshold, Basel alignment)</text>
+        <text x="36" y="242" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="242" class="mdd-item">Class distribution and imbalance ratio; chosen evaluation metrics</text>
+        <text x="36" y="262" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="262" class="mdd-item">Vintage analysis — performance window and maturity cutoff justification</text>
+
+        <line x1="14" y1="274" x2="646" y2="274" stroke="var(--border,rgba(0,0,0,0.08))" stroke-width="0.5"/>
+
+        <!-- Relationships -->
+        <text x="14" y="292" class="mdd-cat">4. Relationships &amp; Insights</text>
+        <text x="36" y="312" class="mdd-check" fill="var(--green,#1D9E75)">☑</text>
+        <text x="56" y="312" class="mdd-item">Correlation matrix with multicollinearity flags (VIF &gt; 5)</text>
+        <text x="36" y="332" class="mdd-check" fill="var(--amber,#D97706)">☐</text>
+        <text x="56" y="332" class="mdd-item">WoE / IV table for top 10 features, ranked by Information Value</text>
+      </svg>
+    </div>
+
+    <div class="callout blue">
+      <p><strong>On Information Value (IV):</strong> IV measures how well a feature separates defaulters from non-defaulters using WoE bins. IV &lt; 0.02 = useless; 0.02–0.1 = weak; 0.1–0.3 = medium; &gt;0.3 = strong. The IV ranking from your EDA directly dictates the feature shortlist for your scorecard — it's not a nice-to-have, it's a regulatory expectation.</p>
+    </div>
+
+    <h2 id="hypothesis-driven"><span class="num">05 — Approach</span>The Hypothesis-Driven EDA Mindset</h2>
+
+    <p>Undirected EDA — plotting everything and seeing what sticks — is slow and often misleading. The most effective credit risk analysts approach EDA as a series of falsifiable hypotheses, driven by business knowledge.</p>
+
+    <p>Before opening a dataset, write down your priors. In loan default modeling, standard hypotheses include: borrowers with higher DTI default more; salaried income is more stable than self-employed; longer loan terms increase default exposure; collateral reduces default severity even if it doesn't reduce probability. Then let the data confirm or contradict each one.</p>
+
+    <!-- Hypothesis Table -->
+    <div class="chart-wrap">
+      <div class="chart-title">Hypothesis-Driven EDA — Banking Examples</div>
+      <div class="chart-sub">Form hypotheses first; let data confirm or challenge them</div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Hypothesis</th><th>What EDA Shows</th><th>Outcome</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>"Higher DTI → higher default rate"</td>
+            <td>DTI quartile analysis: Q1 (DTI &lt;0.2) defaults at 4.1%, Q4 (DTI &gt;0.6) at 27.3%</td>
+            <td>✓ Confirmed — DTI is a strong monotonic predictor</td>
+          </tr>
+          <tr>
+            <td>"Freelance income is unstable → more defaults"</td>
+            <td>Freelance default rate 22.6% vs salaried 7.4%</td>
+            <td>✓ Confirmed — but also reflects lower income and higher DTI on average</td>
+          </tr>
+          <tr>
+            <td>"Loan grade already captures all credit risk"</td>
+            <td>Within Grade C, no-collateral borrowers default at 10.2% vs 5.8% with property</td>
+            <td>✗ Rejected — collateral adds signal beyond grade; both should be in the model</td>
+          </tr>
+          <tr>
+            <td>"Larger loan amounts are riskier"</td>
+            <td>Correlation: loan_amount ↔ default = +0.12 (weak); controlling for grade removes the effect</td>
+            <td>✗ Partially rejected — amount is a proxy for grade; grade dominates when both included</td>
+          </tr>
+          <tr>
+            <td>"Recent borrowers are less risky (better screening)"</td>
+            <td>Vintage analysis: mature cohorts show 13–15% default; recent cohorts too immature to compare</td>
+            <td>? Inconclusive — need 18 months of data to validate; exclude from training set</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>When a hypothesis is rejected, that's not a failure — it's a finding. The fact that loan amount doesn't independently predict default (once grade is controlled for) is important information for feature selection and for communicating to stakeholders why a "bigger loan = more risk" intuition doesn't hold in the data.</p>
+
+    <h2 id="the-mindset"><span class="num">06 — Philosophy</span>The Right Mindset: EDA as Ongoing Dialogue</h2>
+
+    <p>The best framing for EDA is not a checklist but a dialogue — between you, the data, and the business. Every chart answers one question and raises two more. Every anomaly is an invitation to understand the data-generating process better.</p>
+
+    <div class="callout">
+      <p><strong>The hardest insight to act on:</strong> Sometimes EDA reveals that your data is fundamentally unsuitable for the model you intended to build. Maybe the observation window is too short. Maybe a key feature is missing for 60% of the population. Maybe the target definition changed mid-dataset. These discoveries feel like failure, but they are the most important outputs EDA can produce — they prevent you from building and deploying a model that will underperform in the real world.</p>
+    </div>
+
+    <p>In banking, where model errors translate directly into financial loss, regulatory scrutiny, or unfair outcomes for borrowers, EDA is not bureaucratic overhead. It is the intellectual foundation of everything that follows. A model built on unexamined data is a liability.</p>
+
+    <div class="callout amber">
+      <p><strong>EDA never really ends:</strong> After deployment, monitoring dashboards should track the same distributions you explored here — DTI distribution, missing rate on credit_score, default rate by grade. When those distributions shift, your EDA findings may no longer apply. The model needs recalibration. EDA is not a phase — it's a practice.</p>
+    </div>
+
+    <hr>
+
+    <!-- Series Complete Banner -->
+    <div class="series-complete">
+      <strong>Series Complete — EDA for Banking Loans</strong>
+      <p>You've worked through the full 8-part EDA series: from initial data exploration through missing values, univariate and bivariate analysis, multivariate interactions, outlier handling, target variable deep dive, and finally synthesizing insights into action.</p>
+      <p style="margin-top:.75rem!important">The next step is feature engineering — transforming what you've learned into model-ready inputs.</p>
+    </div>
+
+    <!-- Post Nav -->
+    <div class="post-nav">
+      <a href="p7-target.html">← P7: Target Variable</a>
+      <a href="p1-why-explore.html">↩ Back to Part 1</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const saved = localStorage.getItem('theme');
+    if(saved === 'dark') { document.body.classList.add('dark'); document.getElementById('toggleIcon').textContent='☀️'; document.getElementById('toggleLabel').textContent='Light'; }
+  })();
+  function toggleDark(){
+    const isDark = document.body.classList.toggle('dark');
+    document.getElementById('toggleIcon').textContent = isDark ? '☀️' : '🌙';
+    document.getElementById('toggleLabel').textContent = isDark ? 'Light' : 'Dark';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }
+  const sections = document.querySelectorAll('[id]');
+  const tocItems = document.querySelectorAll('.toc-item');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (s.getBoundingClientRect().top < 160) current = s.id; });
+    tocItems.forEach(t => {
+      t.classList.toggle('active', t.dataset.section === current);
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>
