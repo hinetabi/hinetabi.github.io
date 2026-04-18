@@ -4,158 +4,9 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Auto EDA — CSV Explorer</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auto-eda/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#fafaf8;--bg2:#f1efea;--card:#fff;
-      --t1:#1a1a18;--t2:#6b6b67;
-      --border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.18);
-      --green:#1D9E75;--green-bg:#E1F5EE;--green-t:#0F6E56;
-      --amber:#D97706;--amber-bg:#FEF3C7;--amber-t:#92400E;
-      --red:#EF4444;--red-bg:#FEE2E2;--red-t:#991B1B;
-      --blue:#3B82F6;--blue-bg:#EFF6FF;--blue-t:#1D4ED8;
-      --purple:#7C3AED;--purple-bg:#EDE9FE;--purple-t:#5B21B6;
-      --r:8px;--r2:14px;--pill:999px;
-      --sidebar:200px;--header:54px;--trans:0.2s ease;
-    }
-    body.dark{
-      --bg:#111110;--bg2:#1c1c1a;--card:#1c1c1a;
-      --t1:#f0ede6;--t2:#888780;
-      --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.16);
-      --green-bg:rgba(29,158,117,0.15);--green-t:#6ee9c0;
-      --amber-bg:rgba(217,119,6,0.15);--amber-t:#fcd34d;
-      --red-bg:rgba(239,68,68,0.15);--red-t:#fca5a5;
-      --blue-bg:rgba(59,130,246,0.15);--blue-t:#93c5fd;
-      --purple-bg:rgba(124,58,237,0.15);--purple-t:#c4b5fd;
-    }
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;transition:background var(--trans),color var(--trans)}
-
-    /* ── Upload screen ── */
-    #upload-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;gap:2rem}
-    .up-logo{font-family:'DM Mono',monospace;font-size:13px;color:var(--t2)}
-    .up-box{
-      width:100%;max-width:500px;border:2px dashed var(--border2);border-radius:var(--r2);
-      padding:3rem 2.5rem;text-align:center;cursor:pointer;
-      transition:border-color var(--trans),background var(--trans);
-    }
-    .up-box:hover,.up-box.drag-over{border-color:var(--green);background:var(--green-bg)}
-    .up-icon{font-size:2.5rem;margin-bottom:1rem;display:block}
-    .up-title{font-size:20px;font-weight:500;margin-bottom:.4rem}
-    .up-sub{font-size:14px;color:var(--t2);margin-bottom:1.5rem}
-    .up-btn{display:inline-block;padding:8px 22px;background:var(--green);color:#fff;border-radius:var(--pill);font-size:14px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
-    .up-note{font-size:11px;color:var(--t2);margin-top:1rem;font-family:'DM Mono',monospace}
-    #file-input{display:none}
-    .up-features{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;max-width:500px;width:100%}
-    .up-feat{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;font-size:12px;color:var(--t2);text-align:left}
-    .up-feat strong{display:block;color:var(--t1);font-size:13px;margin-bottom:.25rem}
-
-    /* ── EDA screen ── */
-    #eda-screen{display:none}
-
-    /* Header */
-    .eda-hdr{position:fixed;top:0;left:0;right:0;height:var(--header);background:var(--bg);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;z-index:100;transition:background var(--trans)}
-    .hdr-left{display:flex;align-items:center;gap:.85rem}
-    .hdr-logo{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--t1)}
-    .hdr-file{font-size:12px;color:var(--t2);font-family:'DM Mono',monospace;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .hdr-right{display:flex;align-items:center;gap:.6rem}
-    .loading-row{display:none;align-items:center;gap:.5rem}
-    .spinner{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-    .loading-txt{font-family:'DM Mono',monospace;font-size:11px;color:var(--t2)}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .btn-sm{font-size:12px;padding:5px 13px;border:0.5px solid var(--border2);border-radius:var(--pill);background:var(--bg2);color:var(--t1);cursor:pointer;font-family:'DM Sans',sans-serif;transition:border-color var(--trans)}
-    .btn-sm:hover{border-color:var(--green)}
-
-    /* Sidebar */
-    .eda-sidebar{position:fixed;top:var(--header);left:0;bottom:0;width:var(--sidebar);background:var(--bg);border-right:0.5px solid var(--border);overflow-y:auto;padding:1.25rem 0 3rem;z-index:50;transition:background var(--trans)}
-    .eda-sidebar::-webkit-scrollbar{width:3px}
-    .eda-sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-    .sb-heading{font-size:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--t2);padding:0 1rem;margin-bottom:.4rem;opacity:.55}
-    .sb-link{display:flex;align-items:center;gap:8px;padding:6px 1rem;font-size:12.5px;color:var(--t2);cursor:pointer;border-left:2px solid transparent;transition:all var(--trans);user-select:none}
-    .sb-link:hover{color:var(--t1);background:var(--bg2)}
-    .sb-link.active{color:var(--green-t);border-left-color:var(--green);background:var(--green-bg);font-weight:500}
-    .sb-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0}
-    .sb-link.active .sb-dot{opacity:1}
-    .sb-divider{height:.5px;background:var(--border);margin:.6rem 1rem}
-
-    /* Main */
-    .eda-main{margin-left:var(--sidebar);padding-top:calc(var(--header) + 2.5rem);padding-bottom:6rem;padding-left:2.25rem;padding-right:2.25rem;max-width:1100px}
-
-    /* Section */
-    .eda-sec{margin-bottom:3.5rem}
-    .sec-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.25rem}
-    .sec-title{font-size:20px;font-weight:500;letter-spacing:-.3px;margin-bottom:.2rem}
-    .sec-sub{font-size:13px;color:var(--t2);margin-bottom:1.25rem}
-
-    /* Stat grid */
-    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.65rem;margin-bottom:1rem}
-    .stat-box{background:var(--bg2);border-radius:var(--r);padding:.7rem 1rem}
-    .stat-lbl{font-size:10px;color:var(--t2);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
-    .stat-val{font-size:22px;font-weight:500;margin-top:.15rem}
-    .green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.blue{color:var(--blue)}
-
-    /* Card */
-    .card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.25rem;margin-bottom:1rem;transition:background var(--trans)}
-    .card-title{font-size:12px;font-weight:500;font-family:'DM Mono',monospace;margin-bottom:.2rem}
-    .card-sub{font-size:11px;color:var(--t2);margin-bottom:1rem}
-
-    /* Feature grid */
-    .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(390px,1fr));gap:1rem}
-    .feat-card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r2);padding:1.2rem;transition:background var(--trans)}
-    .feat-name{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;margin-bottom:.3rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .feat-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.9rem}
-    .tag{font-size:10px;padding:2px 8px;border-radius:var(--pill);font-family:'DM Mono',monospace;font-weight:500}
-    .tag-num{background:var(--blue-bg);color:var(--blue-t)}
-    .tag-cat{background:var(--amber-bg);color:var(--amber-t)}
-    .tag-miss{background:var(--red-bg);color:var(--red-t)}
-    .tag-ok{background:var(--green-bg);color:var(--green-t)}
-    .tag-warn{background:var(--amber-bg);color:var(--amber-t)}
-    .tag-bad{background:var(--red-bg);color:var(--red-t)}
-    .tag-purple{background:var(--purple-bg);color:var(--purple-t)}
-
-    /* Mini stats inside feat-card */
-    .fs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.35rem;margin-bottom:.9rem}
-    .fs-box{background:var(--bg2);border-radius:6px;padding:.4rem .55rem}
-    .fs-lbl{font-size:9px;font-family:'DM Mono',monospace;color:var(--t2);text-transform:uppercase;letter-spacing:.04em}
-    .fs-val{font-size:12.5px;font-weight:500;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-    /* Chart canvas */
-    .chart-wrap{position:relative;height:155px}
-
-    /* Missing bars */
-    .miss-row{display:grid;grid-template-columns:140px 1fr 58px;align-items:center;gap:.7rem;margin-bottom:.6rem}
-    .miss-name{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--t2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .miss-bg{height:7px;background:var(--bg2);border-radius:4px;overflow:hidden}
-    .miss-fill{height:100%;border-radius:4px}
-    .miss-pct{font-family:'DM Mono',monospace;font-size:11px}
-
-    /* Correlation */
-    .corr-scroll{overflow-x:auto}
-    #corr-canvas{display:block;max-width:100%}
-
-    /* Insight callout */
-    .callout{border-left:3px solid var(--green);background:var(--green-bg);border-radius:0 var(--r) var(--r) 0;padding:.7rem 1rem;margin-bottom:.65rem;font-size:13px;color:var(--green-t);line-height:1.5}
-    .callout.amber{border-left-color:var(--amber);background:var(--amber-bg);color:var(--amber-t)}
-    .callout.red{border-left-color:var(--red);background:var(--red-bg);color:var(--red-t)}
-    .callout.blue{border-left-color:var(--blue);background:var(--blue-bg);color:var(--blue-t)}
-
-    /* Data table */
-    .tbl-scroll{overflow-x:auto;border-radius:var(--r);border:0.5px solid var(--border)}
-    table{width:100%;border-collapse:collapse;font-size:12px}
-    th{text-align:left;padding:.5rem .8rem;background:var(--bg2);color:var(--t2);font-weight:500;font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
-    td{padding:.5rem .8rem;border-top:0.5px solid var(--border);color:var(--t2);vertical-align:middle}
-    tr:hover td{background:var(--bg2)}
-    .mono{font-family:'DM Mono',monospace}
-    .null-cell{color:var(--red);font-family:'DM Mono',monospace;font-size:10px;opacity:.7}
-
-    @media(max-width:820px){
-      .eda-sidebar{display:none}
-      .eda-main{margin-left:0;padding-left:1rem;padding-right:1rem}
-      .up-features{grid-template-columns:1fr 1fr}
-    }
-    @media(max-width:500px){.up-features{grid-template-columns:1fr}}
-  </style>
 </head>
 <body>
 
@@ -178,7 +29,7 @@
     <div class="up-feat"><strong>📈 Histograms</strong>Distribution chart for every numeric column</div>
     <div class="up-feat"><strong>📊 Bar Charts</strong>Top value counts for every categorical column</div>
     <div class="up-feat"><strong>🔥 Correlation Heatmap</strong>Pearson matrix for all numeric pairs</div>
-    <div class="up-feat"><strong>🌙 Dark Mode</strong>Same design as the EDA blog series</div>
+    <div class="up-feat"><strong>🧭 Co-variable Analysis</strong>Scatter, box-plots, crosstabs on demand</div>
   </div>
 </div>
 
@@ -202,681 +53,82 @@
   <aside class="eda-sidebar" id="sidebar">
     <div class="sb-heading" style="margin-bottom:.75rem">Sections</div>
     <div class="sb-link active" onclick="navTo('s-overview')"><div class="sb-dot"></div>Overview</div>
-    <div class="sb-link" onclick="navTo('s-insights')"><div class="sb-dot"></div>Auto Insights</div>
-    <div class="sb-link" onclick="navTo('s-missing')"><div class="sb-dot"></div>Missing Values</div>
     <div class="sb-link" onclick="navTo('s-numeric')"><div class="sb-dot"></div>Numeric Features</div>
     <div class="sb-link" onclick="navTo('s-categorical')"><div class="sb-dot"></div>Categorical Features</div>
     <div class="sb-link" onclick="navTo('s-corr')"><div class="sb-dot"></div>Correlations</div>
+    <div class="sb-link" onclick="navTo('s-covar')"><div class="sb-dot"></div>Co-variable Analysis</div>
     <div class="sb-link" onclick="navTo('s-sample')"><div class="sb-dot"></div>Sample Data</div>
+    <div class="sb-link" onclick="navTo('s-insights')"><div class="sb-dot"></div>Auto Insights</div>
   </aside>
 
   <main class="eda-main">
+    <!-- Each <section> is a thin shell. The rendering logic for
+         each one lives in auto-eda/sections/<name>.js — edit there. -->
+
     <section class="eda-sec" id="s-overview">
       <span class="sec-num">01 — Overview</span>
       <div class="sec-title">Dataset Overview</div>
       <div id="overview-out"></div>
     </section>
 
-    <section class="eda-sec" id="s-insights">
-      <span class="sec-num">02 — Auto Insights</span>
-      <div class="sec-title">Key Findings</div>
-      <div class="sec-sub">Automatically detected patterns, warnings, and anomalies</div>
-      <div id="insights-out"></div>
-    </section>
-
-    <section class="eda-sec" id="s-missing">
-      <span class="sec-num">03 — Missing Values</span>
-      <div class="sec-title">Missingness Profile</div>
-      <div class="sec-sub">Red &gt;30% · Amber 5–30% · Green &lt;5%</div>
-      <div id="missing-out"></div>
-    </section>
-
     <section class="eda-sec" id="s-numeric">
-      <span class="sec-num">04 — Numeric Features</span>
+      <span class="sec-num">02 — Numeric Features</span>
       <div class="sec-title">Distributions & Statistics</div>
       <div class="sec-sub" id="num-sub"></div>
+      <div id="num-picker"></div>
       <div id="numeric-out" class="feat-grid"></div>
     </section>
 
     <section class="eda-sec" id="s-categorical">
-      <span class="sec-num">05 — Categorical Features</span>
+      <span class="sec-num">03 — Categorical Features</span>
       <div class="sec-title">Value Counts & Frequencies</div>
       <div class="sec-sub" id="cat-sub"></div>
+      <div id="cat-picker"></div>
       <div id="categorical-out" class="feat-grid"></div>
     </section>
 
     <section class="eda-sec" id="s-corr">
-      <span class="sec-num">06 — Correlations</span>
+      <span class="sec-num">04 — Correlations</span>
       <div class="sec-title">Numeric Feature Correlations</div>
       <div class="sec-sub">Pearson r — green (positive) · red (negative)</div>
       <div id="corr-out"></div>
     </section>
 
+    <section class="eda-sec" id="s-covar">
+      <span class="sec-num">05 — Co-variable Analysis</span>
+      <div class="sec-title">Bivariate Analysis</div>
+      <div class="sec-sub">Pick any two columns — the right test & chart are chosen automatically</div>
+      <div id="covar-out"></div>
+    </section>
+
     <section class="eda-sec" id="s-sample">
-      <span class="sec-num">07 — Sample Data</span>
+      <span class="sec-num">06 — Sample Data</span>
       <div class="sec-title">First 10 Rows</div>
       <div id="sample-out"></div>
+    </section>
+
+    <section class="eda-sec" id="s-insights">
+      <span class="sec-num">07 — Auto Insights</span>
+      <div class="sec-title">Key Findings</div>
+      <div class="sec-sub">Automatically detected patterns, warnings, and anomalies</div>
+      <div id="insights-out"></div>
     </section>
   </main>
 </div>
 
-<script>
-// ══════════════════════════════════
-//  STATE
-// ══════════════════════════════════
-const MAX_ROWS       = 50000;
-const MAX_BINS       = 40;
-const MAX_CORR_COLS  = 16;
-const MAX_NUM_SHOW   = 24;
-const MAX_CAT_SHOW   = 24;
-
-let rawData = [], headers = [], colTypes = {};
-let numCols = [], catCols = [];
-let stats   = {};
-let corrMat = {};
-let charts  = {};   // Chart.js instances keyed by canvas id
-
-// ══════════════════════════════════
-//  DARK MODE
-// ══════════════════════════════════
-(function initDark(){
-  if(localStorage.getItem('theme')==='dark'){
-    document.body.classList.add('dark');
-    const b=document.getElementById('dark-btn');
-    if(b) b.textContent='☀️ Light';
-  }
-})();
-
-function toggleDark(){
-  const dark=document.body.classList.toggle('dark');
-  document.getElementById('dark-btn').textContent=dark?'☀️ Light':'🌙 Dark';
-  localStorage.setItem('theme',dark?'dark':'light');
-  updateChartColors();
-  renderCorrHeatmap(); // redraw canvas with correct bg
-}
-
-// ══════════════════════════════════
-//  UPLOAD / RESET
-// ══════════════════════════════════
-const dropZone  = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-
-dropZone.addEventListener('dragover',  e=>{e.preventDefault();dropZone.classList.add('drag-over')});
-dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e=>{
-  e.preventDefault();dropZone.classList.remove('drag-over');
-  const f=e.dataTransfer.files[0];if(f)processFile(f);
-});
-fileInput.addEventListener('change', e=>{if(e.target.files[0])processFile(e.target.files[0])});
-
-function resetTool(){
-  document.getElementById('upload-screen').style.display='flex';
-  document.getElementById('eda-screen').style.display='none';
-  fileInput.value='';
-  Object.values(charts).forEach(c=>c.destroy());
-  charts={};rawData=[];headers=[];
-}
-
-function navTo(id){
-  document.getElementById(id)?.scrollIntoView({behavior:'smooth'});
-}
-
-function setLoading(on,txt){
-  const row=document.getElementById('loading-row');
-  row.style.display=on?'flex':'none';
-  if(txt) document.getElementById('loading-txt').textContent=txt;
-}
-
-// ══════════════════════════════════
-//  FILE PROCESSING
-// ══════════════════════════════════
-function processFile(file){
-  document.getElementById('upload-screen').style.display='none';
-  document.getElementById('eda-screen').style.display='block';
-  document.getElementById('hdr-file').textContent=file.name;
-  setLoading(true,'Parsing CSV…');
-
-  Papa.parse(file,{
-    header:true, skipEmptyLines:true, dynamicTyping:false,
-    complete(res){
-      let data=res.data;
-      const totalRows=data.length;
-      if(data.length>MAX_ROWS) data=data.slice(0,MAX_ROWS);
-      rawData=data; headers=res.meta.fields||[];
-
-      setLoading(true,'Detecting types…');
-      delay(()=>{
-        detectTypes();
-        setLoading(true,'Computing statistics…');
-        delay(()=>{
-          computeAllStats();
-          setLoading(true,'Computing correlations…');
-          delay(()=>{
-            computeCorrelations();
-            setLoading(true,'Rendering…');
-            delay(()=>{
-              renderAll(totalRows,file.name);
-              setLoading(false);
-            });
-          });
-        });
-      });
-    },
-    error(err){ alert('Parse error: '+err.message); resetTool(); }
-  });
-}
-
-const delay=fn=>setTimeout(fn,30);
-
-// ══════════════════════════════════
-//  TYPE DETECTION
-// ══════════════════════════════════
-function detectTypes(){
-  colTypes={}; numCols=[]; catCols=[];
-  headers.forEach(col=>{
-    const vals=rawData.map(r=>r[col]).filter(v=>v!==''&&v!=null);
-    const numN=vals.filter(v=>!isNaN(parseFloat(v))&&isFinite(v)).length;
-    if(vals.length>0&&numN/vals.length>=0.8){
-      colTypes[col]='numeric'; numCols.push(col);
-    } else {
-      colTypes[col]='categorical'; catCols.push(col);
-    }
-  });
-}
-
-// ══════════════════════════════════
-//  STATISTICS
-// ══════════════════════════════════
-function numVals(col){
-  return rawData.map(r=>parseFloat(r[col])).filter(v=>!isNaN(v)&&isFinite(v));
-}
-
-function pct(sorted,p){
-  const i=(p/100)*(sorted.length-1);
-  const lo=Math.floor(i),hi=Math.ceil(i);
-  return lo===hi?sorted[lo]:sorted[lo]*(hi-i)+sorted[hi]*(i-lo);
-}
-
-function numericStats(col){
-  const vals=numVals(col);
-  const missing=rawData.filter(r=>{const v=r[col];return v===''||v==null||isNaN(parseFloat(v))}).length;
-  if(!vals.length) return {count:0,missing};
-  const sorted=[...vals].sort((a,b)=>a-b), n=vals.length;
-  const mean=vals.reduce((s,v)=>s+v,0)/n;
-  const variance=vals.reduce((s,v)=>s+Math.pow(v-mean,2),0)/Math.max(n-1,1);
-  const std=Math.sqrt(variance);
-  const q1=pct(sorted,25),median=pct(sorted,50),q3=pct(sorted,75);
-  const iqr=q3-q1, min=sorted[0], max=sorted[n-1];
-  const skew=std>0?3*(mean-median)/std:0;
-  const lf=q1-1.5*iqr, uf=q3+1.5*iqr;
-  const outliers=vals.filter(v=>v<lf||v>uf).length;
-
-  // Histogram
-  const bins=Math.min(MAX_BINS,Math.max(10,Math.ceil(Math.sqrt(n))));
-  const span=max-min||1, bw=span/bins;
-  const counts=new Array(bins).fill(0);
-  const labels=[];
-  for(let i=0;i<bins;i++){
-    labels.push(fmt(min+i*bw));
-    const lo2=min+i*bw, hi2=min+(i+1)*bw;
-    vals.forEach(v=>{ if(v>=lo2&&(i===bins-1?v<=hi2:v<hi2)) counts[i]++; });
-  }
-  return {count:n,missing,mean,std,min,max,q1,median,q3,iqr,skew,outliers,outlierPct:outliers/n,histCounts:counts,histLabels:labels};
-}
-
-function catStats(col){
-  const all=rawData.map(r=>r[col]);
-  const missing=all.filter(v=>v===''||v==null).length;
-  const nonNull=all.filter(v=>v!==''&&v!=null);
-  const counts={};
-  nonNull.forEach(v=>{counts[v]=(counts[v]||0)+1});
-  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  return {count:nonNull.length,missing,unique:sorted.length,topValues:sorted.slice(0,10),mode:sorted[0]?.[0],modeCount:sorted[0]?.[1]};
-}
-
-function computeAllStats(){
-  stats={};
-  headers.forEach(col=>{
-    stats[col]=colTypes[col]==='numeric'?numericStats(col):catStats(col);
-  });
-}
-
-// ══════════════════════════════════
-//  CORRELATIONS
-// ══════════════════════════════════
-function pearson(x,y){
-  const n=x.length; if(n<2) return 0;
-  const mx=x.reduce((s,v)=>s+v,0)/n, my=y.reduce((s,v)=>s+v,0)/n;
-  let num=0,dx=0,dy=0;
-  for(let i=0;i<n;i++){num+=(x[i]-mx)*(y[i]-my);dx+=Math.pow(x[i]-mx,2);dy+=Math.pow(y[i]-my,2)}
-  const den=Math.sqrt(dx*dy); return den===0?0:num/den;
-}
-
-function computeCorrelations(){
-  const cols=numCols.slice(0,MAX_CORR_COLS);
-  corrMat={};
-  cols.forEach(c1=>{
-    corrMat[c1]={};
-    cols.forEach(c2=>{
-      if(c1===c2){corrMat[c1][c2]=1;return}
-      const pairs=rawData.map(r=>[parseFloat(r[c1]),parseFloat(r[c2])]).filter(([a,b])=>!isNaN(a)&&!isNaN(b)&&isFinite(a)&&isFinite(b));
-      corrMat[c1][c2]=pairs.length<2?0:pearson(pairs.map(p=>p[0]),pairs.map(p=>p[1]));
-    });
-  });
-}
-
-// ══════════════════════════════════
-//  HELPERS
-// ══════════════════════════════════
-function fmt(n){
-  if(n==null||isNaN(n)) return '—';
-  const a=Math.abs(n);
-  if(a>=1e9) return (n/1e9).toFixed(2)+'B';
-  if(a>=1e6) return (n/1e6).toFixed(2)+'M';
-  if(a>=1e3) return (n/1e3).toFixed(1)+'K';
-  if(a<0.001&&n!==0) return n.toExponential(2);
-  return n.toFixed(a<1?3:2);
-}
-function pctStr(n){return(n*100).toFixed(1)+'%'}
-function int(n){return n.toLocaleString()}
-function sid(s){return s.replace(/[^a-zA-Z0-9]/g,'_')}
-
-// ══════════════════════════════════
-//  RENDER ALL
-// ══════════════════════════════════
-function renderAll(totalRows,fname){
-  renderOverview(totalRows);
-  renderInsights();
-  renderMissing();
-  renderNumeric();
-  renderCategorical();
-  renderCorrelation();
-  renderSample();
-  setupScrollSpy();
-}
-
-// ── Overview ──
-function renderOverview(totalRows){
-  const nNum=numCols.length, nCat=catCols.length;
-  const totalMiss=headers.reduce((s,c)=>s+(stats[c]?.missing||0),0);
-  const cells=rawData.length*headers.length;
-  const missRate=cells?totalMiss/cells:0;
-  const sampled=rawData.length<totalRows;
-
-  let h=`<div class="stat-grid">
-    <div class="stat-box"><div class="stat-lbl">Rows</div><div class="stat-val">${int(totalRows)}</div></div>
-    <div class="stat-box"><div class="stat-lbl">Columns</div><div class="stat-val">${headers.length}</div></div>
-    <div class="stat-box"><div class="stat-lbl">Numeric</div><div class="stat-val green">${nNum}</div></div>
-    <div class="stat-box"><div class="stat-lbl">Categorical</div><div class="stat-val amber">${nCat}</div></div>
-    <div class="stat-box"><div class="stat-lbl">Missing Rate</div><div class="stat-val ${missRate>.2?'red':missRate>.05?'amber':'green'}">${pctStr(missRate)}</div></div>
-    <div class="stat-box"><div class="stat-lbl">Total Cells</div><div class="stat-val">${int(cells)}</div></div>
-  </div>`;
-
-  if(sampled) h+=`<div class="callout amber">⚠️ File has ${int(totalRows)} rows. Analysis uses first ${int(MAX_ROWS)} rows.</div>`;
-
-  h+=`<div class="card"><div class="card-title">All Columns</div><div class="card-sub">Detected type, completeness, and cardinality</div>
-  <div class="tbl-scroll"><table><thead><tr><th>#</th><th>Column</th><th>Type</th><th>Non-null</th><th>Missing %</th><th>Unique / Min / Max</th></tr></thead><tbody>`;
-
-  headers.forEach((col,i)=>{
-    const s=stats[col]||{};
-    const mp=rawData.length?(s.missing||0)/rawData.length:0;
-    const typeTag=colTypes[col]==='numeric'?'<span class="tag tag-num">numeric</span>':'<span class="tag tag-cat">categorical</span>';
-    const extra=colTypes[col]==='numeric'?`${fmt(s.min)} → ${fmt(s.max)}`:`${int(s.unique||0)} unique`;
-    h+=`<tr>
-      <td class="mono" style="opacity:.5">${i+1}</td>
-      <td class="mono" style="color:var(--t1)">${col}</td>
-      <td>${typeTag}</td>
-      <td>${int(s.count||0)}</td>
-      <td style="color:${mp>.3?'var(--red)':mp>.05?'var(--amber)':'var(--green)'}">${pctStr(mp)}</td>
-      <td class="mono">${extra}</td>
-    </tr>`;
-  });
-  h+='</tbody></table></div></div>';
-  document.getElementById('overview-out').innerHTML=h;
-}
-
-// ── Auto Insights ──
-function renderInsights(){
-  const ins=[];
-
-  // Missing
-  headers.forEach(col=>{
-    const mp=(stats[col]?.missing||0)/rawData.length;
-    if(mp>.4) ins.push({c:'red',t:`<strong>${col}</strong> — ${pctStr(mp)} missing. Consider dropping or creating a <code>has_${col}</code> indicator flag.`});
-    else if(mp>.15) ins.push({c:'amber',t:`<strong>${col}</strong> — ${pctStr(mp)} missing. Investigate MCAR / MAR / MNAR before imputing.`});
-  });
-
-  // Skew
-  numCols.forEach(col=>{
-    const s=stats[col]||{};
-    if(Math.abs(s.skew||0)>1.5) ins.push({c:'amber',t:`<strong>${col}</strong> is highly skewed (skewness = ${(s.skew).toFixed(2)}). Consider log-transform before using in linear models.`});
-  });
-
-  // Outliers
-  numCols.forEach(col=>{
-    const s=stats[col]||{};
-    if((s.outlierPct||0)>.05) ins.push({c:'amber',t:`<strong>${col}</strong> has ${pctStr(s.outlierPct)} outliers by IQR (${int(s.outliers)} records). Review before winsorizing.`});
-  });
-
-  // High correlation
-  const cCols=numCols.slice(0,MAX_CORR_COLS);
-  const hiCorr=[];
-  for(let i=0;i<cCols.length;i++) for(let j=i+1;j<cCols.length;j++){
-    const r=corrMat[cCols[i]]?.[cCols[j]];
-    if(r!=null&&Math.abs(r)>=0.7) hiCorr.push({c1:cCols[i],c2:cCols[j],r});
-  }
-  hiCorr.sort((a,b)=>Math.abs(b.r)-Math.abs(a.r)).slice(0,5).forEach(({c1,c2,r})=>{
-    ins.push({c:'blue',t:`<strong>${c1}</strong> ↔ <strong>${c2}</strong> are highly correlated (r = ${r.toFixed(2)}). Check for multicollinearity in linear models.`});
-  });
-
-  // Constant columns
-  headers.forEach(col=>{
-    const s=stats[col]||{};
-    if(colTypes[col]==='categorical'&&s.unique===1) ins.push({c:'red',t:`<strong>${col}</strong> has only 1 unique value — zero variance, no predictive power. Drop it.`});
-    if(colTypes[col]==='numeric'&&s.std===0) ins.push({c:'red',t:`<strong>${col}</strong> has zero standard deviation — constant feature. Drop it.`});
-  });
-
-  // Potential IDs
-  headers.forEach(col=>{
-    const s=stats[col]||{};
-    if(colTypes[col]==='categorical'&&s.unique===rawData.length&&rawData.length>10) ins.push({c:'amber',t:`<strong>${col}</strong> has a unique value per row — likely an ID column. Exclude from model features.`});
-  });
-
-  const html=ins.length
-    ?ins.map(i=>`<div class="callout ${i.c}">⚡ ${i.t}</div>`).join('')
-    :'<div class="callout">✅ No major data quality issues detected.</div>';
-  document.getElementById('insights-out').innerHTML=html;
-}
-
-// ── Missing Values ──
-function renderMissing(){
-  const cols=headers
-    .map(col=>({col,miss:stats[col]?.missing||0,p:(stats[col]?.missing||0)/rawData.length}))
-    .filter(d=>d.miss>0).sort((a,b)=>b.p-a.p);
-
-  if(!cols.length){
-    document.getElementById('missing-out').innerHTML='<div class="callout">✅ No missing values in the dataset!</div>';
-    return;
-  }
-  let h=`<div class="card"><div class="card-title">Missing Rate by Column</div><div class="card-sub">${cols.length} of ${headers.length} columns have missing values</div>`;
-  cols.forEach(({col,miss,p})=>{
-    const color=p>.3?'var(--red)':p>.05?'var(--amber)':'var(--green)';
-    h+=`<div class="miss-row">
-      <div class="miss-name" title="${col}">${col}</div>
-      <div class="miss-bg"><div class="miss-fill" style="width:${Math.min(100,p*100)}%;background:${color}"></div></div>
-      <div class="miss-pct" style="color:${color}">${pctStr(p)}</div>
-    </div>`;
-  });
-  h+='</div>';
-  document.getElementById('missing-out').innerHTML=h;
-}
-
-// ── Numeric Features ──
-function chartColors(){
-  const dark=document.body.classList.contains('dark');
-  return {
-    grid:dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)',
-    tick:dark?'#888780':'#6b6b67',
-  };
-}
-
-function renderNumeric(){
-  const cols=numCols.slice(0,MAX_NUM_SHOW);
-  document.getElementById('num-sub').textContent=numCols.length>MAX_NUM_SHOW
-    ?`Showing first ${MAX_NUM_SHOW} of ${numCols.length} numeric columns`
-    :`${cols.length} numeric column${cols.length!==1?'s':''}`;
-
-  const out=document.getElementById('numeric-out');
-  out.innerHTML='';
-
-  cols.forEach(col=>{
-    const s=stats[col]||{};
-    if(!s.count) return;
-    const mp=s.missing/rawData.length;
-    const skewAbs=Math.abs(s.skew||0);
-    const skewLbl=skewAbs<0.5?'Symmetric':skewAbs<1?'Mod. skew':'High skew';
-    const skewCls=skewAbs<0.5?'tag-ok':skewAbs<1?'tag-warn':'tag-bad';
-    const cid='h_'+sid(col);
-
-    const div=document.createElement('div');
-    div.className='feat-card';
-    div.innerHTML=`
-      <div class="feat-name" title="${col}">${col}</div>
-      <div class="feat-meta">
-        <span class="tag tag-num">numeric</span>
-        ${mp>0?`<span class="tag tag-miss">missing ${pctStr(mp)}</span>`:'<span class="tag tag-ok">complete</span>'}
-        <span class="tag ${skewCls}">${skewLbl} (${(s.skew||0).toFixed(2)})</span>
-        ${s.outlierPct>.02?`<span class="tag tag-warn">${pctStr(s.outlierPct)} outliers</span>`:''}
-      </div>
-      <div class="fs-grid">
-        <div class="fs-box"><div class="fs-lbl">Mean</div><div class="fs-val">${fmt(s.mean)}</div></div>
-        <div class="fs-box"><div class="fs-lbl">Std</div><div class="fs-val">${fmt(s.std)}</div></div>
-        <div class="fs-box"><div class="fs-lbl">Min</div><div class="fs-val">${fmt(s.min)}</div></div>
-        <div class="fs-box"><div class="fs-lbl">Max</div><div class="fs-val">${fmt(s.max)}</div></div>
-        <div class="fs-box"><div class="fs-lbl">Q1</div><div class="fs-val">${fmt(s.q1)}</div></div>
-        <div class="fs-box"><div class="fs-lbl">Median</div><div class="fs-val">${fmt(s.median)}</div></div>
-        <div class="fs-box"><div class="fs-lbl">Q3</div><div class="fs-val">${fmt(s.q3)}</div></div>
-        <div class="fs-box"><div class="fs-lbl">Count</div><div class="fs-val">${int(s.count)}</div></div>
-      </div>
-      <div class="chart-wrap"><canvas id="${cid}"></canvas></div>`;
-    out.appendChild(div);
-    requestAnimationFrame(()=>makeHistogram(cid,s));
-  });
-}
-
-function makeHistogram(cid,s){
-  const canvas=document.getElementById(cid);
-  if(!canvas||!s.histCounts) return;
-  const c=chartColors();
-  if(charts[cid]) charts[cid].destroy();
-  charts[cid]=new Chart(canvas,{
-    type:'bar',
-    data:{
-      labels:s.histLabels,
-      datasets:[{data:s.histCounts,backgroundColor:'rgba(29,158,117,0.75)',borderColor:'rgba(29,158,117,0.9)',borderWidth:0.5,borderRadius:2}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{title:ctx=>`≥ ${ctx[0].label}`,label:ctx=>`Count: ${ctx.parsed.y}`}}},
-      scales:{
-        x:{grid:{color:c.grid},ticks:{color:c.tick,font:{family:'DM Mono',size:9},maxTicksLimit:8,maxRotation:0}},
-        y:{grid:{color:c.grid},ticks:{color:c.tick,font:{family:'DM Mono',size:9}}}
-      }
-    }
-  });
-}
-
-// ── Categorical Features ──
-function renderCategorical(){
-  const cols=catCols.slice(0,MAX_CAT_SHOW);
-  document.getElementById('cat-sub').textContent=catCols.length>MAX_CAT_SHOW
-    ?`Showing first ${MAX_CAT_SHOW} of ${catCols.length} categorical columns`
-    :`${cols.length} categorical column${cols.length!==1?'s':''}`;
-
-  const out=document.getElementById('categorical-out');
-  out.innerHTML='';
-
-  cols.forEach(col=>{
-    const s=stats[col]||{};
-    const mp=s.missing/rawData.length;
-    const cid='b_'+sid(col);
-
-    const div=document.createElement('div');
-    div.className='feat-card';
-    div.innerHTML=`
-      <div class="feat-name" title="${col}">${col}</div>
-      <div class="feat-meta">
-        <span class="tag tag-cat">categorical</span>
-        ${mp>0?`<span class="tag tag-miss">missing ${pctStr(mp)}</span>`:'<span class="tag tag-ok">complete</span>'}
-        <span class="tag tag-num">${int(s.unique||0)} unique</span>
-        ${s.unique===rawData.length&&rawData.length>10?'<span class="tag tag-purple">possible ID</span>':''}
-        ${s.unique===1?'<span class="tag tag-bad">constant</span>':''}
-      </div>
-      <div class="fs-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="fs-box"><div class="fs-lbl">Count</div><div class="fs-val">${int(s.count||0)}</div></div>
-        <div class="fs-box"><div class="fs-lbl">Unique</div><div class="fs-val">${int(s.unique||0)}</div></div>
-        <div class="fs-box"><div class="fs-lbl">Top Value</div><div class="fs-val" title="${s.mode||''}" style="font-size:11px">${s.mode||'—'}</div></div>
-      </div>
-      <div class="chart-wrap"><canvas id="${cid}"></canvas></div>`;
-    out.appendChild(div);
-    requestAnimationFrame(()=>makeBarChart(cid,s));
-  });
-}
-
-function makeBarChart(cid,s){
-  const canvas=document.getElementById(cid);
-  if(!canvas||!s.topValues) return;
-  const c=chartColors();
-  const top=s.topValues.slice(0,8);
-  const horiz=top.length>4;
-
-  if(charts[cid]) charts[cid].destroy();
-  charts[cid]=new Chart(canvas,{
-    type:'bar',
-    data:{
-      labels:top.map(([v])=>String(v).length>16?String(v).slice(0,14)+'…':String(v)),
-      datasets:[{
-        data:top.map(([,c])=>c),
-        backgroundColor:top.map((_,i)=>i===0?'rgba(29,158,117,0.85)':'rgba(29,158,117,0.35)'),
-        borderRadius:3,borderWidth:0
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,indexAxis:horiz?'y':'x',
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Count: ${ctx.parsed[horiz?'x':'y']}`}}},
-      scales:{
-        x:{grid:{color:c.grid},ticks:{color:c.tick,font:{family:'DM Mono',size:9}}},
-        y:{grid:{color:c.grid},ticks:{color:c.tick,font:{family:'DM Mono',size:9}}}
-      }
-    }
-  });
-}
-
-// ── Correlation Heatmap ──
-function corrColor(r){
-  const t=Math.abs(r);
-  if(r>=0){return[Math.round(255*(1-t)+29*t),Math.round(255*(1-t)+158*t),Math.round(255*(1-t)+117*t)]}
-  else{return[Math.round(255*(1-t)+239*t),Math.round(255*(1-t)+68*t),Math.round(255*(1-t)+68*t)]}
-}
-
-function renderCorrelation(){
-  const cols=numCols.slice(0,MAX_CORR_COLS);
-  if(cols.length<2){
-    document.getElementById('corr-out').innerHTML='<div class="callout amber">Need at least 2 numeric columns to compute correlations.</div>';
-    return;
-  }
-  document.getElementById('corr-out').innerHTML=`<div class="card">
-    <div class="card-title">Pearson Correlation Matrix</div>
-    <div class="card-sub">${cols.length} numeric columns${numCols.length>MAX_CORR_COLS?` (limited to first ${MAX_CORR_COLS})`:''}. Diagonal = 1.00.</div>
-    <div class="corr-scroll"><canvas id="corr-canvas"></canvas></div></div>`;
-  renderCorrHeatmap();
-}
-
-function renderCorrHeatmap(){
-  const cols=numCols.slice(0,MAX_CORR_COLS);
-  const canvas=document.getElementById('corr-canvas');
-  if(!canvas||cols.length<2) return;
-
-  const dark=document.body.classList.contains('dark');
-  const cell=Math.min(54,Math.max(28,Math.floor(580/cols.length)));
-  const lpad=130,tpad=130;
-  const W=lpad+cols.length*cell, H=tpad+cols.length*cell;
-
-  canvas.width=W; canvas.height=H;
-  const scale=Math.min(1,680/W);
-  canvas.style.width=Math.round(W*scale)+'px';
-  canvas.style.height=Math.round(H*scale)+'px';
-
-  const ctx=canvas.getContext('2d');
-  const bg=dark?'#1c1c1a':'#ffffff';
-  const tickCol=dark?'#888780':'#6b6b67';
-
-  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-  ctx.font=`${Math.min(11,cell*0.21)}px "DM Mono",monospace`;
-
-  // Column headers (rotated 45°)
-  cols.forEach((col,j)=>{
-    const lbl=col.length>14?col.slice(0,12)+'…':col;
-    ctx.save();
-    ctx.translate(lpad+j*cell+cell/2, tpad-10);
-    ctx.rotate(-Math.PI/4);
-    ctx.textAlign='left'; ctx.fillStyle=tickCol;
-    ctx.fillText(lbl,0,0);
-    ctx.restore();
-  });
-
-  // Row labels
-  cols.forEach((col,i)=>{
-    const lbl=col.length>16?col.slice(0,14)+'…':col;
-    ctx.textAlign='right'; ctx.fillStyle=tickCol;
-    ctx.fillText(lbl, lpad-8, tpad+i*cell+cell/2+4);
-  });
-
-  // Cells
-  cols.forEach((c1,i)=>cols.forEach((c2,j)=>{
-    const r=corrMat[c1]?.[c2]??0;
-    const [R,G,B]=corrColor(r);
-    ctx.fillStyle=`rgb(${R},${G},${B})`;
-    ctx.fillRect(lpad+j*cell, tpad+i*cell, cell-1, cell-1);
-
-    const fs=Math.max(8,Math.min(11,cell*0.22));
-    ctx.font=`${fs}px "DM Mono",monospace`;
-    ctx.textAlign='center';
-    const bright=(R*299+G*587+B*114)/1000;
-    ctx.fillStyle=bright>150?'rgba(26,26,24,0.85)':'rgba(255,255,255,0.95)';
-    ctx.fillText(r.toFixed(2), lpad+j*cell+cell/2, tpad+i*cell+cell/2+fs*0.38);
-  }));
-}
-
-// ── Sample Data ──
-function renderSample(){
-  const rows=rawData.slice(0,10);
-  let h='<div class="tbl-scroll"><table><thead><tr>';
-  headers.forEach(col=>{ h+=`<th>${col}</th>`; });
-  h+='</tr></thead><tbody>';
-  rows.forEach(row=>{
-    h+='<tr>';
-    headers.forEach(col=>{
-      const v=row[col];
-      const d=(v===''||v==null)?'<span class="null-cell">null</span>':String(v).slice(0,50);
-      h+=`<td>${d}</td>`;
-    });
-    h+='</tr>';
-  });
-  h+='</tbody></table></div>';
-  document.getElementById('sample-out').innerHTML=h;
-}
-
-// ── Chart Color Update on Dark Toggle ──
-function updateChartColors(){
-  const c=chartColors();
-  Object.values(charts).forEach(ch=>{
-    if(!ch.options?.scales) return;
-    ['x','y'].forEach(ax=>{
-      if(ch.options.scales[ax]){
-        ch.options.scales[ax].grid.color=c.grid;
-        ch.options.scales[ax].ticks.color=c.tick;
-      }
-    });
-    ch.update();
-  });
-}
-
-// ── Scroll Spy ──
-function setupScrollSpy(){
-  const sections=['s-overview','s-insights','s-missing','s-numeric','s-categorical','s-corr','s-sample'];
-  const links=document.querySelectorAll('.sb-link');
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        links.forEach(l=>l.classList.remove('active'));
-        const idx=sections.indexOf(e.target.id);
-        if(idx>=0) links[idx]?.classList.add('active');
-      }
-    });
-  },{rootMargin:'-15% 0px -65% 0px'});
-  sections.forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el)});
-}
-</script>
+<!-- ═══════════ SCRIPTS ═══════════
+  core.js first (it wires up the drop-zone and defines all shared
+  state, helpers, and the renderAll() orchestrator). Section files
+  load after — each one just defines its render<Section>() function,
+  which renderAll() looks up by name when an upload completes.
+-->
+<script src="auto-eda/core.js"></script>
+<script src="auto-eda/sections/overview.js"></script>
+<script src="auto-eda/sections/insights.js"></script>
+<script src="auto-eda/sections/numeric.js"></script>
+<script src="auto-eda/sections/categorical.js"></script>
+<script src="auto-eda/sections/correlations.js"></script>
+<script src="auto-eda/sections/covariable.js"></script>
+<script src="auto-eda/sections/sample.js"></script>
 </body>
 </html>
