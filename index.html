@@ -1,75 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3LNV66EG8G"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-3LNV66EG8G');
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Le Thanh Binh — Data Scientist</title>
-  <meta name="google-site-verification" content="uH3I4abJpS6lZO-Ey2bQJS7dZfN5hAY5qPMOTUpF9IM" />
   <meta name="description" content="Le Thanh Binh is a Data Scientist with 3+ years building production ML systems at scale — credit scoring, search relevance, NLP, and MLOps. Based in Vietnam." />
   <meta name="author" content="Le Thanh Binh" />
   <link rel="canonical" href="https://hinetabi.github.io/" />
-  <!-- Open Graph -->
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://hinetabi.github.io/" />
   <meta property="og:site_name"   content="Le Thanh Binh" />
   <meta property="og:title"       content="Le Thanh Binh — Data Scientist" />
   <meta property="og:description" content="Data Scientist with 3+ years building production ML systems at scale — credit scoring, search relevance, NLP, and MLOps." />
-  <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary" />
   <meta name="twitter:title"       content="Le Thanh Binh — Data Scientist" />
   <meta name="twitter:description" content="Data Scientist with 3+ years building production ML systems at scale — credit scoring, search relevance, NLP, and MLOps." />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #fafaf8;
-      --bg-secondary: #f1efea;
-      --bg-card: #ffffff;
-      --text-primary: #1a1a18;
-      --text-secondary: #6b6b67;
-      --border: rgba(0,0,0,0.1);
-      --border-hover: rgba(0,0,0,0.2);
-      --green: #1D9E75;
-      --green-bg: #E1F5EE;
-      --green-text: #0F6E56;
-      --radius-md: 8px;
-      --radius-lg: 14px;
+      --bg:            #fbfaf7;
+      --bg-subtle:     #f3f1ea;
+      --text:          #171714;
+      --text-dim:      #6b685f;
+      --text-muted:    #9c998f;
+      --border:        rgba(23,23,20,0.09);
+      --border-strong: rgba(23,23,20,0.22);
+
+      --green:         #1D9E75;
+      --green-bg:      #E1F5EE;
+      --green-text:    #0F6E56;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
       --radius-pill: 999px;
-      --transition: 0.25s ease;
+
+      --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+      --ease: cubic-bezier(.2,.7,.3,1);
     }
 
     body.dark {
-      --bg: #111110;
-      --bg-secondary: #1c1c1a;
-      --bg-card: #1c1c1a;
-      --text-primary: #f0ede6;
-      --text-secondary: #888780;
-      --border: rgba(255,255,255,0.09);
-      --border-hover: rgba(255,255,255,0.18);
+      --bg:            #17160f;
+      --bg-subtle:     #22211b;
+      --text:          #f4f1e6;
+      --text-dim:      #c2bfb2;
+      --text-muted:    #8f8c7f;
+      --border:        rgba(244,241,230,0.14);
+      --border-strong: rgba(244,241,230,0.32);
+
+      --green-bg:      rgba(29,158,117,0.22);
+      --green-text:    #7ddcb3;
     }
 
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: var(--font);
+      font-feature-settings: "ss01", "cv11";
       background: var(--bg);
-      color: var(--text-primary);
-      transition: background var(--transition), color var(--transition);
+      color: var(--text);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      transition: background 0.4s var(--ease), color 0.4s var(--ease);
+    }
+
+    ::selection { background: var(--green-bg); color: var(--green-text); }
+
+    /* Thin scroll-progress bar */
+    .progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      width: 0%;
+      background: var(--green);
+      z-index: 100;
+      transition: width 0.08s linear;
     }
 
     .site {
-      max-width: 880px;
+      max-width: 680px;
       margin: 0 auto;
-      padding: 0 1.5rem 4rem;
+      padding: 0 1.5rem 5rem;
     }
 
     /* NAV */
@@ -77,589 +103,658 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.4rem 0;
-      border-bottom: 0.5px solid var(--border);
-      margin-bottom: 3.5rem;
+      padding: 1.75rem 0;
+      margin-bottom: 5rem;
     }
 
-    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-left { display: flex; align-items: center; gap: 0.8rem; }
 
     .nav-logo {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-primary);
-      font-family: 'DM Mono', monospace;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+    .nav-logo .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 3px var(--green-bg);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } }
 
-    .nav-links { display: flex; gap: 1.75rem; }
+    .nav-links { display: flex; gap: 1.5rem; }
     .nav-links a {
-      font-size: 14px;
-      color: var(--text-secondary);
+      font-size: 13.5px;
+      color: var(--text-dim);
       text-decoration: none;
-      transition: color var(--transition);
+      position: relative;
+      transition: color 0.2s var(--ease);
     }
-    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--text); }
+    .nav-links a.active::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: -6px;
+      height: 1.5px;
+      background: var(--green);
+      border-radius: 2px;
+    }
 
     .toggle-btn {
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
-      padding: 5px 13px;
-      border: 0.5px solid var(--border-hover);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 5px 11px;
+      border: 1px solid var(--border);
       border-radius: var(--radius-pill);
-      background: var(--bg-secondary);
-      color: var(--text-primary);
+      background: transparent;
+      color: var(--text-dim);
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: background var(--transition), border-color var(--transition);
+      transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
     }
-    .toggle-btn:hover { border-color: var(--green); }
+    .toggle-btn:hover { border-color: var(--border-strong); color: var(--text); }
 
     /* HERO */
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 2rem;
-      align-items: center;
-      margin-bottom: 3.5rem;
-    }
+    .hero { margin-bottom: 4.5rem; }
 
-    .hero-tag {
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
       font-size: 12px;
       font-weight: 500;
       color: var(--green-text);
       background: var(--green-bg);
-      padding: 4px 11px;
+      padding: 5px 11px;
       border-radius: var(--radius-pill);
-      display: inline-block;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .eyebrow .live {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
     }
 
     .hero h1 {
-      font-size: 34px;
-      font-weight: 500;
-      color: var(--text-primary);
-      line-height: 1.22;
-      margin-bottom: 0.85rem;
-      letter-spacing: -0.5px;
+      font-size: clamp(32px, 5vw, 42px);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 .wave {
+      display: inline-block;
+      transform-origin: 70% 70%;
+      cursor: default;
+    }
+    .hero h1 .wave:hover { animation: wave 1.6s ease-in-out; }
+    @keyframes wave {
+      0%, 100% { transform: rotate(0); }
+      15% { transform: rotate(14deg); }
+      30% { transform: rotate(-8deg); }
+      45% { transform: rotate(14deg); }
+      60% { transform: rotate(-4deg); }
+      75% { transform: rotate(10deg); }
     }
 
     .hero-sub {
-      font-size: 15px;
-      color: var(--text-secondary);
-      line-height: 1.75;
-      margin-bottom: 1.5rem;
-      max-width: 430px;
+      font-size: 16px;
+      color: var(--text-dim);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 1.75rem;
     }
+    .hero-sub strong { color: var(--text); font-weight: 500; }
 
     .hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
 
-    .btn-primary {
-      background: var(--green);
-      color: #fff;
-      border: none;
-      padding: 10px 22px;
-      border-radius: var(--radius-md);
+    .btn {
+      font-family: var(--font);
       font-size: 14px;
       font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: opacity 0.2s;
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
+      border: 1px solid transparent;
     }
-    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-primary .arrow { transition: transform 0.2s var(--ease); }
+    .btn-primary:hover .arrow { transform: translateX(3px); }
 
     .btn-secondary {
       background: transparent;
-      color: var(--text-primary);
-      border: 0.5px solid var(--border-hover);
-      padding: 10px 22px;
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
-      cursor: pointer;
-      transition: border-color var(--transition);
-      text-decoration: none;
+      color: var(--text);
+      border: 1px solid var(--border-strong);
     }
-    .btn-secondary:hover { border-color: var(--green); color: var(--green); }
+    .btn-secondary:hover { border-color: var(--text); transform: translateY(-1px); }
 
-    .avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: #9FE1CB;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: 500;
-      color: #0F6E56;
-      flex-shrink: 0;
-      border: 3px solid var(--bg);
-      box-shadow: 0 0 0 1px var(--border);
-    }
-
-    /* STATS */
+    /* STATS — no cards, just numbers with a rule */
     .stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 3.5rem;
-    }
-
-    .stat-card {
-      background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      padding: 1.1rem;
-      transition: background var(--transition);
+      gap: 2rem;
+      padding: 2rem 0;
+      margin-bottom: 4.5rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
 
     .stat-num {
-      font-size: 26px;
-      font-weight: 500;
-      color: var(--text-primary);
-      font-family: 'DM Mono', monospace;
-      letter-spacing: -1px;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      line-height: 1;
     }
-
     .stat-label {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 3px;
-    }
-
-    /* SECTION TITLE */
-    .section-title {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 1.25rem;
-      font-family: 'DM Mono', monospace;
-    }
-
-    /* SKILLS */
-    .skills-section { margin-bottom: 3.5rem; }
-    .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-
-    .skill-pill {
-      font-size: 13px;
-      padding: 5px 13px;
-      border-radius: var(--radius-pill);
-      font-weight: 400;
-      border: 0.5px solid transparent;
-    }
-    .pill-teal  { background: #E1F5EE; color: #0F6E56; border-color: #9FE1CB; }
-    .pill-blue  { background: #E6F1FB; color: #185FA5; border-color: #B5D4F4; }
-    .pill-purple { background: #EEEDFE; color: #534AB7; border-color: #CECBF6; }
-    .pill-amber { background: #FAEEDA; color: #854F0B; border-color: #FAC775; }
-    .pill-purple { background: #EEEDFE; color: #534AB7; border-color: #CECBF6; }
-
-    /* BLOG */
-    .blog-section { margin-bottom: 3.5rem; }
-
-    .blog-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1.25rem;
-      padding: 1rem 0;
-      border-bottom: 0.5px solid var(--border);
-      text-decoration: none;
-      transition: opacity var(--transition);
-    }
-    .blog-item:last-child { border-bottom: none; }
-    .blog-item:hover .blog-title { color: var(--green); }
-    .blog-item:hover .blog-thumb { border-color: var(--border-hover); }
-
-    /* Thumbnail */
-    .blog-thumb {
-      width: 80px;
-      height: 60px;
-      border-radius: var(--radius-md);
-      flex-shrink: 0;
-      overflow: hidden;
-      border: 0.5px solid var(--border);
-      transition: border-color var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .blog-thumb.thumb-green { background: var(--green-bg); }
-    .blog-thumb.thumb-blue  { background: #E6F1FB; }
-    body.dark .blog-thumb.thumb-blue { background: rgba(59,130,246,0.1); }
-    .blog-thumb svg { width: 80px; height: 60px; display: block; }
-
-    .blog-body { flex: 1; }
-
-    .blog-tag {
-      font-size: 11px;
-      font-weight: 500;
-      padding: 3px 9px;
-      border-radius: var(--radius-pill);
-      display: inline-block;
-      margin-bottom: 0.5rem;
-    }
-
-    .blog-title {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-primary);
-      transition: color var(--transition);
+      font-size: 12.5px;
+      color: var(--text-dim);
+      margin-top: 8px;
       line-height: 1.4;
     }
 
-    .blog-arrow {
-      font-size: 15px;
-      color: var(--text-secondary);
-      flex-shrink: 0;
+    /* SECTION */
+    .section { margin-bottom: 4.5rem; }
+
+    .section-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 1.75rem;
     }
 
-    /* EXPERIENCE */
-    .exp-section { margin-bottom: 3.5rem; }
-
-    .exp-item {
+    /* SKILLS */
+    .skills {
       display: flex;
-      gap: 1rem;
-      padding: 1rem 0;
-      border-bottom: 0.5px solid var(--border);
+      flex-wrap: wrap;
+      gap: 8px;
     }
-    .exp-item:last-child { border-bottom: none; }
+    .skill {
+      font-size: 13px;
+      padding: 6px 13px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      background: transparent;
+      transition: color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+      cursor: default;
+    }
+    .skill:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
 
-    .exp-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: var(--radius-md);
-      background: var(--green);
+    /* WRITING — list with small thumbnails */
+    .item {
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      align-items: center;
+      gap: 1.1rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      transition: padding 0.25s var(--ease);
+    }
+    .item:first-of-type { border-top: 1px solid var(--border); }
+    .item::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      top: 0; bottom: 0;
+      background: var(--bg-subtle);
+      opacity: 0;
+      z-index: -1;
+      border-radius: var(--radius-sm);
+      transition: opacity 0.25s var(--ease);
+    }
+    .item:hover { padding-left: 12px; padding-right: 12px; margin-left: -12px; margin-right: -12px; }
+    .item:hover::before { opacity: 1; }
+    .item:hover .item-arrow { transform: translateX(4px); color: var(--green); }
+    .item:hover .item-title { color: var(--green); }
+    .item:hover .thumb { border-color: var(--border-strong); }
+
+    .thumb {
+      width: 72px;
+      height: 56px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      font-weight: 500;
-      color: #fff;
       flex-shrink: 0;
-      font-family: 'DM Mono', monospace;
-      overflow: hidden;
+      transition: border-color 0.2s var(--ease);
     }
+    .thumb svg { width: 100%; height: 100%; display: block; }
+    .thumb.tint-green  { background: #E1F5EE; }
+    .thumb.tint-blue   { background: #E6F1FB; }
+    .thumb.tint-purple { background: #EEEDFE; }
+    body.dark .thumb.tint-green  { background: rgba(29,158,117,0.22); }
+    body.dark .thumb.tint-blue   { background: rgba(59,130,246,0.22); }
+    body.dark .thumb.tint-purple { background: rgba(124,58,237,0.28); }
 
-    .exp-logo.logo-img {
-      background: var(--bg-card);
-      border: 0.5px solid var(--border);
-      padding: 4px;
+    .item-body { min-width: 0; }
+    .item-tag {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
     }
-    .exp-logo.logo-img img { width: 100%; height: 100%; object-fit: contain; }
-
-    .exp-logo.logo-upp { background: #4B6BFB; }
-
-    .exp-title {
-      font-size: 14px;
+    .item-title {
+      font-size: 15.5px;
       font-weight: 500;
-      color: var(--text-primary);
+      line-height: 1.35;
+      color: var(--text);
+      transition: color 0.2s var(--ease);
+    }
+    .item-arrow {
+      font-size: 15px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform 0.25s var(--ease), color 0.2s var(--ease);
     }
 
-    .exp-meta {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 3px;
+    /* EXPERIENCE */
+    .exp {
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .exp:first-of-type { border-top: 1px solid var(--border); }
+
+    .exp-head {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .exp-logo {
+      position: relative;
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      background: var(--text);
+      color: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+      overflow: hidden;
+      font-family: var(--mono);
+    }
+    .exp-logo.logo-img {
+      background: #fff;
+      border: 1px solid var(--border);
+    }
+    body.dark .exp-logo.logo-img { background: #f4f1e6; }
+    .exp-logo.logo-img img {
+      position: absolute;
+      inset: 4px;
+      width: calc(100% - 8px);
+      height: calc(100% - 8px);
+      object-fit: contain;
+      display: block;
+    }
+
+    .exp-title { font-size: 14.5px; font-weight: 500; line-height: 1.25; }
+    .exp-company { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+    .exp-date {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
     }
 
     .exp-bullets {
-      margin-top: 0.6rem;
-      padding-left: 1rem;
-      list-style: disc;
+      margin: 0.85rem 0 0.2rem 3.5rem;
+      padding: 0;
+      list-style: none;
     }
     .exp-bullets li {
-      font-size: 13px;
-      color: var(--text-secondary);
+      font-size: 13.5px;
+      color: var(--text-dim);
       line-height: 1.65;
-      margin-bottom: 0.25rem;
+      padding-left: 14px;
+      position: relative;
+      margin-bottom: 0.3rem;
+    }
+    .exp-bullets li::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 9px;
+      width: 5px; height: 1.5px;
+      background: var(--text-muted);
+      border-radius: 2px;
     }
 
-    /* CONTACT */
-    .contact-section {
-      background: var(--bg-secondary);
-      border-radius: var(--radius-lg);
-      padding: 1.75rem;
+    /* CONTACT — inline, minimal */
+    .contact {
+      padding: 2rem 0 0;
+      border-top: 1px solid var(--border);
+    }
+    .contact-title {
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      margin-bottom: 8px;
+    }
+    .contact-sub {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+      line-height: 1.55;
+    }
+
+    .contact-links {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .contact-link {
+      font-size: 13.5px;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: var(--font);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
+    }
+    .contact-link:hover { border-color: var(--text); transform: translateY(-1px); }
+    .contact-link .icon { font-size: 11px; color: var(--text-muted); transition: transform 0.2s var(--ease); }
+    .contact-link:hover .icon { transform: translate(2px, -2px); color: var(--green); }
+    .contact-link.copied { border-color: var(--green); color: var(--green); }
+
+    /* FOOTER */
+    footer {
+      margin-top: 3.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      transition: background var(--transition);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--text-muted);
     }
 
-    .connect-title {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-
-    .connect-sub {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .contact-links { display: flex; gap: 10px; flex-wrap: wrap; }
-
-    .contact-link {
-      font-size: 13px;
-      padding: 8px 18px;
-      border: 0.5px solid var(--border-hover);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      background: var(--bg-card);
-      text-decoration: none;
-      transition: border-color var(--transition), color var(--transition);
-    }
-    .contact-link:hover { border-color: var(--green); color: var(--green); }
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+    .reveal.in { opacity: 1; transform: translateY(0); }
 
     /* RESPONSIVE */
-    @media (max-width: 600px) {
-      .hero { grid-template-columns: 1fr; }
-      .avatar { display: none; }
-      .stats { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 640px) {
+      .site { padding: 0 1.25rem 4rem; }
       .nav-links { display: none; }
-      .hero h1 { font-size: 26px; }
+      .stats { grid-template-columns: repeat(3, 1fr); gap: 1rem; padding: 1.5rem 0; }
+      .stat-num { font-size: 26px; }
+      .hero h1 { font-size: 30px; }
+      .exp-head { grid-template-columns: auto 1fr; }
+      .exp-date { grid-column: 2; margin-top: 2px; }
+      .exp-bullets { margin-left: 0; }
+      footer { flex-direction: column; gap: 0.5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      .reveal { opacity: 1; transform: none; }
     }
   </style>
 </head>
 <body>
+  <div class="progress" id="progress"></div>
+
   <div class="site">
 
     <nav>
       <div class="nav-left">
-        <span class="nav-logo">hinetabi.github.io</span>
-        <button class="toggle-btn" id="toggleBtn" onclick="toggleDark()">
-          <span id="toggleIcon">🌙</span>
-          <span id="toggleLabel">Dark</span>
-        </button>
+        <span class="nav-logo"><span class="dot"></span> hinetabi</span>
       </div>
-      <div class="nav-links">
+      <div class="nav-links" id="navLinks">
         <a href="#about">About</a>
         <a href="#writing">Writing</a>
         <a href="#experience">Experience</a>
         <a href="#contact">Contact</a>
       </div>
+      <button class="toggle-btn" onclick="toggleDark()">
+        <span id="toggleIcon">🌙</span>
+        <span id="toggleLabel">Dark</span>
+      </button>
     </nav>
 
     <!-- HERO -->
-    <section id="about" class="hero">
-      <div>
-        <div class="hero-tag">Data Scientist @ Cake by VP Bank</div>
-        <h1>Hi, I'm<br>Le Thanh Binh</h1>
-        <p class="hero-sub">Data Scientist with 3+ years building production ML systems at scale.</p>
-        <div class="hero-btns">
-          <a class="btn-primary" href="#contact">Get in touch</a>
-          <a class="btn-secondary" href="CV_LeThanhBinh.pdf" download>Download CV</a>
-        </div>
+    <section id="about" class="hero reveal">
+      <div class="eyebrow"><span class="live"></span> Available for collaborations</div>
+      <h1>Hi <span class="wave" title="Hi!">👋</span>, I'm Le Thanh Binh.</h1>
+      <p class="hero-sub">A data scientist with <strong>3+ years</strong> shipping production ML — credit scoring, search relevance, NLP, and the MLOps plumbing that keeps them reliable. Currently at <strong>Cake by VPBank</strong> in Ho Chi Minh City.</p>
+      <div class="hero-btns">
+        <a class="btn btn-primary" href="#contact">Get in touch <span class="arrow">→</span></a>
       </div>
-      <div class="avatar">LB</div>
     </section>
 
     <!-- STATS -->
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-num">3+</div>
+    <section class="stats reveal">
+      <div>
+        <div class="stat-num" data-count="3" data-suffix="+">0</div>
         <div class="stat-label">Years experience</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num">10+</div>
+      <div>
+        <div class="stat-num" data-count="10" data-suffix="+">0</div>
         <div class="stat-label">Production ML deployments</div>
       </div>
-      <div class="stat-card">
+      <div>
         <div class="stat-num">$ X</div>
         <div class="stat-label">Impact on revenue</div>
       </div>
-    </div>
+    </section>
 
     <!-- SKILLS -->
-    <div class="skills-section">
+    <section class="section reveal">
       <div class="section-title">Skills</div>
-      <div class="skills-grid">
-        <span class="skill-pill pill-purple">Deep Learning</span>
-        <span class="skill-pill pill-amber">Machine Learning</span>
-        <span class="skill-pill pill-blue">Data Analytics</span>
-        <span class="skill-pill pill-teal">Data Engineering</span>
+      <div class="skills">
+        <span class="skill">Deep Learning</span>
+        <span class="skill">Machine Learning</span>
+        <span class="skill">Data Analytics</span>
+        <span class="skill">Data Engineering</span>
+        <span class="skill">PyTorch</span>
+        <span class="skill">Python</span>
+        <span class="skill">SQL</span>
+        <span class="skill">NLP</span>
       </div>
-    </div>
+    </section>
 
     <!-- WRITING -->
-    <div id="writing" class="blog-section">
+    <section id="writing" class="section reveal">
       <div class="section-title">Writing</div>
 
-      <a class="blog-item" href="blog/building-credit-score-models-in-digital-bank.html">
-        <!-- Thumbnail: cumulative lift curve mini-chart (green) -->
-        <div class="blog-thumb thumb-green">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-            <!-- Filled area under model curve -->
-            <polygon points="6,52 20,43 34,30 48,19 62,11 74,8 74,52" fill="var(--green)" fill-opacity="0.15"/>
-            <!-- Random baseline (diagonal) -->
-            <line x1="6" y1="52" x2="74" y2="8" stroke="var(--green)" stroke-width="1" opacity="0.3" stroke-dasharray="3,2"/>
-            <!-- Model lift curve -->
-            <polyline points="6,52 20,43 34,30 48,19 62,11 74,8" stroke="var(--green)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- Highlight dot -->
-            <circle cx="34" cy="30" r="2.5" fill="var(--green)"/>
-            <circle cx="62" cy="11" r="2.5" fill="var(--green)"/>
-            <!-- Axes -->
-            <line x1="6" y1="54" x2="76" y2="54" stroke="var(--green)" stroke-width="0.8" opacity="0.3"/>
-            <line x1="6" y1="6"  x2="6"  y2="54" stroke="var(--green)" stroke-width="0.8" opacity="0.3"/>
-            <!-- Label -->
-            <text x="40" y="7" text-anchor="middle" font-family="DM Mono, monospace" font-size="6.5" fill="var(--green-text)" opacity="0.7" font-weight="500">CREDIT SCORE</text>
+      <a class="item" href="blog/building-credit-score-models-in-digital-bank.html">
+        <div class="thumb tint-green">
+          <svg viewBox="0 0 72 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <polygon points="6,48 18,40 30,28 42,18 54,10 66,6 66,48" fill="#1D9E75" fill-opacity="0.18"/>
+            <line x1="6" y1="48" x2="66" y2="6" stroke="#1D9E75" stroke-width="0.8" opacity="0.35" stroke-dasharray="3,2"/>
+            <polyline points="6,48 18,40 30,28 42,18 54,10 66,6" stroke="#1D9E75" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="30" cy="28" r="2" fill="#1D9E75"/>
+            <circle cx="54" cy="10" r="2" fill="#1D9E75"/>
           </svg>
         </div>
-        <div class="blog-body">
-          <span class="blog-tag pill-teal">MLOps · Series</span>
-          <div class="blog-title">Building Credit Score Models in a Digital Bank</div>
+        <div class="item-body">
+          <div class="item-tag">MLOps · Series</div>
+          <div class="item-title">Building credit score models in a digital bank</div>
         </div>
-        <span class="blog-arrow">→</span>
+        <span class="item-arrow">→</span>
       </a>
 
-      <a class="blog-item" href="blog/eda-banking/p1-why-explore.html">
-        <!-- Thumbnail: EDA banking / green bar chart with loan grades -->
-        <div class="blog-thumb" style="background:#E1F5EE;">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-            <!-- Bar chart: default rate by grade A→G -->
-            <rect x="6"  y="50" width="8" height="2"  fill="#1D9E75" opacity="0.5" rx="1"/>
-            <rect x="16" y="46" width="8" height="6"  fill="#1D9E75" opacity="0.6" rx="1"/>
-            <rect x="26" y="41" width="8" height="11" fill="#1D9E75" opacity="0.75" rx="1"/>
-            <rect x="36" y="34" width="8" height="18" fill="#D97706" opacity="0.75" rx="1"/>
-            <rect x="46" y="26" width="8" height="26" fill="#D97706" opacity="0.85" rx="1"/>
-            <rect x="56" y="16" width="8" height="36" fill="#EF4444" opacity="0.75" rx="1"/>
-            <rect x="66" y="8"  width="8" height="44" fill="#EF4444" opacity="0.9" rx="1"/>
-            <!-- Axis -->
-            <line x1="4" y1="54" x2="76" y2="54" stroke="#1D9E75" stroke-width="0.8" opacity="0.3"/>
-            <!-- Label -->
-            <text x="40" y="7" text-anchor="middle" font-family="DM Mono, monospace" font-size="5.5" fill="#0F6E56" opacity="0.9" font-weight="500">EDA · Banking</text>
+      <a class="item" href="blog/eda-banking/p1-why-explore.html">
+        <div class="thumb tint-green">
+          <svg viewBox="0 0 72 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <rect x="6"  y="46" width="7" height="3"  fill="#1D9E75" opacity="0.55" rx="1"/>
+            <rect x="15" y="42" width="7" height="7"  fill="#1D9E75" opacity="0.65" rx="1"/>
+            <rect x="24" y="37" width="7" height="12" fill="#1D9E75" opacity="0.8" rx="1"/>
+            <rect x="33" y="30" width="7" height="19" fill="#D97706" opacity="0.8" rx="1"/>
+            <rect x="42" y="22" width="7" height="27" fill="#D97706" opacity="0.9" rx="1"/>
+            <rect x="51" y="14" width="7" height="35" fill="#EF4444" opacity="0.8" rx="1"/>
+            <rect x="60" y="7"  width="7" height="42" fill="#EF4444" opacity="0.95" rx="1"/>
           </svg>
         </div>
-        <div class="blog-body">
-          <span class="blog-tag pill-teal">EDA · Series · 8 parts</span>
-          <div class="blog-title">EDA for Banking Loans — A What &amp; Why Guide</div>
+        <div class="item-body">
+          <div class="item-tag">EDA · Series · 8 parts</div>
+          <div class="item-title">EDA for banking loans — a what &amp; why guide</div>
         </div>
-        <span class="blog-arrow">→</span>
+        <span class="item-arrow">→</span>
       </a>
 
-      <a class="blog-item" href="blog/text-embedding-at-scale.html">
-        <!-- Thumbnail: vector embedding space (blue) -->
-        <div class="blog-thumb thumb-blue">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-            <!-- Connection lines -->
-            <line x1="16" y1="16" x2="40" y2="30" stroke="#3B82F6" stroke-width="0.9" opacity="0.35"/>
-            <line x1="60" y1="12" x2="40" y2="30" stroke="#3B82F6" stroke-width="0.9" opacity="0.35"/>
-            <line x1="40" y1="30" x2="58" y2="46" stroke="#3B82F6" stroke-width="0.9" opacity="0.35"/>
-            <line x1="40" y1="30" x2="18" y2="46" stroke="#3B82F6" stroke-width="0.9" opacity="0.25"/>
-            <line x1="16" y1="16" x2="60" y2="12" stroke="#3B82F6" stroke-width="0.9" opacity="0.18"/>
-            <line x1="60" y1="12" x2="58" y2="46" stroke="#3B82F6" stroke-width="0.9" opacity="0.18"/>
-            <!-- Nodes -->
-            <circle cx="16" cy="16" r="4"   fill="#3B82F6" opacity="0.6"/>
-            <circle cx="60" cy="12" r="3"   fill="#3B82F6" opacity="0.5"/>
-            <circle cx="40" cy="30" r="5.5" fill="#3B82F6" opacity="0.9"/>
-            <circle cx="58" cy="46" r="3.5" fill="#3B82F6" opacity="0.55"/>
-            <circle cx="18" cy="46" r="2.5" fill="#3B82F6" opacity="0.4"/>
-            <!-- Label -->
-            <text x="40" y="57" text-anchor="middle" font-family="DM Mono, monospace" font-size="6.5" fill="#185FA5" opacity="0.7" font-weight="500">EMBEDDING</text>
+      <a class="item" href="blog/text-embedding-at-scale.html">
+        <div class="thumb tint-blue">
+          <svg viewBox="0 0 72 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <line x1="14" y1="14" x2="36" y2="28" stroke="#3B82F6" stroke-width="0.8" opacity="0.35"/>
+            <line x1="54" y1="10" x2="36" y2="28" stroke="#3B82F6" stroke-width="0.8" opacity="0.35"/>
+            <line x1="36" y1="28" x2="52" y2="44" stroke="#3B82F6" stroke-width="0.8" opacity="0.35"/>
+            <line x1="36" y1="28" x2="16" y2="44" stroke="#3B82F6" stroke-width="0.8" opacity="0.25"/>
+            <line x1="14" y1="14" x2="54" y2="10" stroke="#3B82F6" stroke-width="0.8" opacity="0.18"/>
+            <circle cx="14" cy="14" r="3.5" fill="#3B82F6" opacity="0.6"/>
+            <circle cx="54" cy="10" r="2.5" fill="#3B82F6" opacity="0.5"/>
+            <circle cx="36" cy="28" r="5"   fill="#3B82F6" opacity="0.9"/>
+            <circle cx="52" cy="44" r="3"   fill="#3B82F6" opacity="0.55"/>
+            <circle cx="16" cy="44" r="2.2" fill="#3B82F6" opacity="0.4"/>
           </svg>
         </div>
-        <div class="blog-body">
-          <span class="blog-tag pill-blue">NLP</span>
-          <div class="blog-title">Develop and Deploy Text Embedding Models at Scale</div>
+        <div class="item-body">
+          <div class="item-tag">NLP</div>
+          <div class="item-title">Developing &amp; deploying text embedding models at scale</div>
         </div>
-        <span class="blog-arrow">→</span>
+        <span class="item-arrow">→</span>
       </a>
-
-    </div>
+    </section>
 
     <!-- BUILDING -->
-    <div id="building" class="blog-section">
+    <section id="building" class="section reveal">
       <div class="section-title">Building</div>
 
-      <a class="blog-item" href="auto-eda.html">
-        <div class="blog-thumb" style="background:#EDE9FE;">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-            <rect x="9" y="10" width="62" height="40" rx="6" fill="#7C3AED" opacity="0.10"/>
-            <line x1="18" y1="18" x2="18" y2="46" stroke="#7C3AED" opacity="0.35"/>
-            <line x1="30" y1="18" x2="30" y2="46" stroke="#7C3AED" opacity="0.35"/>
-            <line x1="42" y1="18" x2="42" y2="46" stroke="#7C3AED" opacity="0.35"/>
-            <line x1="54" y1="18" x2="54" y2="46" stroke="#7C3AED" opacity="0.35"/>
-            <line x1="18" y1="26" x2="62" y2="26" stroke="#7C3AED" opacity="0.25"/>
-            <line x1="18" y1="34" x2="62" y2="34" stroke="#7C3AED" opacity="0.25"/>
-            <line x1="18" y1="42" x2="62" y2="42" stroke="#7C3AED" opacity="0.25"/>
-            <rect x="20" y="38" width="6" height="8" rx="1" fill="#7C3AED" opacity="0.65"/>
-            <rect x="32" y="32" width="6" height="14" rx="1" fill="#7C3AED" opacity="0.75"/>
-            <rect x="44" y="26" width="6" height="20" rx="1" fill="#7C3AED" opacity="0.85"/>
-            <rect x="56" y="20" width="6" height="26" rx="1" fill="#7C3AED" opacity="0.95"/>
-            <text x="40" y="9" text-anchor="middle" font-family="DM Mono, monospace" font-size="6.5" fill="#5B21B6" opacity="0.85" font-weight="500">AUTO · EDA</text>
+      <a class="item" href="auto-eda.html">
+        <div class="thumb tint-purple">
+          <svg viewBox="0 0 72 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <rect x="8" y="8" width="56" height="40" rx="5" fill="#7C3AED" opacity="0.10"/>
+            <line x1="16" y1="16" x2="16" y2="44" stroke="#7C3AED" opacity="0.35"/>
+            <line x1="28" y1="16" x2="28" y2="44" stroke="#7C3AED" opacity="0.35"/>
+            <line x1="40" y1="16" x2="40" y2="44" stroke="#7C3AED" opacity="0.35"/>
+            <line x1="52" y1="16" x2="52" y2="44" stroke="#7C3AED" opacity="0.35"/>
+            <line x1="16" y1="24" x2="58" y2="24" stroke="#7C3AED" opacity="0.22"/>
+            <line x1="16" y1="32" x2="58" y2="32" stroke="#7C3AED" opacity="0.22"/>
+            <line x1="16" y1="40" x2="58" y2="40" stroke="#7C3AED" opacity="0.22"/>
+            <rect x="18" y="36" width="5" height="7"  rx="1" fill="#7C3AED" opacity="0.7"/>
+            <rect x="30" y="30" width="5" height="13" rx="1" fill="#7C3AED" opacity="0.8"/>
+            <rect x="42" y="24" width="5" height="19" rx="1" fill="#7C3AED" opacity="0.9"/>
+            <rect x="54" y="18" width="5" height="25" rx="1" fill="#7C3AED"/>
           </svg>
         </div>
-        <div class="blog-body">
-          <span class="blog-tag pill-purple">Tool · In-browser</span>
-          <div class="blog-title">Auto EDA — CSV Explorer</div>
+        <div class="item-body">
+          <div class="item-tag">Tool · In-browser</div>
+          <div class="item-title">Auto EDA — a CSV explorer in your browser</div>
         </div>
-        <span class="blog-arrow">→</span>
+        <span class="item-arrow">→</span>
       </a>
-    </div>
+    </section>
 
     <!-- EXPERIENCE -->
-    <div id="experience" class="exp-section">
+    <section id="experience" class="section reveal">
       <div class="section-title">Experience</div>
 
-      <div class="exp-item">
-        <div class="exp-logo logo-img"><img src="resources/logo/cake_by_vp.png" alt="Cake by VP Bank"></div>
-        <div>
-          <div class="exp-title">Data Scientist</div>
-          <div class="exp-meta">Cake by VPBank &nbsp;·&nbsp; 2025 – Present &nbsp;·&nbsp; Ho Chi Minh City</div>
-          <ul class="exp-bullets">
-            <li>Leading digital bank in Vietnam with 6M+ users, offering loans, payments, and personal financial management.</li>
-            <li>Building credit scoring and behavioral models to assess financial risk for consumer lending and digital banking products.</li>
-          </ul>
+      <div class="exp">
+        <div class="exp-head">
+          <div class="exp-logo logo-img"><img src="resources/logo/cake_by_vp.png" alt="Cake by VPBank"></div>
+          <div>
+            <div class="exp-title">Data Scientist</div>
+            <div class="exp-company">Cake by VPBank · Ho Chi Minh City</div>
+          </div>
+          <div class="exp-date">2025 — Now</div>
         </div>
+        <ul class="exp-bullets">
+          <li>Leading digital bank in Vietnam with 6M+ users — loans, payments, and personal financial management.</li>
+          <li>Building credit scoring and behavioral models to assess financial risk for consumer lending.</li>
+        </ul>
       </div>
 
-      <div class="exp-item">
-        <div class="exp-logo logo-img"><img src="resources/logo/coccoc.png" alt="Coc Coc"></div>
-        <div>
-          <div class="exp-title">Data Scientist</div>
-          <div class="exp-meta">Coc Coc &nbsp;·&nbsp; 2024 – 2025 &nbsp;·&nbsp; Ha Noi</div>
-          <ul class="exp-bullets">
-            <li>Vietnam’s second-largest search engine and browser, serving 25M+ monthly active users.</li>
-            <li>Designed and deployed ML models for search relevance, ad ranking, and recommendation systems, directly impacting millions of users daily.</li>
-          </ul>
+      <div class="exp">
+        <div class="exp-head">
+          <div class="exp-logo logo-img"><img src="resources/logo/coccoc.png" alt="Coc Coc"></div>
+          <div>
+            <div class="exp-title">Data Scientist</div>
+            <div class="exp-company">Coc Coc · Ha Noi</div>
+          </div>
+          <div class="exp-date">2024 — 2025</div>
         </div>
+        <ul class="exp-bullets">
+          <li>Vietnam's second-largest search engine and browser, serving 25M+ monthly active users.</li>
+          <li>Designed and deployed ML models for search relevance, ad ranking, and recommendations.</li>
+        </ul>
       </div>
 
-      <div class="exp-item">
-        <div class="exp-logo logo-upp">U</div>
-        <div>
-          <div class="exp-title">Data Scientist</div>
-          <div class="exp-meta">UPP Global Technology JSC &nbsp;·&nbsp; 2022 – 2023 &nbsp;·&nbsp; Ha Noi</div>
-          <ul class="exp-bullets">
-            <li>Early-stage startup delivering enterprise AI and Big Data solutions, including Chatbots, Data Governance frameworks, and Agentic systems.</li>
-          </ul>
+      <div class="exp">
+        <div class="exp-head">
+          <div class="exp-logo">U</div>
+          <div>
+            <div class="exp-title">Data Scientist</div>
+            <div class="exp-company">UPP Global Technology JSC · Ha Noi</div>
+          </div>
+          <div class="exp-date">2022 — 2023</div>
         </div>
+        <ul class="exp-bullets">
+          <li>Early-stage startup delivering enterprise AI — chatbots, data governance, and agentic systems.</li>
+        </ul>
       </div>
-    </div>
+    </section>
 
     <!-- CONTACT -->
-    <div id="contact" class="contact-section">
-      <div>
-        <div class="connect-title">Let's connect</div>
-        <div class="connect-sub">Open to collaborations and research opportunities.</div>
-      </div>
+    <section id="contact" class="contact reveal">
+      <div class="contact-title">Let's connect.</div>
+      <div class="contact-sub">Open to collaborations, research chats, and interesting problems.</div>
       <div class="contact-links">
-        <a class="contact-link" href="https://www.linkedin.com/in/hinetabi/" target="_blank">LinkedIn</a>
-        <a class="contact-link" href="https://github.com/hinetabi" target="_blank">GitHub</a>
-        <a class="contact-link" href="mailto:binhlethanhfptu@gmail.com">Email</a>
+        <a class="contact-link" href="https://www.linkedin.com/in/hinetabi/" target="_blank">LinkedIn <span class="icon">↗</span></a>
+        <a class="contact-link" href="https://github.com/hinetabi" target="_blank">GitHub <span class="icon">↗</span></a>
+        <button class="contact-link" id="emailBtn" type="button">
+          <span id="emailText">binhlt.work@gmail.com</span>
+          <span class="icon" id="emailIcon">⎘</span>
+        </button>
       </div>
-    </div>
+    </section>
+
+    <footer>
+      <span>© 2026 · Le Thanh Binh</span>
+      <span>Built in HCMC</span>
+    </footer>
 
   </div>
 
   <script>
+    // ---------- THEME ----------
     let dark = false;
-
     function toggleDark() {
       dark = !dark;
       document.body.classList.toggle('dark', dark);
@@ -667,9 +762,83 @@
       document.getElementById('toggleLabel').textContent = dark ? 'Light' : 'Dark';
       localStorage.setItem('theme', dark ? 'dark' : 'light');
     }
-
-    // Restore saved preference
     if (localStorage.getItem('theme') === 'dark') toggleDark();
+
+    // ---------- SCROLL PROGRESS BAR ----------
+    const progress = document.getElementById('progress');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+      progress.style.width = p + '%';
+    }, { passive: true });
+
+    // ---------- REVEAL ON SCROLL ----------
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // ---------- COUNT-UP STATS ----------
+    const countIO = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        const target = parseInt(el.dataset.count, 10);
+        const suffix = el.dataset.suffix || '';
+        const duration = 900;
+        const start = performance.now();
+        const step = (now) => {
+          const p = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(eased * target) + suffix;
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+        countIO.unobserve(el);
+      });
+    }, { threshold: 0.4 });
+    document.querySelectorAll('[data-count]').forEach(el => countIO.observe(el));
+
+    // ---------- ACTIVE NAV LINK ----------
+    const sections = ['about', 'writing', 'experience', 'contact']
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+    const navLinks = document.querySelectorAll('#navLinks a');
+    const navIO = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          const match = document.querySelector(`#navLinks a[href="#${e.target.id}"]`);
+          if (match) match.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    sections.forEach(s => navIO.observe(s));
+
+    // ---------- COPY EMAIL ----------
+    const emailBtn = document.getElementById('emailBtn');
+    const emailText = document.getElementById('emailText');
+    const emailIcon = document.getElementById('emailIcon');
+    const EMAIL = 'binhlt.work@gmail.com';
+    emailBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(EMAIL);
+        const original = emailText.textContent;
+        emailBtn.classList.add('copied');
+        emailText.textContent = 'Copied!';
+        emailIcon.textContent = '✓';
+        setTimeout(() => {
+          emailBtn.classList.remove('copied');
+          emailText.textContent = original;
+          emailIcon.textContent = '⎘';
+        }, 1600);
+      } catch (err) {
+        window.location.href = 'mailto:' + EMAIL;
+      }
+    });
   </script>
 </body>
 </html>
